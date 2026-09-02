@@ -1,0 +1,4 @@
+/* Tailwind first, then Mantine (layered) so Mantine's `@layer mantine`
+   takes precedence over Tailwind's preflight/base layers. */
+@import "tailwindcss";
+@import "@mantine/core/styles.layer.css";
