@@ -1,4 +1,4 @@
-import { useI18n } from '../../i18n/context.js'
+import { useI18n } from '../i18n/context.js'
 
 const LANGUAGES = [
   { code: 'es', label: 'ES' },

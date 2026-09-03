@@ -19,3 +19,7 @@
 
 - Ningún string visible para el usuario debe escribirse como literal en el código; usa siempre claves de traducción con `useI18n()`.
 - Añade cada clave a los locales de español e inglés en `src/i18n/locales/`.
+
+## Rutas (routing)
+
+- Las rutas de la aplicación deben definirse en inglés, independientemente del idioma que use el cliente (ejemplo: `/generator`, no `/generador`).
