@@ -1,1 +1,1 @@
-export const APP_NAME = 'Scanner VKFit'
+export const APP_NAME = 'Scan VKFit'

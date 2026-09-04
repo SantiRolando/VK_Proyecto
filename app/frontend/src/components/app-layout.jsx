@@ -1,6 +1,8 @@
 import { AppShell, Burger, Group, NavLink, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
+  IconArrowsRightLeft,
+  IconPackage,
   IconReportAnalytics,
   IconRuler,
   IconTicket,
@@ -17,6 +19,8 @@ import { LanguageSwitch } from './language-switch.jsx'
 
 const NAV_ITEMS = [
   { to: '/generator', key: 'nav.generator', icon: IconRuler },
+  { to: '/stock', key: 'nav.stock', icon: IconPackage },
+  { to: '/transactions', key: 'nav.transactions', icon: IconArrowsRightLeft },
   { to: '/reports', key: 'reports.title', icon: IconReportAnalytics },
   { to: '/users', key: 'nav.users', icon: IconUsers },
   { to: '/coupons', key: 'nav.coupons', icon: IconTicket },

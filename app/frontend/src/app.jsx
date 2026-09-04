@@ -28,6 +28,18 @@ const CouponsPage = lazy(() =>
   })),
 )
 
+const StockPage = lazy(() =>
+  import('./pages/stock/stock-page.jsx').then((module) => ({
+    default: module.StockPage,
+  })),
+)
+
+const TransactionsPage = lazy(() =>
+  import('./pages/transactions/transactions-page.jsx').then((module) => ({
+    default: module.TransactionsPage,
+  })),
+)
+
 function App() {
   return (
     <Suspense fallback={<RouteFallback />}>
@@ -36,6 +48,8 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/generator" element={<GeneratorPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/stock" element={<StockPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/coupons" element={<CouponsPage />} />
         </Route>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
+  Card,
   Collapse,
   Container,
   Paper,
@@ -111,9 +112,9 @@ export function GeneratorPage() {
           {t('generator.subtitle')}
         </Text>
 
-        <div className="mt-8">
+        <Card withBorder radius="md" padding="lg" className="mt-8">
           <SizingForm onResult={setResult} />
-        </div>
+        </Card>
 
         <Collapse expanded={Boolean(result)}>
           {result && (

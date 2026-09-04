@@ -5,17 +5,19 @@ import {
   Button,
   Group,
   Stack,
-  Table,
   Text,
   Title,
 } from '@mantine/core'
-import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconEye, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useI18n } from '../../i18n/context.js'
 import { mockCoupons } from '../../mocks/coupons.js'
+import { ResponsiveTable } from '../../components/responsive-table.jsx'
+import { ActionsMenu } from '../../components/actions-menu.jsx'
 import { GamificationSettings } from './gamification-settings.jsx'
 import { PointsHistory } from './points-history.jsx'
 import { CouponFormModal } from './coupon-form.jsx'
 import { DeleteCouponModal } from './delete-coupon-modal.jsx'
+import { CouponViewModal } from './coupon-view-modal.jsx'
 
 function formatCouponValue(coupon) {
   return coupon.type === 'percentage' ? `${coupon.value}%` : `$${coupon.value}`
@@ -27,6 +29,7 @@ export function CouponsPage() {
   const [formOpened, setFormOpened] = useState(false)
   const [editing, setEditing] = useState(null)
   const [deleting, setDeleting] = useState(null)
+  const [viewing, setViewing] = useState(null)
 
   const dateLocale = language === 'en' ? 'en-US' : 'es-AR'
 
@@ -45,6 +48,10 @@ export function CouponsPage() {
   const openEdit = (coupon) => {
     setEditing(coupon)
     setFormOpened(true)
+  }
+
+  const openView = (coupon) => {
+    setViewing(coupon)
   }
 
   const closeForm = () => {
@@ -77,57 +84,126 @@ export function CouponsPage() {
     setDeleting(null)
   }
 
-  const rows = coupons.map((coupon) => (
-    <Table.Tr key={coupon.id}>
-      <Table.Td>{coupon.code}</Table.Td>
-      <Table.Td>
-        <Badge
-          variant="light"
-          color={coupon.type === 'percentage' ? 'blue' : 'teal'}
-        >
-          {t(
-            coupon.type === 'percentage'
-              ? 'coupons.type.percentage'
-              : 'coupons.type.fixed',
-          )}
-        </Badge>
-      </Table.Td>
-      <Table.Td>{formatCouponValue(coupon)}</Table.Td>
-      <Table.Td>
-        {coupon.used}/{coupon.maxUses}
-      </Table.Td>
-      <Table.Td>
-        {formatDate(coupon.startDate)} – {formatDate(coupon.endDate)}
-      </Table.Td>
-      <Table.Td>
-        <Badge variant="light" color={coupon.active ? 'green' : 'gray'}>
-          {t(
-            coupon.active ? 'coupons.status.active' : 'coupons.status.inactive',
-          )}
-        </Badge>
-      </Table.Td>
-      <Table.Td>
-        <Group gap="xs" wrap="nowrap">
-          <ActionIcon
-            variant="subtle"
-            color="dark"
-            aria-label={t('coupons.edit')}
-            onClick={() => openEdit(coupon)}
-          >
-            <IconPencil size={16} />
-          </ActionIcon>
-          <ActionIcon
-            variant="subtle"
-            color="red"
-            aria-label={t('coupons.delete')}
-            onClick={() => setDeleting(coupon)}
-          >
-            <IconTrash size={16} />
-          </ActionIcon>
-        </Group>
-      </Table.Td>
-    </Table.Tr>
-  ))
+  const renderType = (coupon) => (
+    <Badge
+      variant="light"
+      color={coupon.type === 'percentage' ? 'blue' : 'teal'}
+    >
+      {t(
+        coupon.type === 'percentage'
+          ? 'coupons.type.percentage'
+          : 'coupons.type.fixed',
+      )}
+    </Badge>
+  )
+
+  const renderActive = (coupon) => (
+    <Badge variant="light" color={coupon.active ? 'green' : 'gray'}>
+      {t(coupon.active ? 'coupons.status.active' : 'coupons.status.inactive')}
+    </Badge>
+  )
+
+  const renderActions = (coupon) => (
+    <Group gap="xs" wrap="nowrap">
+      <ActionIcon
+        variant="subtle"
+        color="dark"
+        aria-label={t('coupons.view')}
+        onClick={() => openView(coupon)}
+      >
+        <IconEye size={16} />
+      </ActionIcon>
+      <ActionIcon
+        variant="subtle"
+        color="dark"
+        aria-label={t('coupons.edit')}
+        onClick={() => openEdit(coupon)}
+      >
+        <IconPencil size={16} />
+      </ActionIcon>
+      <ActionIcon
+        variant="subtle"
+        color="red"
+        aria-label={t('coupons.delete')}
+        onClick={() => setDeleting(coupon)}
+      >
+        <IconTrash size={16} />
+      </ActionIcon>
+    </Group>
+  )
+
+  const columns = [
+    {
+      key: 'code',
+      header: t('coupons.table.code'),
+      render: (coupon) => coupon.code,
+      hideInCard: true,
+    },
+    {
+      key: 'type',
+      header: t('coupons.table.type'),
+      render: renderType,
+    },
+    {
+      key: 'value',
+      header: t('coupons.table.value'),
+      render: (coupon) => formatCouponValue(coupon),
+    },
+    {
+      key: 'uses',
+      header: t('coupons.table.uses'),
+      render: (coupon) => `${coupon.used}/${coupon.maxUses}`,
+    },
+    {
+      key: 'validity',
+      header: t('coupons.table.validity'),
+      render: (coupon) =>
+        `${formatDate(coupon.startDate)} – ${formatDate(coupon.endDate)}`,
+    },
+    {
+      key: 'active',
+      header: t('coupons.table.active'),
+      render: renderActive,
+      hideInCard: true,
+    },
+    {
+      key: 'actions',
+      header: t('coupons.table.actions'),
+      render: renderActions,
+      hideInCard: true,
+    },
+  ]
+
+  const renderCardTitle = (coupon) => (
+    <Group justify="space-between" gap="xs" wrap="nowrap" align="flex-start">
+      <Text fw={600}>{coupon.code}</Text>
+      {renderActive(coupon)}
+    </Group>
+  )
+
+  const renderCardActions = (coupon) => (
+    <ActionsMenu
+      label={t('coupons.table.actions')}
+      actions={[
+        {
+          label: t('coupons.view'),
+          icon: <IconEye size={16} />,
+          onClick: () => openView(coupon),
+        },
+        {
+          label: t('coupons.edit'),
+          icon: <IconPencil size={16} />,
+          onClick: () => openEdit(coupon),
+        },
+        {
+          label: t('coupons.delete'),
+          icon: <IconTrash size={16} />,
+          color: 'red',
+          onClick: () => setDeleting(coupon),
+        },
+      ]}
+    />
+  )
 
   return (
     <Stack gap="xl">
@@ -158,27 +234,19 @@ export function CouponsPage() {
         {coupons.length === 0 ? (
           <Text c="dimmed">{t('coupons.empty')}</Text>
         ) : (
-          <Table.ScrollContainer minWidth={900}>
-            <Table
-              striped
-              highlightOnHover
-              verticalSpacing="sm"
-              horizontalSpacing="sm"
-            >
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('coupons.table.code')}</Table.Th>
-                  <Table.Th>{t('coupons.table.type')}</Table.Th>
-                  <Table.Th>{t('coupons.table.value')}</Table.Th>
-                  <Table.Th>{t('coupons.table.uses')}</Table.Th>
-                  <Table.Th>{t('coupons.table.validity')}</Table.Th>
-                  <Table.Th>{t('coupons.table.active')}</Table.Th>
-                  <Table.Th>{t('coupons.table.actions')}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
-          </Table.ScrollContainer>
+          <ResponsiveTable
+            data={coupons}
+            getKey={(coupon) => coupon.id}
+            columns={columns}
+            minWidth={900}
+            cardTitle={renderCardTitle}
+            cardActions={renderCardActions}
+            onCardClick={openView}
+            striped
+            highlightOnHover
+            verticalSpacing="sm"
+            horizontalSpacing="sm"
+          />
         )}
       </div>
 
@@ -194,6 +262,8 @@ export function CouponsPage() {
         onClose={() => setDeleting(null)}
         onConfirm={confirmDelete}
       />
+
+      <CouponViewModal coupon={viewing} onClose={() => setViewing(null)} />
     </Stack>
   )
 }

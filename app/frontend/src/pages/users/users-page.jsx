@@ -5,12 +5,12 @@ import {
   Button,
   Group,
   Progress,
-  Table,
   Text,
   TextInput,
   Title,
 } from '@mantine/core'
 import {
+  IconEye,
   IconPencil,
   IconPlus,
   IconSearch,
@@ -19,8 +19,11 @@ import {
 import { useI18n } from '../../i18n/context.js'
 import { mockUsers } from '../../mocks/users.js'
 import { getRoleColor, getRoleLabelKey } from '../../features/users/roles.js'
+import { ResponsiveTable } from '../../components/responsive-table.jsx'
+import { ActionsMenu } from '../../components/actions-menu.jsx'
 import { UserFormModal } from './user-form.jsx'
 import { DeleteUserModal } from './delete-user-modal.jsx'
+import { UserViewModal } from './user-view-modal.jsx'
 
 function getEffectivenessColor(ratio) {
   if (ratio >= 0.8) return 'green'
@@ -35,6 +38,7 @@ export function UsersPage() {
   const [formOpened, setFormOpened] = useState(false)
   const [editing, setEditing] = useState(null)
   const [deleting, setDeleting] = useState(null)
+  const [viewing, setViewing] = useState(null)
 
   const dateLocale = language === 'en' ? 'en-US' : 'es-AR'
 
@@ -67,6 +71,10 @@ export function UsersPage() {
   const openEdit = (user) => {
     setEditing(user)
     setFormOpened(true)
+  }
+
+  const openView = (user) => {
+    setViewing(user)
   }
 
   const closeForm = () => {
@@ -102,58 +110,141 @@ export function UsersPage() {
     setDeleting(null)
   }
 
-  const rows = filtered.map((user) => (
-    <Table.Tr key={user.id}>
-      <Table.Td>{user.name}</Table.Td>
-      <Table.Td>{user.email}</Table.Td>
-      <Table.Td>
-        <Badge variant="light" color={getRoleColor(user.role)}>
-          {t(getRoleLabelKey(user.role))}
-        </Badge>
-      </Table.Td>
-      <Table.Td>{user.generations}</Table.Td>
-      <Table.Td>{user.points}</Table.Td>
-      <Table.Td>{formatDate(user.lastGeneration)}</Table.Td>
-      <Table.Td>
-        {user.effectiveness == null ? (
-          <Text c="dimmed" size="sm">
-            —
-          </Text>
-        ) : (
-          <Group gap="xs" wrap="nowrap" align="center">
-            <Progress
-              value={user.effectiveness * 100}
-              color={getEffectivenessColor(user.effectiveness)}
-              size="sm"
-              w={64}
-              radius="xl"
-            />
-            <Text size="sm">{Math.round(user.effectiveness * 100)}%</Text>
-          </Group>
-        )}
-      </Table.Td>
-      <Table.Td>
-        <Group gap="xs" wrap="nowrap">
-          <ActionIcon
-            variant="subtle"
-            color="dark"
-            aria-label={t('users.edit')}
-            onClick={() => openEdit(user)}
-          >
-            <IconPencil size={16} />
-          </ActionIcon>
-          <ActionIcon
-            variant="subtle"
-            color="red"
-            aria-label={t('users.delete')}
-            onClick={() => setDeleting(user)}
-          >
-            <IconTrash size={16} />
-          </ActionIcon>
-        </Group>
-      </Table.Td>
-    </Table.Tr>
-  ))
+  const renderRole = (user) => (
+    <Badge variant="light" color={getRoleColor(user.role)}>
+      {t(getRoleLabelKey(user.role))}
+    </Badge>
+  )
+
+  const renderEffectiveness = (user) =>
+    user.effectiveness == null ? (
+      <Text c="dimmed" size="sm">
+        —
+      </Text>
+    ) : (
+      <Group gap="xs" wrap="nowrap" align="center">
+        <Progress
+          value={user.effectiveness * 100}
+          color={getEffectivenessColor(user.effectiveness)}
+          size="sm"
+          w={64}
+          radius="xl"
+        />
+        <Text size="sm">{Math.round(user.effectiveness * 100)}%</Text>
+      </Group>
+    )
+
+  const renderActions = (user) => (
+    <Group gap="xs" wrap="nowrap">
+      <ActionIcon
+        variant="subtle"
+        color="dark"
+        aria-label={t('users.view')}
+        onClick={() => openView(user)}
+      >
+        <IconEye size={16} />
+      </ActionIcon>
+      <ActionIcon
+        variant="subtle"
+        color="dark"
+        aria-label={t('users.edit')}
+        onClick={() => openEdit(user)}
+      >
+        <IconPencil size={16} />
+      </ActionIcon>
+      <ActionIcon
+        variant="subtle"
+        color="red"
+        aria-label={t('users.delete')}
+        onClick={() => setDeleting(user)}
+      >
+        <IconTrash size={16} />
+      </ActionIcon>
+    </Group>
+  )
+
+  const columns = [
+    {
+      key: 'name',
+      header: t('users.table.name'),
+      render: (user) => user.name,
+      hideInCard: true,
+    },
+    {
+      key: 'email',
+      header: t('users.table.email'),
+      render: (user) => user.email,
+      hideInCard: true,
+    },
+    {
+      key: 'role',
+      header: t('users.table.role'),
+      render: renderRole,
+      hideInCard: true,
+    },
+    {
+      key: 'generations',
+      header: t('users.table.generations'),
+      render: (user) => user.generations,
+    },
+    {
+      key: 'points',
+      header: t('users.table.points'),
+      render: (user) => user.points,
+    },
+    {
+      key: 'lastGeneration',
+      header: t('users.table.lastGeneration'),
+      render: (user) => formatDate(user.lastGeneration),
+    },
+    {
+      key: 'effectiveness',
+      header: t('users.table.effectiveness'),
+      render: renderEffectiveness,
+    },
+    {
+      key: 'actions',
+      header: t('users.table.actions'),
+      render: renderActions,
+      hideInCard: true,
+    },
+  ]
+
+  const renderCardTitle = (user) => (
+    <Group justify="space-between" gap="xs" wrap="nowrap" align="flex-start">
+      <div>
+        <Text fw={600}>{user.name}</Text>
+        <Text size="xs" c="dimmed">
+          {user.email}
+        </Text>
+      </div>
+      {renderRole(user)}
+    </Group>
+  )
+
+  const renderCardActions = (user) => (
+    <ActionsMenu
+      label={t('users.table.actions')}
+      actions={[
+        {
+          label: t('users.view'),
+          icon: <IconEye size={16} />,
+          onClick: () => openView(user),
+        },
+        {
+          label: t('users.edit'),
+          icon: <IconPencil size={16} />,
+          onClick: () => openEdit(user),
+        },
+        {
+          label: t('users.delete'),
+          icon: <IconTrash size={16} />,
+          color: 'red',
+          onClick: () => setDeleting(user),
+        },
+      ]}
+    />
+  )
 
   return (
     <div>
@@ -180,28 +271,19 @@ export function UsersPage() {
       {filtered.length === 0 ? (
         <Text c="dimmed">{t('users.empty')}</Text>
       ) : (
-        <Table.ScrollContainer minWidth={900}>
-          <Table
-            striped
-            highlightOnHover
-            verticalSpacing="sm"
-            horizontalSpacing="sm"
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>{t('users.table.name')}</Table.Th>
-                <Table.Th>{t('users.table.email')}</Table.Th>
-                <Table.Th>{t('users.table.role')}</Table.Th>
-                <Table.Th>{t('users.table.generations')}</Table.Th>
-                <Table.Th>{t('users.table.points')}</Table.Th>
-                <Table.Th>{t('users.table.lastGeneration')}</Table.Th>
-                <Table.Th>{t('users.table.effectiveness')}</Table.Th>
-                <Table.Th>{t('users.table.actions')}</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
+        <ResponsiveTable
+          data={filtered}
+          getKey={(user) => user.id}
+          columns={columns}
+          minWidth={900}
+          cardTitle={renderCardTitle}
+          cardActions={renderCardActions}
+          onCardClick={openView}
+          striped
+          highlightOnHover
+          verticalSpacing="sm"
+          horizontalSpacing="sm"
+        />
       )}
 
       <UserFormModal
@@ -216,6 +298,8 @@ export function UsersPage() {
         onClose={() => setDeleting(null)}
         onConfirm={confirmDelete}
       />
+
+      <UserViewModal user={viewing} onClose={() => setViewing(null)} />
     </div>
   )
 }

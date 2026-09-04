@@ -147,7 +147,7 @@ export function SizingForm({ onResult }) {
             {t('generator.form.requiredHint')}
           </Text>
 
-          <SimpleGrid cols={{ base: 2, sm: 3 }}>
+          <SimpleGrid cols={{ base: 2, sm: 3 }} className="items-end">
             {MEASUREMENT_FIELDS.map(({ field, key }) => (
               <NumberInput
                 key={field}
