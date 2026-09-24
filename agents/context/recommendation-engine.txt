@@ -1,0 +1,243 @@
+﻿# Scan VKFit — Motor de Recomendación de Talle
+
+
+**Documento técnico interno**
+Estado: Cerrado · Última actualización: 22/09/2026
+
+
+---
+
+
+## Tablas de referencia
+
+
+### Femenina — Endurance y Soft
+
+
+| Índice | Busto (cm) | Cintura (cm) | Talle Endurance | Talle Soft |
+|--------|------------|--------------|-----------------|------------|
+| 1 | 74.9 – 78.7 | 63.5 – 64.77 | XS | XXS |
+| 2 | 78.8 – 82.55 | 64.7 – 66.0 | S | XS |
+| 3 | 83.8 – 87.6 | 66.0 – 69.8 | M | S |
+| 4 | 88.9 – 92.71 | 71.12 – 74.93 | L | M |
+| 5 | 93.98 – 99.06 | 76.2 – 80.01 | XL | L |
+| 6 | 99.06 – 104.14 | 81.28 – 85.09 | 2XL | XL |
+| 7 | 104.14 – 107.95 | 83.8 – 88.9 | 3XL | XXL |
+
+
+> **Nota de implementación:** Endurance y Soft comparten los mismos rangos de medidas. La diferencia entre líneas es solo de etiqueta: el índice 1 es XS en Endurance y XXS en Soft, y así sucesivamente. El desplazamiento es siempre de un lugar hacia abajo en Soft (tejido más elástico).
+
+
+### Masculina adulta — Jammer y Sunga
+
+
+| Índice | Cintura (cm) | Cadera (cm) | Talle VK |
+|--------|--------------|-------------|----------|
+| 1 | 75 – 80 | 80 – 85 | XS |
+| 2 | 80 – 85 | 85 – 90 | S |
+| 3 | 85 – 90 | 90 – 95 | M |
+| 4 | 90 – 95 | 95 – 100 | L |
+| 5 | 95 – 100 | 100 – 105 | XL |
+| 6 | 100 – 105 | 105 – 110 | XXL |
+
+
+> **Nota:** Jammer y Sunga comparten la misma tabla y las mismas etiquetas.
+
+
+### Infantil varones — Jammer y Sunga
+
+
+| Talle VK | Edad orientativa | Cintura (cm) | Cadera (cm) |
+|----------|-----------------|--------------|-------------|
+| 8 | 8 – 9 años | 59 | 70 |
+| 10 | 10 – 11 años | 63 | 75 |
+| 12 | 12 – 13 años | 67 | 80 |
+
+
+> **Nota:** Según la propia tabla oficial, *"las edades son orientativas. Para elegir el talle, priorizar las medidas corporales de cintura y cadera."* La edad se usa como referencia de contexto y como señal de alerta para detectar cruces niño/adulto, pero no como variable de selección directa.
+
+
+### Infantil niñas — Endurance
+
+
+| Talle VK | Edad |
+|----------|------|
+| S | 5 – 6 años |
+| M | 7 – 8 años |
+| L | 9 – 10 años |
+| XL | 11 – 12 años |
+
+
+> **⚠️ Pendiente de aclaración:** Esta tabla mapea por edad únicamente, sin medidas corporales. Queda pendiente confirmar con Vikinga si se mantiene así o si se incorporan medidas como en la tabla de varones. Por ahora se implementa por edad, con derivación a atención personalizada si hay signos de proporción atípica.
+
+
+---
+
+
+## Algoritmo de recomendación
+
+
+### Paso 1 — Selección de tabla según línea
+
+
+| Línea seleccionada | Variables activas | Tabla a usar |
+|--------------------|------------------|--------------|
+| Endurance | Busto + Cintura | Femenina |
+| Soft | Busto + Cintura | Femenina (etiquetas Soft) |
+| Jammer (adulto) | Cintura + Cadera | Masculina adulta |
+| Sunga (adulto) | Cintura + Cadera | Masculina adulta |
+| Jammer / Sunga infantil | Cintura + Cadera (+ edad orientativa) | Infantil varones |
+| Endurance infantil | Edad | Infantil niñas |
+
+
+> **Nota:** Pecho y busto son el mismo dato (perímetro de pecho). El campo en la UI puede llamarse "busto" o "pecho" de forma indistinta según el contexto; internamente es una sola variable.
+
+
+---
+
+
+### Paso 2 — Obtener índice de fila para cada contorno
+
+
+Para cada una de las dos variables de la tabla elegida, se determina el índice de fila de la siguiente manera:
+
+
+- **Dentro de un rango:** el índice de esa fila.
+- **En superposición entre dos rangos:** el índice más alto (criterio de seguridad, consistente con la regla de desempate general).
+- **En un hueco entre filas:** la fila del rango inmediatamente superior (Opción B, confirmada por Vikinga).
+- **Por debajo de la tabla:** sin índice válido → derivar a atención personalizada.
+- **Por encima de la tabla:** sin índice válido → derivar a atención personalizada.
+
+
+---
+
+
+### Paso 3 — Calcular diferencia
+
+
+```
+diferencia = |índice_variable_A − índice_variable_B|
+```
+
+
+---
+
+
+### Paso 4 — Validación de proporciones (torso y cruce niño/adulto)
+
+
+Antes de resolver el resultado final, se aplican dos validaciones independientes:
+
+
+**4a. Cruce niño/adulto**
+Si la línea seleccionada es infantil pero las medidas ingresadas corresponden a rangos de la tabla adulta (o viceversa), el sistema no recomienda y deriva a atención personalizada. Los rangos de cintura no se superponen entre tablas (infantil: 59–67 cm; adulta: 75–105 cm), por lo que en la mayoría de los casos esto se detecta automáticamente. Casos ambiguos (medidas en zona de transición) también derivan.
+
+
+**4b. Longitud de cuerpo (torso)**
+Si el torso ingresado es corto en relación al talle que resultaría del cálculo, el sistema agrega una advertencia de tiro: la prenda podría quedar corta aunque el contorno cierre bien. Esta advertencia no bloquea la recomendación; se superpone al resultado como una nota visible. Los umbrales de torso por talle quedan a definir con Vikinga en la siguiente etapa de especificación.
+
+
+---
+
+
+### Paso 5 — Resolver resultado
+
+
+| Diferencia | Resultado |
+|------------|-----------|
+| 0 o 1 | **Recomendación directa.** Talle = índice más alto entre A y B. |
+| 2 | **Recomendación con advertencia.** Talle = índice más alto entre A y B. Se agrega aviso de ajuste: "puede que necesites probar el talle adyacente". |
+| 3 o más | **Sin recomendación.** Derivar a atención personalizada con el mensaje acordado y botón "Contactar con VK". |
+
+
+---
+
+
+### Paso 6 — Traducir índice a etiqueta
+
+
+| Índice | Endurance | Soft | Jammer adulto | Sunga adulto |
+|--------|-----------|------|---------------|--------------|
+| 1 | XS | XXS | XS | XS |
+| 2 | S | XS | S | S |
+| 3 | M | S | M | M |
+| 4 | L | M | L | L |
+| 5 | XL | L | XL | XL |
+| 6 | 2XL | XL | XXL | XXL |
+| 7 | 3XL | XXL | — | — |
+
+
+---
+
+
+## Casos de prueba
+
+
+Los siguientes casos ilustran el comportamiento esperado del sistema y sirven como base para testing.
+
+
+### Caso 1 — Recomendación directa (Endurance)
+**Entrada:** Busto 85 cm, Cintura 67 cm
+**Cálculo:** Busto → índice 3 (M), Cintura → índice 3 (M). Diferencia = 0.
+**Resultado:** ✅ Recomendación directa → **Talle M Endurance**
+
+
+### Caso 2 — Recomendación con advertencia (Endurance)
+**Entrada:** Busto 85 cm, Cintura 74 cm
+**Cálculo:** Busto → índice 3 (M), Cintura → índice 4 (L). Diferencia = 1.
+**Resultado:** ✅ Recomendación directa (diferencia ≤ 1) → **Talle L Endurance** *(se toma el más alto)*
+
+
+### Caso 3 — Recomendación con advertencia por diferencia (Endurance)
+**Entrada:** Busto 79 cm, Cintura 72 cm
+**Cálculo:** Busto → índice 2 (S), Cintura → índice 4 (L). Diferencia = 2.
+**Resultado:** ⚠️ Recomendación con advertencia → **Talle L Endurance** + aviso de ajuste
+
+
+### Caso 4 — Sin recomendación por diferencia alta (Jammer adulto)
+**Entrada:** Cintura 76 cm, Cadera 100 cm
+**Cálculo:** Cintura → índice 1 (XS), Cadera → índice 5 (XL). Diferencia = 4.
+**Resultado:** ❌ Derivar a atención personalizada
+
+
+### Caso 5 — Medida en hueco (Endurance)
+**Entrada:** Busto 83.0 cm, Cintura 67 cm
+**Cálculo:** Busto 83.0 está entre índice 2 (termina en 82.55) e índice 3 (arranca en 83.8) → se asigna índice 3. Cintura → índice 3. Diferencia = 0.
+**Resultado:** ✅ Recomendación directa → **Talle M Endurance**
+
+
+### Caso 6 — Mismo caso en Soft
+**Entrada:** igual al Caso 1
+**Cálculo:** mismo índice 3.
+**Resultado:** ✅ Recomendación directa → **Talle S Soft** *(índice 3 en nomenclatura Soft)*
+
+
+### Caso 7 — Medida fuera de tabla por arriba (Jammer adulto)
+**Entrada:** Cintura 110 cm, Cadera 115 cm
+**Cálculo:** Ambas medidas superan el máximo de la tabla (105 y 110 respectivamente).
+**Resultado:** ❌ Derivar a atención personalizada
+
+
+### Caso 8 — Recomendación infantil varones sin alerta
+**Entrada:** Línea infantil, Cintura 63 cm, Cadera 75 cm, Edad 10 años
+**Cálculo:** Ambas medidas coinciden con Talle 10.
+**Resultado:** ✅ Recomendación directa → **Talle 10**
+
+
+### Caso 9 — Cruce niño/adulto
+**Entrada:** Línea infantil, Cintura 80 cm, Cadera 95 cm, Edad 10 años
+**Cálculo:** Ambas medidas corresponden a la tabla masculina adulta (índice 2–3), fuera del rango de la tabla infantil.
+**Resultado:** ❌ Derivar a atención personalizada
+
+
+---
+
+
+## Puntos pendientes de especificación
+
+
+| Tema | Estado |
+|------|--------|
+| Umbrales de torso por talle (para advertencia de tiro) | Pendiente — definir con Vikinga |
+| Tabla infantil niñas: ¿solo edad o también medidas? | Pendiente de confirmación |
+| Tabla infantil niñas Soft | No existe actualmente |

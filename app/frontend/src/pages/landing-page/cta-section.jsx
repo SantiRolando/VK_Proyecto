@@ -22,7 +22,7 @@ export function CtaSection() {
           color="white"
           size="lg"
           leftSection={<IconPlayerPlay size={18} />}
-          onClick={() => navigate('/generator')}
+          onClick={() => navigate('/fit')}
         >
           {t('cta.guest')}
         </Button>

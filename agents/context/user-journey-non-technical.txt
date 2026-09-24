@@ -1,0 +1,79 @@
+﻿Scan VKFit: Recorrido de la experiencia
+Documento de alcance funcional para validación con el cliente
+Qué es Scan VKFit
+Scan VKFit es una aplicación web pensada para usarse desde el celular, sin necesidad de descargar nada desde una tienda de aplicaciones. Nace para resolver un problema concreto de la venta de indumentaria de natación: la persona quiere comprar, pero no sabe qué talle pedir, y la tabla de medidas tradicional no termina de despejar la duda. El resultado conocido es que la compra se posterga, o se concreta y después vuelve como cambio.
+La aplicación reemplaza esa tabla estática por una recomendación concreta. La persona ingresa cinco medidas de su cuerpo y el sistema le devuelve un talle sugerido para la línea de prenda que le interesa, ya sea Endurance, Soft, Jammer, Sunga o Infantil. A partir de ahí puede ver qué productos existen efectivamente disponibles en ese talle y coordinar la compra con Vikinga.
+Del otro lado del mostrador, la aplicación le da a Vikinga un panel de administración donde se controla el inventario, se gestionan las ventas en curso y se observan datos que hoy no se están capturando: cuántas personas consultaron su talle y no compraron, qué talles se recomendaron cuando no había stock, y qué tan bien está funcionando la recomendación según lo que reportan los propios clientes.
+Parte I: El recorrido del cliente
+Cómo llega una persona a la aplicación
+Hay varias puertas de entrada y todas desembocan en el mismo lugar. La persona puede entrar directamente a la aplicación, donde lo primero que encuentra es una pantalla que le ofrece tres caminos claros: iniciar sesión, crear una cuenta, o simplemente probar el sistema sin registrarse.
+También existe una página informativa que explica de qué se trata VKFit y por qué conviene usarlo. Es la página pensada para quien todavía no entiende la propuesta, y sirve como destino para campañas o para códigos QR generales de la marca.
+El caso más interesante es el del QR puesto sobre un producto o una acción publicitaria puntual. Si Vikinga imprime un código asociado, por ejemplo, a la línea Endurance, la persona que lo escanea no aterriza en una pantalla genérica: llega directamente a la pantalla de medición con esa línea ya seleccionada. Se ahorra un paso y, sobre todo, se ahorra la posibilidad de confundirse de línea.
+Probar sin compromiso
+La decisión de diseño más importante del recorrido es que no hace falta registrarse para obtener un talle. Cualquier persona puede ingresar sus cinco medidas: altura, busto, cintura, cadera y torso; Para posteriormente recibir su recomendación de inmediato, sin dejar un mail, sin crear una contraseña, sin ninguna fricción previa.
+Esto responde a una lógica simple: el valor de la aplicación se entiende recién cuando la persona ve su talle en pantalla. Pedirle datos antes de haberle demostrado nada es la forma más eficaz de perderla.
+Una vez que obtuvo su talle, en cambio, el sistema sí la invita activamente a crear una cuenta, y lo hace mostrándole qué gana con eso: poder guardar sus medidas para no volver a cargarlas, ver el stock real disponible en su talle, y acumular puntos que se transforman en cupones de descuento.
+Si acepta, nada de lo que hizo se pierde. Las medidas que cargó como invitada y el talle que obtuvo se trasladan automáticamente a su cuenta nueva. No tiene que volver a empezar.
+Dónde termina el modo invitado
+El modo invitado permite obtener el talle y explorar el catálogo, pero coordinar una compra requiere tener una cuenta. La razón es operativa: para coordinar una venta Vikinga necesita saber con quién está hablando y por dónde contactarlo.
+Cuando una persona en modo invitado intenta avanzar hacia la compra, el sistema la lleva a la pantalla de registro. Esa pantalla también ofrece la alternativa de iniciar sesión, para quien ya tenía cuenta y simplemente no la había abierto en ese momento.
+La cuenta y el perfil
+Crear una cuenta implica dejar algunos datos demográficos y, de manera obligatoria, un número de teléfono con WhatsApp. Ese número es la vía por la cual Vikinga va a coordinar la entrega.
+El ingreso a la aplicación es el mismo formulario tanto para clientes como para el personal de Vikinga; el sistema reconoce internamente de quién se trata. Además de la contraseña habitual, se contempla la recuperación de credenciales y el ingreso mediante un código de un solo uso, pensado para quien no recuerda su clave y no quiere detenerse a resetearla.
+Ya con la cuenta creada, la persona puede guardar varios perfiles de medidas con nombre propio. Este punto merece atención porque cambia el uso real de la aplicación: una madre puede tener guardado su propio perfil y el de su hijo, y alternar entre ellos con un selector siempre visible. Lo mismo aplica para alguien que quiera distinguir entre un calce de entrenamiento y uno de competencia. Cada perfil guarda sus medidas y su historial por separado.
+También puede guardar varias direcciones de envío, para no tener que escribirlas cada vez.
+Ver qué hay disponible
+Acá está la diferencia central con una tienda tradicional. El catálogo no muestra todo el surtido: muestra lo que existe efectivamente disponible en el talle recomendado para esa persona. Los productos agotados en ese talle no aparecen.
+La intención es evitar la frustración clásica de interesarse por una prenda y descubrir recién al final que no está en el talle que se necesita.
+Qué puede devolver el sistema
+Al procesar las medidas, el sistema genera un talle sugerido basado en la tabla técnica de la línea seleccionada. En la mayoría de los casos, la persona recibe un talle directo (por ejemplo, "Talle M" o "Talle 42").
+Sin embargo, cuando alguna de las dimensiones ingresadas difiere significativamente de la proporción estándar de la prenda, el sistema advierte esta situación e indica cuál es el talle más adecuado según la medida crítica, recomendando el calce según la preferencia de uso.
+Cuando no hay stock en el talle recomendado
+Este caso se resuelve de manera explícita y no se esconde. Si el talle sugerido no tiene unidades disponibles en ningún color de la línea consultada, el sistema lo dice con claridad en lugar de mostrar una pantalla vacía.
+Y ofrece dos salidas. La primera es suscribirse a un aviso de reposición, para que la persona sepa cuándo vuelve a haber stock. La segunda es ver los talles inmediatamente adyacentes, uno arriba y uno abajo, siempre aclarando que no son el talle recomendado y que el calce puede no ser el óptimo. La decisión queda del lado de la persona, con la información sobre la mesa.
+Del lado de Vikinga, cada vez que esto ocurre queda registrado. Esa información alimenta el reporte de demanda no satisfecha que se describe más adelante.
+Coordinar la compra
+Elegido el producto, el color y el talle, la persona define cómo quiere recibirlo: retiro en el local o envío a domicilio, seleccionando en ese caso una de sus direcciones guardadas.
+El último paso es elegir por qué canal quiere coordinar la venta: mail o WhatsApp. Por defecto se propone el mail, pero la persona puede optar por WhatsApp, que para muchos va a ser el canal más natural.
+Sea cual sea el canal elegido, el sistema arma solo el mensaje, ya cargado con el detalle del producto, el talle, el color, el método de entrega elegido y los datos de contacto. La persona no tiene que redactar nada ni acordarse de qué información incluir: simplemente confirma y el mensaje sale hacia Vikinga.
+En ese momento el pedido queda registrado como una venta en curso, en estado "pendiente de coordinación", y el sistema reserva preventivamente la unidad para que no se la lleve otro cliente mientras se termina de acordar la entrega.
+Una aclaración de alcance para esta primera versión: la coordinación se completa por el mismo canal por el que se inició. Una venta que arrancó por WhatsApp se cierra por WhatsApp. No está contemplado que cambie de canal a mitad de camino.
+Después de la compra: el feedback y los puntos
+El sistema le pregunta a la persona cómo le quedó la prenda: chica, correcta o grande. Y acá hay una decisión deliberada que conviene remarcar: esa pregunta no está atada a haber comprado. Cualquiera que haya obtenido un talle puede reportar cómo le calzó, incluso si compró la prenda en el local físico, o si se probó una que ya tenía en casa.
+El motivo es que la calidad del dato importa más que su vínculo con una venta. Si solo se preguntara a quienes compraron, se perdería justamente el feedback de quienes no compraron porque la recomendación no les convenció.
+En cualquiera de las tres respuestas, la persona puede además dejar un comentario libre contando su experiencia. Ese campo es opcional pero termina siendo la fuente más rica de información para ajustar el sistema.
+Cada feedback enviado participa de un esquema de recompensas: se ejecuta un cálculo que puede otorgar puntos acumulables, y esos puntos se canjean por cupones de descuento, ya sea un porcentaje o un monto fijo. La lógica es que el cliente reciba algo concreto a cambio de una información que a Vikinga le sirve mucho.
+La persona también tiene acceso al historial completo de todas las recomendaciones que fue obteniendo a lo largo del tiempo.
+Parte II: El recorrido del administrador
+Lo primero que ve al entrar
+El panel abre con una pantalla de control que responde cuatro preguntas de negocio.
+Cuánto de la consulta se convierte en venta. La relación entre cuántas recomendaciones de talle se generaron y cuántas terminaron en una compra coordinada. Es el indicador que dice si la aplicación está cumpliendo su función comercial.
+Qué tan bien está recomendando el sistema. El porcentaje de personas que reportaron que el talle les quedó correcto. Este número se muestra separando a quienes compraron de quienes solo consultaron, porque son poblaciones distintas y mezclarlas distorsiona la lectura.
+Qué está por faltar. Los productos cuyo stock disponible cayó por debajo del mínimo definido, para poder reponer antes de quedarse sin.
+Qué ventas están en el aire. El listado de las coordinaciones abiertas, con el detalle de cómo se entrega cada una, el teléfono del cliente y (dato clave para no perder el hilo) por qué canal se está llevando adelante esa conversación, mail o WhatsApp.
+Manejar las ventas en curso
+Cuando un cliente dispara una coordinación, la unidad correspondiente queda reservada de inmediato. Esto evita el problema de comprometer verbalmente una prenda que en el ínterin se vendió en el local.
+A partir de ahí la venta atraviesa una secuencia de estados que el administrador va marcando:
+Pendiente de coordinación. El cliente confirmó su intención de compra y el mensaje llegó, pero todavía nadie de Vikinga lo respondió. El stock ya está reservado.
+Contactado. Alguien de Vikinga ya se comunicó y la conversación está en marcha.
+Confirmada. La venta se cerró. Recién en este momento la unidad se descuenta definitivamente del inventario físico.
+Cancelada. No prosperó, por el motivo que sea. La reserva se libera al instante y la unidad vuelve a estar disponible para el resto de los clientes.
+El administrador puede cancelar en cualquier momento previo a la confirmación.
+Controlar el inventario
+El stock se maneja con una unidad mínima que combina producto, color y talle. No se cuenta "cuántas mallas Endurance hay", sino cuántas hay de ese modelo en ese color y ese talle específico. Es la única granularidad que permite que el filtrado del catálogo del lado del cliente sea confiable.
+Todo movimiento manual de inventario exige elegir un motivo de una lista predefinida: ingreso de mercadería, cambio por talle, pérdida o producto defectuoso, o ajuste manual. Esto construye una trazabilidad: dentro de unos meses es posible saber no solo que el stock cambió, sino por qué cambió. Sin esta obligación, los descuadres se vuelven imposibles de explicar.
+Los datos que hoy no se están viendo
+Esta es la parte del panel que aporta información que actualmente no existe en ningún lado.
+El mapa de talles faltantes. Un reporte que consolida cuántas veces el sistema recomendó un talle o un color que tenía stock en cero. Dicho de otro modo: es la lista de ventas que se perdieron por no tener la mercadería adecuada. Es una guía directa para decidir qué reponer y en qué cantidad, basada en demanda real y no en intuición.
+Los comentarios de los clientes. Una sección dedicada a leer los textos libres que dejaron las personas al evaluar el calce. Más allá del valor cualitativo, sirve para detectar desvíos sistemáticos: si varias personas de contexturas parecidas reportan que el talle les quedó chico, hay un ajuste para hacer en la matriz de medidas.
+Exportación. Todos los reportes de esta sección se pueden bajar en Excel y CSV, para trabajarlos con las herramientas que Vikinga ya use.
+Configurar las reglas del juego
+El esquema de recompensas no está cableado en el código: se configura desde el panel. El administrador define cuántos puntos cuesta canjear cada tipo de cupón, con qué probabilidad se otorgan puntos al enviar feedback, cuántos puntos se dan, y qué límite diario existe para evitar que alguien abuse del mecanismo enviando feedback en masa.
+Esto permite ajustar la generosidad del sistema con el tiempo, según cómo responda la gente, sin depender de una nueva versión de la aplicación.
+Usar la herramienta en el local
+Existe un modo pensado para el mostrador físico. Al activar el switch "para terceros", el personal de Vikinga puede generar recomendaciones de talle para un cliente presente en el local usando su propio acceso, sin que esas consultas contaminen sus métricas personales ni el historial de su perfil.
+Si se quiere, esa consulta puede vincularse manualmente a un cliente registrado. De esta forma la herramienta sirve tanto en el canal digital como en la atención presencial, y los datos que genera el local también alimentan la analítica general.
+Cómo se conectan los dos recorridos
+Vale la pena cerrar señalando que los dos recorridos no son independientes: cada acción del cliente alimenta información del lado del administrador, y cada decisión del administrador se refleja en lo que ve el cliente.
+Cuando alguien consulta su talle, se suma una generación al indicador de conversión. Cuando el talle recomendado no tiene stock, se anota en el mapa de talles faltantes. Cuando coordina una compra, aparece en el listado de ventas en el aire y la unidad se reserva. Cuando el administrador confirma o cancela, el inventario se actualiza y el catálogo que ven los demás clientes cambia en consecuencia. Y cuando alguien reporta cómo le quedó la prenda, ese dato entra al indicador de precisión y al análisis de comentarios que eventualmente corrige las recomendaciones futuras.
+Ese circuito cerrado es la propuesta de fondo de Scan VKFit: que cada consulta, compre o no compre, deje a Vikinga mejor informada que antes.
