@@ -14,6 +14,13 @@ function withQuery(path, query) {
   return queryString ? `${path}?${queryString}` : path
 }
 
+// Valida un `returnTo` recibido por query: solo rutas internas de la app.
+export function safeReturnTo(returnTo) {
+  if (typeof returnTo !== 'string') return null
+  if (!returnTo.startsWith('/') || returnTo.startsWith('//')) return null
+  return returnTo
+}
+
 export const routes = {
   home: '/',
   about: '/about',
@@ -28,9 +35,9 @@ export const routes = {
   fitResult: (generationId) => `/fit/result/${generationId}`,
 
   catalog: (query) => withQuery('/catalog', query),
-  product: (productId) => `/catalog/${productId}`,
+  product: (productId, query) => withQuery(`/catalog/${productId}`, query),
 
-  checkout: '/checkout',
+  checkout: (query) => withQuery('/checkout', query),
   checkoutConfirmation: (saleId) => `/checkout/confirmation/${saleId}`,
 
   accountProfiles: '/account/profiles',

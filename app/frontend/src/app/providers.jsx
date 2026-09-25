@@ -2,17 +2,12 @@
 // sesión y perfil activo. El router y Lenis viven en `main.jsx`.
 
 import { MantineProvider } from '@mantine/core'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { I18nProvider } from '../i18n/i18n-provider.jsx'
 import { AuthProvider } from '../features/auth/auth-provider.jsx'
 import { ActiveProfileProvider } from '../features/account/active-profile-provider.jsx'
 import { theme } from '../theme/theme.js'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, staleTime: 30_000, refetchOnWindowFocus: false },
-  },
-})
+import { queryClient } from './query-client.js'
 
 export function Providers({ children }) {
   return (

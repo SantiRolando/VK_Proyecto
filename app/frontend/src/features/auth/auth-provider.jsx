@@ -91,8 +91,11 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      // Adopta una sesión obtenida por otra vía (p. ej. OTP) sin pasar por
+      // login/register.
+      adoptSession: applySession,
     }),
-    [state, login, register, logout],
+    [state, login, register, logout, applySession],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

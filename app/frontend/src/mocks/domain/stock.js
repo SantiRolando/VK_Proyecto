@@ -29,6 +29,17 @@ export function hasAvailableStock(db, variantId) {
   return availableQuantity(db, variantId) > 0
 }
 
+// ¿Hay alguna variante activa de ese talle con stock disponible?
+// Base de `SIZE_GENERATION.stockAvailableAtQuery`.
+export function hasStockForSize(db, sizeId) {
+  return db.productVariants.some(
+    (variant) =>
+      variant.active &&
+      variant.sizeId === sizeId &&
+      availableQuantity(db, variant.id) > 0,
+  )
+}
+
 // Stock crítico: variante activa con disponible por debajo del mínimo.
 export function isCriticalStock(db, variant) {
   if (!variant.active) return false

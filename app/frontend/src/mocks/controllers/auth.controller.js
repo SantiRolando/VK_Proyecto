@@ -9,6 +9,7 @@
 import { ApiError } from '../../api/client/api-error.js'
 import { getDb, mutate, nextId } from '../db/database.js'
 import { register } from '../router/mock-router.js'
+import { requireFields } from './controller-utils.js'
 
 const MOCK_OTP_CODE = '123456'
 
@@ -28,15 +29,6 @@ export function issueToken(userId) {
 function findUserByEmail(db, email) {
   const normalized = String(email ?? '').trim().toLowerCase()
   return db.users.find((user) => user.email.toLowerCase() === normalized) ?? null
-}
-
-function requireFields(body, fields) {
-  const missing = fields.filter(
-    (field) => body[field] === undefined || body[field] === null || body[field] === '',
-  )
-  if (missing.length > 0) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: missing })
-  }
 }
 
 function migrateGuest(db, guestSessionId, userId, profileName) {

@@ -10,6 +10,79 @@ import { AdminLayout } from '../components/layout/admin-layout.jsx'
 import { RouteFallback } from '../components/route-fallback.jsx'
 import { StubPage } from '../components/stub-page.jsx'
 import { LandingPage } from '../pages/landing-page/landing-page.jsx'
+import { HomePage } from '../features/home/home-page.jsx'
+
+const FitPage = lazy(() =>
+  import('../features/fit/fit-page.jsx').then((module) => ({
+    default: module.FitPage,
+  })),
+)
+
+const ResultPage = lazy(() =>
+  import('../features/fit/result-page.jsx').then((module) => ({
+    default: module.ResultPage,
+  })),
+)
+
+const LoginPage = lazy(() =>
+  import('../features/auth/login-page.jsx').then((module) => ({
+    default: module.LoginPage,
+  })),
+)
+
+const RegisterPage = lazy(() =>
+  import('../features/auth/register-page.jsx').then((module) => ({
+    default: module.RegisterPage,
+  })),
+)
+
+const OtpPage = lazy(() =>
+  import('../features/auth/otp-page.jsx').then((module) => ({
+    default: module.OtpPage,
+  })),
+)
+
+const ForgotPasswordPage = lazy(() =>
+  import('../features/auth/forgot-password-page.jsx').then((module) => ({
+    default: module.ForgotPasswordPage,
+  })),
+)
+
+const ResetPasswordPage = lazy(() =>
+  import('../features/auth/reset-password-page.jsx').then((module) => ({
+    default: module.ResetPasswordPage,
+  })),
+)
+
+const CatalogPage = lazy(() =>
+  import('../features/catalog/catalog-page.jsx').then((module) => ({
+    default: module.CatalogPage,
+  })),
+)
+
+const ProductDetailPage = lazy(() =>
+  import('../features/catalog/product-detail.jsx').then((module) => ({
+    default: module.ProductDetailPage,
+  })),
+)
+
+const AlertsPage = lazy(() =>
+  import('../features/account/alerts-page.jsx').then((module) => ({
+    default: module.AlertsPage,
+  })),
+)
+
+const CheckoutPage = lazy(() =>
+  import('../features/checkout/checkout-page.jsx').then((module) => ({
+    default: module.CheckoutPage,
+  })),
+)
+
+const ConfirmationPage = lazy(() =>
+  import('../features/checkout/confirmation-page.jsx').then((module) => ({
+    default: module.ConfirmationPage,
+  })),
+)
 
 // La página /dev solo existe en modo mock; en el build http la rama es
 // constante false y la página (y su chunk) se eliminan del bundle.
@@ -30,7 +103,7 @@ export function AppRouter() {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         {/* Público */}
-        <Route path={routes.home} element={<LandingPage />} />
+        <Route path={routes.home} element={<HomePage />} />
         <Route path={routes.about} element={<LandingPage />} />
 
         {/* Autenticación (solo sin sesión) */}
@@ -41,42 +114,24 @@ export function AppRouter() {
             </GuestOnly>
           }
         >
-          <Route
-            path={routes.login}
-            element={<StubPage titleKey="auth.login.title" />}
-          />
-          <Route
-            path={routes.loginOtp}
-            element={<StubPage titleKey="auth.otp.title" />}
-          />
-          <Route
-            path={routes.forgotPassword}
-            element={<StubPage titleKey="auth.forgot.title" />}
-          />
-          <Route
-            path={routes.resetPassword}
-            element={<StubPage titleKey="auth.reset.title" />}
-          />
-          <Route
-            path={routes.register}
-            element={<StubPage titleKey="auth.register.title" />}
-          />
+          <Route path={routes.login} element={<LoginPage />} />
+          <Route path={routes.loginOtp} element={<OtpPage />} />
+          <Route path={routes.forgotPassword} element={<ForgotPasswordPage />} />
+          <Route path={routes.resetPassword} element={<ResetPasswordPage />} />
+          <Route path={routes.register} element={<RegisterPage />} />
         </Route>
 
         {/* Cliente: invitado o logueado */}
         <Route element={<CustomerLayout />}>
-          <Route path={routes.fit()} element={<StubPage titleKey="fit.title" />} />
+          <Route path={routes.fit()} element={<FitPage />} />
           <Route
             path={routes.fitResult(':generationId')}
-            element={<StubPage titleKey="fit.result.title" />}
+            element={<ResultPage />}
           />
-          <Route
-            path={routes.catalog()}
-            element={<StubPage titleKey="catalog.title" />}
-          />
+          <Route path={routes.catalog()} element={<CatalogPage />} />
           <Route
             path={routes.product(':productId')}
-            element={<StubPage titleKey="catalog.detail.title" />}
+            element={<ProductDetailPage />}
           />
         </Route>
 
@@ -88,13 +143,10 @@ export function AppRouter() {
             </RequireAuth>
           }
         >
-          <Route
-            path={routes.checkout}
-            element={<StubPage titleKey="checkout.title" />}
-          />
+          <Route path={routes.checkout()} element={<CheckoutPage />} />
           <Route
             path={routes.checkoutConfirmation(':saleId')}
-            element={<StubPage titleKey="checkout.confirmation.title" />}
+            element={<ConfirmationPage />}
           />
           <Route
             path={routes.accountProfiles}
@@ -114,7 +166,7 @@ export function AppRouter() {
           />
           <Route
             path={routes.accountAlerts}
-            element={<StubPage titleKey="account.alerts.title" />}
+            element={<AlertsPage />}
           />
           <Route
             path={routes.accountRewards}

@@ -1,0 +1,49 @@
+// Controller de cupones (T058): valida el cupón que el cliente escribe en el
+// checkout contra las líneas elegidas. El canje por puntos llega en US6.
+
+import { ApiError } from '../../api/client/api-error.js'
+import { getDb } from '../db/database.js'
+import {
+  assertCouponUsable,
+  computeDiscount,
+  findCouponByCode,
+} from '../domain/coupons.js'
+import { round2 } from '../domain/money.js'
+import { resolveSaleLines, subtotalOf } from '../domain/sales.js'
+import { register } from '../router/mock-router.js'
+import { requireFields } from './controller-utils.js'
+
+register('POST', '/coupons/validate', (req) => {
+  const { code, items } = req.body
+  requireFields(req.body, ['code'])
+
+  const db = getDb()
+  const coupon = findCouponByCode(db, code)
+  if (!coupon) throw new ApiError(422, 'COUPON_INVALID', { reason: 'notFound' })
+  assertCouponUsable(coupon, { userId: req.auth.user.id })
+
+  // Sin líneas (por ejemplo, validar al entrar al checkout) el descuento es 0.
+  const subtotal =
+    Array.isArray(items) && items.length > 0
+      ? subtotalOf(resolveSaleLines(db, items))
+      : 0
+  const discount = computeDiscount(coupon, subtotal)
+
+  return {
+    status: 200,
+    data: {
+      valid: true,
+      code: coupon.couponCode,
+      discount,
+      subtotal,
+      total: round2(subtotal - discount),
+      coupon: {
+        id: coupon.id,
+        code: coupon.couponCode,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        maxDiscount: coupon.maxDiscount ?? null,
+      },
+    },
+  }
+}, { auth: 'user' })

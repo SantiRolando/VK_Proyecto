@@ -2,6 +2,7 @@ import { Button, Text, Title } from '@mantine/core'
 import { IconLogin, IconPlayerPlay } from '@tabler/icons-react'
 import { useNavigate } from 'react-router'
 import { useI18n } from '../../i18n/context.js'
+import { routes } from '../../app/routes.js'
 
 export function CtaSection() {
   const { t } = useI18n()
@@ -22,7 +23,7 @@ export function CtaSection() {
           color="white"
           size="lg"
           leftSection={<IconPlayerPlay size={18} />}
-          onClick={() => navigate('/fit')}
+          onClick={() => navigate(routes.fit({ src: 'landing' }))}
         >
           {t('cta.guest')}
         </Button>
@@ -30,6 +31,7 @@ export function CtaSection() {
           variant="white"
           size="lg"
           leftSection={<IconLogin size={18} />}
+          onClick={() => navigate(routes.login)}
         >
           {t('cta.login')}
         </Button>

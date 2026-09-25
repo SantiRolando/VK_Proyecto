@@ -1,0 +1,21 @@
+// Controller de configuración pública (US1): destino de contacto de VK para
+// la derivación a atención personalizada (fuera de rango). Los valores viven
+// en SETTING (R-12); el CRUD admin llega en US11.
+
+import { ApiError } from '../../api/client/api-error.js'
+import { getDb } from '../db/database.js'
+import { register } from '../router/mock-router.js'
+
+function settingValue(db, key) {
+  return db.settings.find((setting) => setting.key === key)?.value ?? null
+}
+
+register('GET', '/public/contact', () => {
+  const db = getDb()
+  const email = settingValue(db, 'coordination_email')
+  const whatsapp = settingValue(db, 'coordination_whatsapp')
+  if (!email && !whatsapp) {
+    throw new ApiError(404, 'NOT_FOUND')
+  }
+  return { status: 200, data: { email, whatsapp } }
+})
