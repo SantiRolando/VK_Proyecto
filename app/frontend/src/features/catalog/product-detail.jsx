@@ -1,4 +1,10 @@
-import { useState } from 'react'
+import { routes } from '@app/routes.js'
+import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
+import { Money } from '@components/money.jsx'
+import { colorHex, colorLabel } from '@constants/colors.js'
+import { lineToSlug } from '@constants/lines.js'
+import { useProduct } from '@features/catalog/hooks/use-product.js'
+import { useI18n } from '@i18n/context.js'
 import {
   Badge,
   Button,
@@ -12,14 +18,8 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 import { IconArrowLeft, IconShoppingCart } from '@tabler/icons-react'
+import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { lineToSlug } from '../../constants/lines.js'
-import { colorHex, colorLabel } from '../../constants/colors.js'
-import { Money } from '../../components/money.jsx'
-import { QueryBoundary } from '../../components/feedback/query-boundary.jsx'
-import { useProduct } from './hooks/use-product.js'
 
 // Detalle de producto (US3): colores del talle seleccionado con su
 // disponibilidad; los agotados no son seleccionables.
@@ -146,7 +146,9 @@ export function ProductDetailPage() {
                           variant={
                             size.id === product.selectedSize?.id ? 'filled' : 'outline'
                           }
-                          color={size.id === product.selectedSize?.id ? 'vikinga' : 'gray'}
+                          color={
+                            size.id === product.selectedSize?.id ? 'vikinga' : 'gray'
+                          }
                           style={{ cursor: 'pointer' }}
                           onClick={() =>
                             navigate(

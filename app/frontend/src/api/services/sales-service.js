@@ -1,7 +1,7 @@
 // Service de compras (US4): crear la venta, ver las propias y validar el
 // cupón del checkout. Solo conoce paths y DTOs (§6.2).
 
-import { apiClient } from '../client/api-client.js'
+import { apiClient } from '@api/client/api-client.js'
 
 export const salesService = {
   create: (payload) => apiClient.post('/sales', payload),

@@ -1,8 +1,8 @@
 // Selector global de perfil activo (US5, R-15). Por ahora solo persiste el
 // id seleccionado; el vínculo con la API de perfiles llega en US5.
 
+import { ActiveProfileContext } from '@features/account/active-profile-context.js'
 import { useCallback, useMemo, useState } from 'react'
-import { ActiveProfileContext } from './active-profile-context.js'
 
 const STORAGE_KEY = 'vkfit.activeProfile'
 
@@ -28,10 +28,7 @@ export function ActiveProfileProvider({ children }) {
     }
   }, [])
 
-  const value = useMemo(
-    () => ({ profileId, setProfileId }),
-    [profileId, setProfileId],
-  )
+  const value = useMemo(() => ({ profileId, setProfileId }), [profileId, setProfileId])
 
   return (
     <ActiveProfileContext.Provider value={value}>

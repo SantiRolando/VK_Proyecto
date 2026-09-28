@@ -1,5 +1,5 @@
+import { notifyRestockAlerts } from '@mocks/domain/alerts.js'
 import { describe, expect, it } from 'vitest'
-import { notifyRestockAlerts } from './alerts.js'
 
 function dbWith(alerts) {
   return { alerts }

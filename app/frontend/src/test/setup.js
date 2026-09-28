@@ -1,7 +1,11 @@
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
-import { cleanup } from '@testing-library/react'
 // Matchers de jest-dom (`toBeInTheDocument`, `toHaveValue`, …) sobre expect.
 import '@testing-library/jest-dom/vitest'
+
+// jsdom + transporte mock tardan más que el segundo por defecto en dejar la
+// pantalla estable: se espera un poco más antes de dar una consulta por fallida.
+configure({ asyncUtilTimeout: 3000 })
 
 // Estado global compartido por los tests de la capa de datos:
 // cada test arranca con localStorage limpio (la DB mock persiste ahí).

@@ -1,5 +1,5 @@
+import { routes } from '@app/routes.js'
 import { describe, expect, it } from 'vitest'
-import { routes } from './routes.js'
 
 const SAMPLE_ARGS = {
   fit: [{ line: 'endurance' }],

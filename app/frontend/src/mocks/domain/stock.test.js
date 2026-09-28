@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
 import {
   availableQuantity,
   isCriticalStock,
   listCriticalVariants,
   reservedQuantity,
-} from './stock.js'
+} from '@mocks/domain/stock.js'
+import { describe, expect, it } from 'vitest'
 
 function makeDb({ sales = [], saleLines = [], productVariants = [] } = {}) {
   return { sales, saleLines, productVariants }

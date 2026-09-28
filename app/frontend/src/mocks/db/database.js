@@ -5,8 +5,8 @@
 // - `resetDatabase()` re-siembra y persiste (botón de `/dev`).
 // - `nextId(items)` genera el próximo id numérico de una colección.
 
-import { seedDatabase } from './seed/seed.js'
-import { loadPersisted, persist } from './persistence.js'
+import { loadPersisted, persist } from '@mocks/db/persistence.js'
+import { seedDatabase } from '@mocks/db/seed/seed.js'
 
 let db = loadPersisted() ?? seedDatabase()
 

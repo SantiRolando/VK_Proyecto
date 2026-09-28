@@ -4,16 +4,17 @@
 // guarda el descuento aplicado y se incrementa `usageCount` (se decrementa al
 // cancelar, US7).
 
-import { ApiError } from '../../api/client/api-error.js'
-import { round2 } from './money.js'
+import { ApiError } from '@api/client/api-error.js'
+import { round2 } from '@mocks/domain/money.js'
 
 export function findCouponByCode(db, code) {
-  const normalized = String(code ?? '').trim().toUpperCase()
+  const normalized = String(code ?? '')
+    .trim()
+    .toUpperCase()
   if (!normalized) return null
   return (
-    db.discountCoupons.find(
-      (coupon) => coupon.couponCode.toUpperCase() === normalized,
-    ) ?? null
+    db.discountCoupons.find((coupon) => coupon.couponCode.toUpperCase() === normalized) ??
+    null
   )
 }
 
@@ -36,8 +37,7 @@ export function computeDiscount(coupon, subtotal) {
     coupon.discountType === 'Fixed'
       ? coupon.discountValue
       : (subtotal * coupon.discountValue) / 100
-  const capped =
-    coupon.maxDiscount != null ? Math.min(raw, coupon.maxDiscount) : raw
+  const capped = coupon.maxDiscount != null ? Math.min(raw, coupon.maxDiscount) : raw
 
   return round2(Math.min(capped, subtotal))
 }

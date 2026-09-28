@@ -2,9 +2,9 @@
 // Se registra la configuración desde el entorno y se importan los controllers
 // (side effect: `register(...)` de cada recurso).
 
-import { configureMockRouter, handle } from './router/mock-router.js'
-import { env } from '../config/env.js'
-import './controllers/register-all.js'
+import { env } from '@config/env.js'
+import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
+import '@mocks/controllers/register-all.js'
 
 configureMockRouter({ latencyMs: env.mockLatencyMs, failRate: env.mockFailRate })
 

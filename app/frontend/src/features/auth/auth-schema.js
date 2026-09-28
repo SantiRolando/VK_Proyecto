@@ -5,9 +5,7 @@ import { z } from 'zod'
 // controller mock; acá solo se valida formato.
 const email = z.string().trim().email({ message: 'invalid' })
 const required = z.string().trim().min(1, { message: 'required' })
-const password = z
-  .string()
-  .min(6, { message: 'password' })
+const password = z.string().min(6, { message: 'password' })
 
 export const loginSchema = z.object({
   email: required.refine((value) => z.string().email().safeParse(value).success, {

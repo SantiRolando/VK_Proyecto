@@ -1,11 +1,20 @@
-import { Alert, Badge, Button, Card, Group, NumberInput, Stack, Text } from '@mantine/core'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { Money } from '@components/money.jsx'
+import { OrderSummary } from '@components/order-summary.jsx'
+import { colorHex, colorLabel } from '@constants/colors.js'
+import { CouponInput } from '@features/checkout/coupon-input.jsx'
+import { useI18n } from '@i18n/context.js'
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Group,
+  NumberInput,
+  Stack,
+  Text,
+} from '@mantine/core'
 import { IconAlertTriangle } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { Money } from '../../components/money.jsx'
-import { colorHex, colorLabel } from '../../constants/colors.js'
-import { CouponInput } from './coupon-input.jsx'
-import { OrderSummary } from './order-summary.jsx'
 
 // Paso 3 del checkout (T062): línea elegida, cupón opcional y totales. El
 // conflicto de stock (T064) se muestra acá sin perder la selección.

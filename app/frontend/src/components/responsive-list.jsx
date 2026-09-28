@@ -11,9 +11,6 @@ import { useMediaQuery } from '@mantine/hooks'
 // `cardTitle(item)` y `cardActions(item)` son renders opcionales para la
 // cabecera de la card en pantallas chicas. `cardActions` se ubica en la
 // esquina superior derecha (típicamente un `ActionsMenu`).
-//
-// `onCardClick(item)` es opcional: si se pasa, tocar/clickear la card
-// dispara ese callback (por ejemplo, para abrir la vista de detalle).
 
 export function ResponsiveList({
   data,
@@ -22,7 +19,6 @@ export function ResponsiveList({
   minWidth = 900,
   cardTitle,
   cardActions,
-  onCardClick,
   ...tableProps
 }) {
   const isSmall = useMediaQuery('(max-width: 48em)')
@@ -31,22 +27,11 @@ export function ResponsiveList({
     return (
       <Stack gap="sm">
         {data.map((item) => (
-          <Card
-            key={getKey(item)}
-            withBorder
-            radius="md"
-            padding="md"
-            onClick={onCardClick ? () => onCardClick(item) : undefined}
-            style={onCardClick ? { cursor: 'pointer' } : undefined}
-          >
+          <Card key={getKey(item)} withBorder radius="md" padding="md">
             <Stack gap="sm">
               <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
                 {cardTitle && <div style={{ flex: 1 }}>{cardTitle(item)}</div>}
-                {cardActions && (
-                  <div onClick={(event) => event.stopPropagation()}>
-                    {cardActions(item)}
-                  </div>
-                )}
+                {cardActions && <div>{cardActions(item)}</div>}
               </Group>
 
               <Stack gap="xs">

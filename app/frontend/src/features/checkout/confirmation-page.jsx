@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { routes } from '@app/routes.js'
+import { ChannelBadge } from '@components/channel-badge.jsx'
+import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
+import { OrderSummary } from '@components/order-summary.jsx'
+import { PageHeader } from '@components/page-header.jsx'
+import { SaleStatusBadge } from '@components/sale-status-badge.jsx'
+import { useSale } from '@features/checkout/hooks/use-sale.js'
+import { useI18n } from '@i18n/context.js'
 import {
   Alert,
   Badge,
@@ -16,16 +23,9 @@ import {
   IconExternalLink,
   IconMessage,
 } from '@tabler/icons-react'
+import { addressFullLine } from '@utils/address.js'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { PageHeader } from '../../components/page-header.jsx'
-import { QueryBoundary } from '../../components/feedback/query-boundary.jsx'
-import { ChannelBadge } from '../../components/channel-badge.jsx'
-import { SaleStatusBadge } from '../../components/sale-status-badge.jsx'
-import { OrderSummary } from './order-summary.jsx'
-import { addressFullLine } from './address-utils.js'
-import { useSale } from './hooks/use-sale.js'
 
 // Confirmación de la compra (T063): estado de la venta, resumen y el mensaje
 // de coordinación listo para enviar por el canal elegido.
@@ -96,9 +96,7 @@ export function ConfirmationPage() {
                   })}
                 </Text>
 
-                {sale.address && (
-                  <Text size="sm">{addressFullLine(sale.address)}</Text>
-                )}
+                {sale.address && <Text size="sm">{addressFullLine(sale.address)}</Text>}
               </Stack>
             </Card>
 
@@ -114,9 +112,7 @@ export function ConfirmationPage() {
                 <Stack gap="sm">
                   <Group gap="xs">
                     <IconMessage size={18} />
-                    <Text fw={600}>
-                      {t('checkout.confirmation.contactTitle')}
-                    </Text>
+                    <Text fw={600}>{t('checkout.confirmation.contactTitle')}</Text>
                   </Group>
 
                   <Text size="sm" c="dimmed">
@@ -177,11 +173,7 @@ export function ConfirmationPage() {
               <Button variant="light" onClick={() => navigate(routes.catalog())}>
                 {t('checkout.confirmation.continue')}
               </Button>
-              <Button
-                variant="subtle"
-                color="gray"
-                onClick={() => navigate(routes.home)}
-              >
+              <Button variant="subtle" color="gray" onClick={() => navigate(routes.home)}>
                 {t('checkout.confirmation.home')}
               </Button>
             </Group>

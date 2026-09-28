@@ -5,7 +5,7 @@
 //   - Una variante con disponible = 1 (prueba de carrera/conflicto).
 //   - Variantes por debajo del mínimo (alertas de stock crítico).
 
-import { createRandom, between } from './helpers.js'
+import { between, createRandom } from '@mocks/db/seed/helpers.js'
 
 export const COLORS = ['navy', 'black', 'blue', 'red', 'pink', 'green', 'purple']
 
@@ -183,9 +183,7 @@ export function buildCatalog(sizes) {
 export function findVariant(sizes, products, productVariants, model, sizeCode, color) {
   const product = products.find((item) => item.model === model)
   if (!product) throw new Error(`Producto de seed no encontrado: ${model}`)
-  const size = sizes.find(
-    (item) => item.line === product.line && item.code === sizeCode,
-  )
+  const size = sizes.find((item) => item.line === product.line && item.code === sizeCode)
   if (!size) throw new Error(`Talle de seed no encontrado: ${product.line} ${sizeCode}`)
   return productVariants.find(
     (variant) =>

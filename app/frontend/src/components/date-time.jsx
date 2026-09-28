@@ -1,4 +1,4 @@
-import { useI18n } from '../i18n/context.js'
+import { useI18n } from '@i18n/context.js'
 
 // Fecha/hora con el formato del idioma activo (`es-UY` / `en`).
 // `options` se pasa directo a Intl.DateTimeFormat (p. ej. { dateStyle: 'medium' }).

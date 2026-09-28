@@ -6,10 +6,10 @@
 // `guestSessionId`, las generaciones de ese invitado pasan al usuario y se
 // crea el perfil por defecto con las medidas de la última generación.
 
-import { ApiError } from '../../api/client/api-error.js'
-import { getDb, mutate, nextId } from '../db/database.js'
-import { register } from '../router/mock-router.js'
-import { requireFields } from './controller-utils.js'
+import { ApiError } from '@api/client/api-error.js'
+import { requireFields } from '@mocks/controllers/controller-utils.js'
+import { getDb, mutate, nextId } from '@mocks/db/database.js'
+import { register } from '@mocks/router/mock-router.js'
 
 const MOCK_OTP_CODE = '123456'
 
@@ -27,7 +27,9 @@ export function issueToken(userId) {
 }
 
 function findUserByEmail(db, email) {
-  const normalized = String(email ?? '').trim().toLowerCase()
+  const normalized = String(email ?? '')
+    .trim()
+    .toLowerCase()
   return db.users.find((user) => user.email.toLowerCase() === normalized) ?? null
 }
 
@@ -138,11 +140,21 @@ register('POST', '/auth/password/reset', (req) => {
   })
 })
 
-register('GET', '/auth/me', (req) => {
-  return { status: 200, data: sanitizeUser(req.auth.user) }
-}, { auth: 'user' })
+register(
+  'GET',
+  '/auth/me',
+  (req) => {
+    return { status: 200, data: sanitizeUser(req.auth.user) }
+  },
+  { auth: 'user' },
+)
 
-register('POST', '/auth/logout', () => {
-  // Mock: la invalidación real ocurre en el cliente (se descarta el token).
-  return { status: 204, data: null }
-}, { auth: 'user' })
+register(
+  'POST',
+  '/auth/logout',
+  () => {
+    // Mock: la invalidación real ocurre en el cliente (se descarta el token).
+    return { status: 204, data: null }
+  },
+  { auth: 'user' },
+)

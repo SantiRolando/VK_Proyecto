@@ -1,8 +1,8 @@
+import { ApiError } from '@api/client/api-error.js'
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { ApiError } from '../../api/client/api-error.js'
-import { getDb, resetDatabase } from '../db/database.js'
-import { configureMockRouter, handle } from '../router/mock-router.js'
-import './register-all.js'
+import '@mocks/controllers/register-all.js'
 
 beforeEach(() => {
   resetDatabase()
@@ -112,7 +112,9 @@ describe('auth controller', () => {
 
   it('también migra el invitado al iniciar sesión (Q-05)', async () => {
     const guestGenerationIds = getDb()
-      .sizeGenerations.filter((generation) => generation.guestSessionId === 'guest-demo-1')
+      .sizeGenerations.filter(
+        (generation) => generation.guestSessionId === 'guest-demo-1',
+      )
       .map((generation) => generation.id)
     expect(guestGenerationIds).toHaveLength(2)
 
@@ -185,7 +187,10 @@ describe('auth controller', () => {
 
 describe('errores de contrato', () => {
   it('ApiError conserva status, code y details', () => {
-    const error = new ApiError(409, 'STOCK_INSUFFICIENT', { variantId: 301, available: 0 })
+    const error = new ApiError(409, 'STOCK_INSUFFICIENT', {
+      variantId: 301,
+      available: 0,
+    })
     expect(error.status).toBe(409)
     expect(error.code).toBe('STOCK_INSUFFICIENT')
     expect(error.details).toEqual({ variantId: 301, available: 0 })

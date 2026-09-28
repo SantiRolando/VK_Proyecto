@@ -1,10 +1,10 @@
+import { routes } from '@app/routes.js'
+import { lineToSlug } from '@constants/lines.js'
+import { RestockSubscribe } from '@features/catalog/restock-subscribe.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Alert, Badge, Group, Stack, Text } from '@mantine/core'
 import { IconCircleOff } from '@tabler/icons-react'
 import { useNavigate } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { lineToSlug } from '../../constants/lines.js'
-import { RestockSubscribe } from './restock-subscribe.jsx'
 
 // Estado sin stock (US3): mensaje explícito + aviso de reposición + talles
 // adyacentes rotulados como NO recomendados.

@@ -1,12 +1,8 @@
+import { LanguageSwitch } from '@components/language-switch.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Text } from '@mantine/core'
+import { IconBuildingStore, IconInfoCircle, IconSparkles } from '@tabler/icons-react'
 import { useLenis } from 'lenis/react'
-import {
-  IconBuildingStore,
-  IconInfoCircle,
-  IconSparkles,
-} from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { LanguageSwitch } from '../../components/language-switch.jsx'
 
 const NAV_LINKS = [
   { key: 'nav.how', target: '#how', icon: IconInfoCircle },

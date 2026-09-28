@@ -1,5 +1,5 @@
+import { useI18n } from '@i18n/context.js'
 import { Badge } from '@mantine/core'
-import { useI18n } from '../i18n/context.js'
 
 const STATUS_COLORS = {
   in: 'green',

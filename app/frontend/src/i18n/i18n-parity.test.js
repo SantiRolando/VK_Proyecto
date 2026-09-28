@@ -1,6 +1,6 @@
+import en from '@i18n/locales/en.js'
+import es from '@i18n/locales/es.js'
 import { describe, expect, it } from 'vitest'
-import en from './locales/en.js'
-import es from './locales/es.js'
 
 describe('i18n', () => {
   it('tiene paridad de claves entre es y en', () => {
@@ -10,7 +10,10 @@ describe('i18n', () => {
   })
 
   it('no tiene claves vacías', () => {
-    for (const [locale, messages] of [['es', es], ['en', en]]) {
+    for (const [locale, messages] of [
+      ['es', es],
+      ['en', en],
+    ]) {
       for (const [key, value] of Object.entries(messages)) {
         expect(value, `${locale}.${key}`).toBeTruthy()
       }

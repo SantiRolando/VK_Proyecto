@@ -1,7 +1,7 @@
+import { useI18n } from '@i18n/context.js'
 import { Text, Title } from '@mantine/core'
+import { Section } from '@pages/landing-page/section.jsx'
 import { IconBell, IconChartLine, IconPackage } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { Section } from './section.jsx'
 
 const STORE_FEATURES = [
   {
@@ -34,10 +34,7 @@ export function Store() {
         {STORE_FEATURES.map((feature) => {
           const Icon = feature.icon
           return (
-            <div
-              key={feature.titleKey}
-              className="rounded-lg border border-gray-200 p-6"
-            >
+            <div key={feature.titleKey} className="rounded-lg border border-gray-200 p-6">
               <Icon size={28} stroke={1.5} className="text-black" />
               <Title order={4} c="black" mt="md">
                 {t(feature.titleKey)}

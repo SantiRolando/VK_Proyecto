@@ -3,6 +3,7 @@
 > **Estado:** borrador para revisión · **Fecha:** 23-sep-2026
 > **Stack:** React + Vite + Mantine · **Datos:** mock detrás de una capa API intercambiable por REST
 > **Fuentes:** `vkscanfit.pdf` (ERD), `User_Journey.pdf` (documentación técnica), `Scan_VKFit__Recorrido_de_la_experiencia.pdf` (alcance funcional) y `CLAUDE.md` (reglas de FE)
+> **Seguimiento:** el estado de cada tarea se marca en §8 (`[x]` hecha · `[~]` parcial o con desvío · `[ ]` pendiente · `➖` descartada); el estado consolidado está en `agents/scan-vkfit-estado-y-pendientes.md` y el detalle por iteración —decisiones, deuda y arreglos colaterales— en `agents/iteraciones.md`.
 
 ---
 
@@ -68,7 +69,7 @@ El motor de talles, la reserva de stock, los puntos, el router mock y la paridad
 
 ### Restricciones y gates de calidad
 
-- Lint verde (incluye regla de *no literal strings* y de nombres de archivo).
+- Lint **y formato** verdes con Biome (`npm run lint` = `biome check .`); las reglas de *no literal strings* y de nombres de archivo quedan por revisión (Biome no tiene equivalente todavía, ver T005).
 - `npm run i18n:check` verde (paridad es/en de claves).
 - `npm run build` verde con `VITE_API_MODE=mock` y con `VITE_API_MODE=http`; el bundle *http* no debe contener código de `src/mocks/`.
 - Presupuesto de rendimiento objetivo: JS inicial de la ruta pública ≤ ~200 KB gzip; el bundle de admin y las librerías de gráficos/exportación se cargan bajo demanda.
@@ -252,7 +253,7 @@ Cada historia es independiente y testeable por sí sola (formato spec-kit).
 | R-03 | Server-state | **TanStack Query**: caché, invalidación tras mutaciones (crítico para "confirmo venta → cambia el catálogo"), reintentos, estados `isPending/isError`. Además facilita persistencia offline futura. | `useEffect + fetch` a mano: más código y sin invalidación. |
 | R-04 | Routing | **React Router** (data router con `lazy` por ruta). | TanStack Router: válido, pero menos estándar en el equipo. |
 | R-05 | Formularios | `@mantine/form` + **zod** (`mantine-form-zod-resolver`) para validación de formato. | Formik/RHF: duplican lo que ya da Mantine. |
-| R-06 | i18n | **Provider propio liviano** que expone `useI18n()` (`t`, `locale`, `setLocale`, `formatNumber/Date/Currency`) con interpolación `{{var}}` y plural vía `Intl.PluralRules`. Locales en `src/i18n/locales/{es,en}.js`. Lint con `eslint-plugin-i18next` (`no-literal-string`) y script de paridad. | i18next/react-i18next: correcto pero más peso y la regla pide el hook `useI18n()`; se puede envolver después sin tocar componentes. |
+| R-06 | i18n | **Provider propio liviano** que expone `useI18n()` (`t`, `locale`, `setLocale`, `formatNumber/Date/Currency`) con interpolación `{{var}}` y plural vía `Intl.PluralRules`. Locales en `src/i18n/locales/{es,en}.js`. Script de paridad (`i18n:check`); la regla de *no literal strings* queda por revisión manual (iteración 8: el lint pasó a Biome, que no la tiene). | i18next/react-i18next: correcto pero más peso y la regla pide el hook `useI18n()`; se puede envolver después sin tocar componentes. |
 | R-15 | Sesión | `AuthContext` (usuario, token, rol) + `ActiveProfileContext` (perfil activo). Token en `localStorage` (solo prototipo). | Zustand/Redux: innecesario para 2 contextos pequeños (principio VIII). |
 | R-07 | Persistencia mock | Base en memoria con **persistencia en `localStorage`** (`vkfit.mockdb.v1`) + botón de reset. Permite que "reservar → recargar → seguir" funcione en demos. | Solo memoria: pierde el estado al recargar y estropea la demo. |
 | R-08 | Gráficos | `@mantine/charts` (Recharts) cargado **lazy** solo en rutas admin. El mapa de calor se implementa con `Table` + celdas coloreadas (no requiere librería). | Chart.js/Nivo: dependencia extra. |
@@ -288,11 +289,11 @@ Cada historia es independiente y testeable por sí sola (formato spec-kit).
 | Principio | Estado | Cómo se cumple |
 |---|---|---|
 | I Mantine primero | ✅ | Tarea previa en cada épica: leer secciones de `agents/llms-full.txt`; sin otras libs de UI |
-| II Nombres | ✅ | `eslint-plugin-check-file` (kebab-case) + revisión |
-| III i18n | ✅ | `useI18n()`, lint `no-literal-string`, `i18n:check` en CI |
+| II Nombres | ⚠️ | Convención en `CLAUDE.md` + revisión (Biome no tiene regla de nombres de archivo) |
+| III i18n | ⚠️ | `useI18n()`, `i18n:check` + test de paridad; **sin** lint `no-literal-string` (Biome no lo tiene) |
 | IV Rutas en inglés | ✅ | `routes.js` único; test que verifica que todos los paths son ASCII en inglés |
 | V PWA-ready sin PWA | ✅ | Lazy routes, skeletons, sin SW/manifest; Query como capa de datos |
-| VI FE agnóstico | ✅ | Regla de lint `no-restricted-imports` para `src/mocks/**` fuera de `src/api/` |
+| VI FE agnóstico | ✅ | `noRestrictedImports` de Biome para `**/mocks/**` y `@mocks/**` fuera de `src/api/` y `src/mocks/` |
 | VII Sin lógica de negocio | ✅ | Motor de talles, puntos y stock en `src/mocks/domain/` |
 | VIII Simplicidad | ✅ | 2 contextos, sin store global |
 | IX Verificable | ✅ | Tests de dominio y del router mock |
@@ -370,8 +371,8 @@ register('POST', '/sales', createSale, { auth: 'customer' });
 ├── .specify/memory/constitution.md
 ├── specs/001-scan-vkfit-fe-prototype/   # spec, plan, research, data-model, contracts, quickstart, tasks
 ├── scripts/check-i18n.mjs               # paridad de claves es/en
-├── .env.example
-├── vite.config.js · postcss.config.cjs · eslint.config.js · vitest.config.js
+├── .env.example · jsconfig.json · biome.json
+├── vite.config.js · vite.aliases.js · vitest.config.js
 └── src/
     ├── main.jsx
     ├── app/
@@ -704,14 +705,17 @@ cd vkfit-fe
 # Runtime
 npm i @mantine/core @mantine/hooks @mantine/form @mantine/notifications @mantine/modals \
       @mantine/dates @mantine/charts dayjs recharts \
-      react-router-dom @tanstack/react-query zod mantine-form-zod-resolver @tabler/icons-react
+      react-router @tanstack/react-query zod mantine-form-zod-resolver @tabler/icons-react \
+      zustand lenis tailwindcss @tailwindcss/vite @fontsource/inter
 
 # Dev
-npm i -D postcss postcss-preset-mantine postcss-simple-vars \
-         vitest jsdom @testing-library/react @testing-library/jest-dom \
-         eslint eslint-plugin-i18next eslint-plugin-check-file prettier
+npm i -D @biomejs/biome vitest jsdom \
+         @testing-library/react @testing-library/dom @testing-library/user-event @testing-library/jest-dom
 ```
-> Verificar versiones compatibles y la configuración de PostCSS/estilos de Mantine contra `agents/llms-full.txt`.
+> `react-router` (v7 unificó `react-router-dom`). No hace falta PostCSS de Mantine: los estilos entran por `src/index.css`. Verificar versiones contra `agents/llms-full.txt`.
+
+**Alias de imports:** `vite.aliases.js` (lo comparten Vite y Vitest) + `jsconfig.json` para el editor.
+**Lint y formato:** Biome (`biome.json`), un solo tool.
 
 `.env.example`
 ```
@@ -721,7 +725,7 @@ VITE_MOCK_LATENCY_MS=250-600
 VITE_MOCK_FAIL_RATE=0             # 0..1 para probar estados de error
 ```
 
-Scripts: `dev`, `build`, `preview`, `lint`, `test`, `i18n:check`.
+Scripts: `dev`, `build`, `preview`, `lint` (`biome check`), `format`, `test`, `test:watch`, `i18n:check`.
 
 ### 7.2 Credenciales demo (solo modo mock)
 
@@ -754,140 +758,142 @@ OTP en mock: `123456`. Reset de datos: `/dev` → "Restablecer base mock".
 
 **Notación:** `T###` id estable · `[P]` paralelizable (archivos distintos, sin dependencia) · `[USn]` historia · rutas exactas. Antes de **toda** tarea que toque Mantine: consultar la sección correspondiente de `agents/llms-full.txt`. Toda tarea de UI incluye sus claves en `es.js` y `en.js`.
 
+> **Estado:** `[x]` hecha · `[~]` parcial o con desvío (se aclara al lado) · `[ ]` pendiente · `➖` descartada. Última actualización: **iteración 7 (M2 cerrado)**. El detalle de cada iteración está en `agents/iteraciones.md` y el estado consolidado en `agents/scan-vkfit-estado-y-pendientes.md`.
+
 ### Fase 1 — Setup
 
-- [ ] T001 Crear proyecto Vite + React (JS) y copiar `CLAUDE.md` y `agents/llms-full.txt` — raíz
-- [ ] T002 Ejecutar `specify init`, cargar constitución (§1) — `.specify/memory/constitution.md`
-- [ ] T003 [P] Instalar dependencias de §7.1 y configurar PostCSS de Mantine — `package.json`, `postcss.config.cjs`
-- [ ] T004 [P] Configurar alias `@`→`src`, env tipadas y `.env.example` — `vite.config.js`, `src/config/env.js`, `.env.example`
-- [ ] T005 [P] ESLint + Prettier: `no-literal-string`, kebab-case (`check-file`), `no-restricted-imports` de `src/mocks/**` fuera de `src/api/` y `src/mocks/` — `eslint.config.js`
-- [ ] T006 [P] Vitest + jsdom + setup — `vitest.config.js`, `src/test/setup.js`
-- [ ] T007 Crear árbol de carpetas de §4.4 (archivos `.gitkeep`) — `src/**`
+- [x] T001 Crear proyecto Vite + React (JS) y copiar `CLAUDE.md` y `agents/llms-full.txt` — raíz
+- ➖ T002 Ejecutar `specify init`, cargar constitución (§1) — `.specify/memory/constitution.md` · *descartada: el usuario aporta su propio spec*
+- [~] T003 [P] Instalar dependencias de §7.1 y configurar PostCSS de Mantine — `package.json`, `postcss.config.cjs` · *§7.1 completo declarado en `package.json` (Mantine entero, `dayjs`, `recharts`, `mantine-form-zod-resolver`); **la instalación la corre el usuario** (el lock queda desactualizado hasta entonces). Sin PostCSS: `src/index.css` importa los estilos*
+- [x] T004 [P] Configurar alias `@`→`src`, env tipadas y `.env.example` — `vite.config.js`, `src/config/env.js`, `.env.example` · *alias por carpeta (`vite.aliases.js`: `@components`, `@api`, `@features`, …) compartidos con Vitest + `jsconfig.json`; env tipadas y `.env.example`*
+- [~] T005 [P] ESLint + Prettier: `no-literal-string`, kebab-case (`check-file`), `no-restricted-imports` de `src/mocks/**` fuera de `src/api/` y `src/mocks/` — `eslint.config.js` · *reemplazados por **Biome** (`biome.json`: lint + format + `noRestrictedImports` para `**/mocks/**` y `@mocks/**`). Pendiente: no hay regla de `no-literal-string` ni de kebab-case en Biome (quedan por revisión)*
+- [x] T006 [P] Vitest + jsdom + setup — `vitest.config.js`, `src/test/setup.js` · *+ Testing Library (`react`/`dom`/`user-event`/`jest-dom`) en la iteración 6*
+- [~] T007 Crear árbol de carpetas de §4.4 (archivos `.gitkeep`) — `src/**` · *existe el árbol de todo lo implementado; falta lo que corresponde a historias pendientes: `profile-selector`, `features/feedback/`, `features/admin/{dashboard,inventory,catalog-admin,analytics,settings,coupons,assistant}`, `hooks/`, `utils/{format,download,query-keys}.js`, `config/features.js`. Desvíos de §4.4: `.specify/` y `specs/` descartados con T002; `i18n/context.js` en lugar de `use-i18n.js`; `/dev` en `pages/dev/dev-page.jsx`*
 
 ### Fase 2 — Fundacional (bloquea todas las historias)
 
-**Tema, i18n y app shell**
-- [ ] T008 [P] Tema Mantine con paleta placeholder `vikinga`, breakpoints, defaults móviles — `src/theme/theme.js`
-- [ ] T009 [P] `i18n-provider` + `use-i18n` (`t`, interpolación, plurales, `formatNumber/Date/Currency`, persistencia de idioma) — `src/i18n/`
-- [ ] T010 [P] Locales base (`common`, `nav`, `errors`, `validation`, `enums`) es/en — `src/i18n/locales/es.js`, `en.js`
-- [ ] T011 Script de paridad de claves y npm script `i18n:check` — `scripts/check-i18n.mjs`
-- [ ] T012 [P] Constantes de enums y líneas (slug ↔ valor) — `src/constants/enums.js`, `lines.js`
-- [ ] T013 Módulo de rutas en inglés con helpers (`routes.fit()`, `routes.adminSale(id)`) — `src/app/routes.js`
-- [ ] T014 Providers (Mantine, Notifications, Modals, Query, i18n, Auth, ActiveProfile) — `src/app/providers.jsx`
-- [ ] T015 Router con rutas `lazy` para todas las pantallas (páginas stub con título i18n) — `src/app/router.jsx`
-- [ ] T016 [P] Layouts público / cliente (header + barra inferior móvil) / admin (navbar colapsable) — `src/components/layout/`
-- [ ] T017 [P] Componentes de estado: `query-boundary`, `empty-state`, `error-state`, `skeletons` — `src/components/feedback/`
-- [ ] T018 [P] Componentes comunes: `page-header`, `language-switch`, `money`, `date-time`, `responsive-list`, badges de talle/stock/estado/canal — `src/components/`
+**Tema, i18n y app shell** _(iteración 2)_
+- [x] T008 [P] Tema Mantine con paleta placeholder `vikinga`, breakpoints, defaults móviles — `src/theme/theme.js`
+- [x] T009 [P] `i18n-provider` + `use-i18n` (`t`, interpolación, plurales, `formatNumber/Date/Currency`, persistencia de idioma) — `src/i18n/`
+- [x] T010 [P] Locales base (`common`, `nav`, `errors`, `validation`, `enums`) es/en — `src/i18n/locales/es.js`, `en.js`
+- [x] T011 Script de paridad de claves y npm script `i18n:check` — `scripts/check-i18n.mjs`
+- [x] T012 [P] Constantes de enums y líneas (slug ↔ valor) — `src/constants/enums.js`, `lines.js`
+- [x] T013 Módulo de rutas en inglés con helpers (`routes.fit()`, `routes.adminSale(id)`) — `src/app/routes.js`
+- [~] T014 Providers (Mantine, Notifications, Modals, Query, i18n, Auth, ActiveProfile) — `src/app/providers.jsx` · *Mantine, i18n, Query, Auth y ActiveProfile ✅; sin `Notifications`/`Modals` (no instalados: la confirmación usa `Modal` de core)*
+- [x] T015 Router con rutas `lazy` para todas las pantallas (páginas stub con título i18n) — `src/app/router.jsx`
+- [x] T016 [P] Layouts público / cliente (header + barra inferior móvil) / admin (navbar colapsable) — `src/components/layout/`
+- [x] T017 [P] Componentes de estado: `query-boundary`, `empty-state`, `error-state`, `skeletons` — `src/components/feedback/`
+- [x] T018 [P] Componentes comunes: `page-header`, `language-switch`, `money`, `date-time`, `responsive-list`, badges de talle/stock/estado/canal — `src/components/`
 
-**Capa API y mock**
-- [ ] T019 `ApiError` y contrato de respuesta/errores (§6.1) — `src/api/client/api-error.js`
-- [ ] T020 `http-transport` (fetch, headers de auth/guest, mapeo de errores) — `src/api/client/http-transport.js`
-- [ ] T021 `api-client` con selección de transporte por `VITE_API_MODE` e import dinámico del mock — `src/api/client/api-client.js`
-- [ ] T022 `mock-router` (registro `register(method, pattern, handler, {auth})`, matching de `:params`, auth por rol, latencia y fallos) — `src/mocks/router/mock-router.js`
-- [ ] T023 `mock-transport` que adapta `mock-router` a la interfaz del transporte — `src/mocks/mock-transport.js`
-- [ ] T024 [P] Base de datos mock en memoria + persistencia `localStorage` versionada + reset — `src/mocks/db/database.js`, `persistence.js`
-- [ ] T025 [P] Seed: usuarios, talles, productos, variantes, settings — `src/mocks/db/seed/`
-- [ ] T026 [P] Seed histórico: generaciones, ventas, movimientos, cupones (fechas relativas a hoy, casos de §4.8) — `src/mocks/db/seed/`
-- [ ] T027 [P] Dominio `stock.js` (reservado/disponible/crítico) + tests — `src/mocks/domain/stock.js`
-- [ ] T028 [P] Dominio `sale-state-machine.js` + tests — `src/mocks/domain/`
-- [ ] T029 Tests del `mock-router` (matching, 401/403/404, latencia) — `src/mocks/router/mock-router.test.js`
-- [ ] T030 Auth mock: controller (`register/login/otp/forgot/me/logout`) y `auth-service` — `src/mocks/controllers/auth.controller.js`, `src/api/services/auth-service.js`
-- [ ] T031 `auth-context` (sesión, `guestSessionId`, rol, `returnTo`) y guards `require-auth`, `require-role`, `guest-only` — `src/features/auth/`, `src/app/guards/`
-- [ ] T032 `active-profile-context` (perfil activo persistido) — `src/features/account/`
-- [ ] T033 Tests de rutas (todas en inglés/únicas) y de paridad i18n — `src/app/routes.test.js`
-- [ ] T034 [P] Herramientas `/dev` (reset DB, cambiar usuario, latencia) solo en modo mock — `src/mocks/dev/dev-tools.jsx`
+**Capa API y mock** _(iteración 1)_
+- [x] T019 `ApiError` y contrato de respuesta/errores (§6.1) — `src/api/client/api-error.js`
+- [x] T020 `http-transport` (fetch, headers de auth/guest, mapeo de errores) — `src/api/client/http-transport.js`
+- [x] T021 `api-client` con selección de transporte por `VITE_API_MODE` e import dinámico del mock — `src/api/client/api-client.js`
+- [x] T022 `mock-router` (registro `register(method, pattern, handler, {auth})`, matching de `:params`, auth por rol, latencia y fallos) — `src/mocks/router/mock-router.js`
+- [x] T023 `mock-transport` que adapta `mock-router` a la interfaz del transporte — `src/mocks/mock-transport.js`
+- [x] T024 [P] Base de datos mock en memoria + persistencia `localStorage` versionada + reset — `src/mocks/db/database.js`, `persistence.js`
+- [x] T025 [P] Seed: usuarios, talles, productos, variantes, settings — `src/mocks/db/seed/`
+- [x] T026 [P] Seed histórico: generaciones, ventas, movimientos, cupones (fechas relativas a hoy, casos de §4.8) — `src/mocks/db/seed/`
+- [x] T027 [P] Dominio `stock.js` (reservado/disponible/crítico) + tests — `src/mocks/domain/stock.js`
+- [x] T028 [P] Dominio `sale-state-machine.js` + tests — `src/mocks/domain/`
+- [x] T029 Tests del `mock-router` (matching, 401/403/404, latencia) — `src/mocks/router/mock-router.test.js`
+- [x] T030 Auth mock: controller (`register/login/otp/forgot/me/logout`) y `auth-service` — `src/mocks/controllers/auth.controller.js`, `src/api/services/auth-service.js`
+- [x] T031 `auth-context` (sesión, `guestSessionId`, rol, `returnTo`) y guards `require-auth`, `require-role`, `guest-only` — `src/features/auth/`, `src/app/guards/`
+- [x] T032 `active-profile-context` (perfil activo persistido) — `src/features/account/`
+- [x] T033 Tests de rutas (todas en inglés/únicas) y de paridad i18n — `src/app/routes.test.js`
+- [~] T034 [P] Herramientas `/dev` (reset DB, cambiar usuario, latencia) solo en modo mock — `src/mocks/dev/dev-tools.jsx` · *reset y login-as funcionan en `src/pages/dev/dev-page.jsx`; la latencia y la tasa de fallos se configuran por env (`VITE_MOCK_LATENCY_MS`, `VITE_MOCK_FAIL_RATE`), sin UI*
 
-**Checkpoint F2:** app navega entre páginas stub, cambia idioma, hace login mock, guards funcionando.
+**Checkpoint F2:** ✅ app navega entre páginas, cambia idioma, hace login mock, guards funcionando.
 
-### Fase 3 — US1: Talle como invitado (P1) 🎯 MVP
+### Fase 3 — US1: Talle como invitado (P1) 🎯 MVP _(iteración 3)_
 
-- [ ] T035 [P] [US1] Dominio `size-engine.js` (R-14, `OUT_OF_RANGE`, dominante, adyacentes) + tests exhaustivos — `src/mocks/domain/size-engine.js`
-- [ ] T036 [US1] Controllers `size-generations` (POST/GET/GET:id) y `sizes` — `src/mocks/controllers/size-generations.controller.js`, `sizes.controller.js`
-- [ ] T037 [P] [US1] `size-service` + hooks (`use-create-generation`, `use-generation`) — `src/api/services/size-service.js`, `src/features/fit/hooks/`
-- [ ] T038 [US1] `home-page` con los tres caminos + `about-page` — `src/features/home/`
-- [ ] T039 [US1] `fit-form` (línea, 5 medidas, validación zod, precarga por `?line`/`linea`, cálculo de `source`, `guestSessionId`) — `src/features/fit/fit-form.jsx`
-- [ ] T040 [P] [US1] `measure-help` (Drawer con instrucciones por medida) — `src/features/fit/measure-help.jsx`
-- [ ] T041 [US1] `fit-page` y `result-page` (talle, dominante, stock, CTA de registro con beneficios, CTA a catálogo) — `src/features/fit/`
-- [ ] T042 [P] [US1] Estado `out-of-range` — `src/features/fit/out-of-range.jsx`
-- [ ] T043 [US1] Claves i18n `home.*`, `fit.*` es/en — `src/i18n/locales/`
+- [x] T035 [P] [US1] Dominio `size-engine.js` (R-14, `OUT_OF_RANGE`, dominante, adyacentes) + tests exhaustivos — `src/mocks/domain/size-engine.js` · *placeholder: el motor real se integra al final (§7)*
+- [x] T036 [US1] Controllers `size-generations` (POST/GET/GET:id) y `sizes` — `src/mocks/controllers/size-generations.controller.js`, `sizes.controller.js`
+- [x] T037 [P] [US1] `size-service` + hooks (`use-create-generation`, `use-generation`) — `src/api/services/size-service.js`, `src/features/fit/hooks/`
+- [x] T038 [US1] `home-page` con los tres caminos + `about-page` — `src/features/home/` · *`/about` reutiliza la landing (`src/pages/landing-page/`)*
+- [x] T039 [US1] `fit-form` (línea, 5 medidas, validación zod, precarga por `?line`/`linea`, cálculo de `source`, `guestSessionId`) — `src/features/fit/fit-form.jsx`
+- [x] T040 [P] [US1] `measure-help` (Drawer con instrucciones por medida) — `src/features/fit/measure-help.jsx`
+- [x] T041 [US1] `fit-page` y `result-page` (talle, dominante, stock, CTA de registro con beneficios, CTA a catálogo) — `src/features/fit/`
+- [x] T042 [P] [US1] Estado `out-of-range` — `src/features/fit/out-of-range.jsx`
+- [x] T043 [US1] Claves i18n `home.*`, `fit.*` es/en — `src/i18n/locales/`
 
-**Checkpoint US1:** `/` → talle sin registrarse, incluido QR con línea preseleccionada.
+**Checkpoint US1:** ✅ `/` → talle sin registrarse, incluido QR con línea preseleccionada.
 
-### Fase 4 — US2: Cuenta y migración (P1)
+### Fase 4 — US2: Cuenta y migración (P1) _(iteración 4)_
 
-- [ ] T044 [US2] Migración de invitado en `register`/`login` del controller (generaciones → cliente + perfil por defecto) + tests — `src/mocks/controllers/auth.controller.js`
-- [ ] T045 [P] [US2] `register-page` con link "¿Ya tienes una cuenta? Iniciar sesión" y `returnTo` — `src/features/auth/register-page.jsx`
-- [ ] T046 [P] [US2] `login-page` unificado (redirección por rol, credenciales demo en modo mock) — `src/features/auth/login-page.jsx`
-- [ ] T047 [P] [US2] `otp-page`, `forgot-password-page`, `reset-password-page` — `src/features/auth/`
-- [ ] T048 [US2] Menú de cuenta y logout en layouts — `src/components/layout/`
-- [ ] T049 [US2] Claves i18n `auth.*` — `src/i18n/locales/`
+- [x] T044 [US2] Migración de invitado en `register`/`login` del controller (generaciones → cliente + perfil por defecto) + tests — `src/mocks/controllers/auth.controller.js`
+- [x] T045 [P] [US2] `register-page` con link "¿Ya tienes una cuenta? Iniciar sesión" y `returnTo` — `src/features/auth/register-page.jsx`
+- [x] T046 [P] [US2] `login-page` unificado (redirección por rol, credenciales demo en modo mock) — `src/features/auth/login-page.jsx`
+- [x] T047 [P] [US2] `otp-page`, `forgot-password-page`, `reset-password-page` — `src/features/auth/`
+- [x] T048 [US2] Menú de cuenta y logout en layouts — `src/components/layout/`
+- [x] T049 [US2] Claves i18n `auth.*` — `src/i18n/locales/`
 
-### Fase 5 — US3: Catálogo filtrado y sin stock (P1)
+### Fase 5 — US3: Catálogo filtrado y sin stock (P1) _(iteración 5)_
 
-- [ ] T050 [US3] Controller `catalog` (filtrado por talle, `available>0`, `meta.adjacentSizes`) + tests — `src/mocks/controllers/catalog.controller.js`
-- [ ] T051 [P] [US3] Controller `alerts` (`POST /restock-alerts`, lista, baja) y aviso al reponer — `src/mocks/controllers/alerts.controller.js`
-- [ ] T052 [P] [US3] `catalog-service`, `alerts-service` + hooks con query keys — `src/api/services/`, `src/features/catalog/hooks/`
-- [ ] T053 [US3] `catalog-page`, `product-card`, `product-detail` (color/talle, colores agotados deshabilitados) — `src/features/catalog/`
-- [ ] T054 [US3] `no-stock-state`, `adjacent-sizes` (con leyenda "no es tu talle recomendado"), `restock-subscribe` (requiere login) — `src/features/catalog/`
-- [ ] T055 [P] [US3] `alerts-page` (mis avisos) — `src/features/account/alerts-page.jsx`
-- [ ] T056 [US3] Claves i18n `catalog.*` — `src/i18n/locales/`
+- [x] T050 [US3] Controller `catalog` (filtrado por talle, `available>0`, `meta.adjacentSizes`) + tests — `src/mocks/controllers/catalog.controller.js`
+- [x] T051 [P] [US3] Controller `alerts` (`POST /restock-alerts`, lista, baja) y aviso al reponer — `src/mocks/controllers/alerts.controller.js` · *el aviso al reponer (`notifyRestockAlerts`) queda a la espera de que US9 registre ingresos*
+- [x] T052 [P] [US3] `catalog-service`, `alerts-service` + hooks con query keys — `src/api/services/`, `src/features/catalog/hooks/`
+- [x] T053 [US3] `catalog-page`, `product-card`, `product-detail` (color/talle, colores agotados deshabilitados) — `src/features/catalog/`
+- [x] T054 [US3] `no-stock-state`, `adjacent-sizes` (con leyenda "no es tu talle recomendado"), `restock-subscribe` (requiere login) — `src/features/catalog/` · *los adyacentes se muestran dentro de `no-stock-state`/`result-page`, sin componente aparte*
+- [x] T055 [P] [US3] `alerts-page` (mis avisos) — `src/features/account/alerts-page.jsx`
+- [x] T056 [US3] Claves i18n `catalog.*` — `src/i18n/locales/`
 
-### Fase 6 — US4: Coordinar compra (P1)
+### Fase 6 — US4: Coordinar compra (P1) _(iteración 6)_
 
-- [ ] T057 [P] [US4] Dominio `coordination-message.js` (asunto/cuerpo/URL `mailto:`/`wa.me` desde settings) + tests — `src/mocks/domain/`
-- [ ] T058 [US4] Controllers `sales` (`POST /sales` atómico con reserva, `GET /me/sales`) y `coupons/validate` + tests de conflicto — `src/mocks/controllers/sales.controller.js`
-- [ ] T059 [P] [US4] Controllers `profiles`/`addresses` mínimos para checkout (alta de dirección) — `src/mocks/controllers/addresses.controller.js`
-- [ ] T060 [P] [US4] `sales-service`, `addresses-service` + hooks; invalidar `['catalog']` al crear venta — `src/api/services/`, `src/features/checkout/hooks/`
-- [ ] T061 [US4] Carrito/selección de línea (estado local de checkout) y redirección de invitado a registro con `returnTo` — `src/features/checkout/`
-- [ ] T062 [US4] `checkout-page` con `delivery-step`, `channel-step` (Email por defecto), `coupon-input`, `summary-step` — `src/features/checkout/`
-- [ ] T063 [US4] `confirmation-page` (abre `contact.url`, botón de respaldo si el navegador bloquea, estado de la venta) — `src/features/checkout/confirmation-page.jsx`
-- [ ] T064 [US4] Manejo de `STOCK_INSUFFICIENT` sin perder la selección — `src/features/checkout/`
-- [ ] T065 [US4] Claves i18n `checkout.*` — `src/i18n/locales/`
+- [x] T057 [P] [US4] Dominio `coordination-message.js` (asunto/cuerpo/URL `mailto:`/`wa.me` desde settings) + tests — `src/mocks/domain/` · *+ `coupons.js`, `sales.js` y `money.js`*
+- [x] T058 [US4] Controllers `sales` (`POST /sales` atómico con reserva, `GET /me/sales`) y `coupons/validate` + tests de conflicto — `src/mocks/controllers/sales.controller.js` · *`coupons/validate` quedó en `coupons.controller.js`; se agregó `GET /me/sales/:id` para la confirmación*
+- [~] T059 [P] [US4] Controllers `profiles`/`addresses` mínimos para checkout (alta de dirección) — `src/mocks/controllers/addresses.controller.js` · *solo `addresses` (listar + alta); el CRUD de `profiles` y de direcciones llega en US5/T071–T075*
+- [x] T060 [P] [US4] `sales-service`, `addresses-service` + hooks; invalidar `['catalog']` al crear venta — `src/api/services/`, `src/features/checkout/hooks/`
+- [x] T061 [US4] Carrito/selección de línea (estado local de checkout) y redirección de invitado a registro con `returnTo` — `src/features/checkout/` · *una línea por venta (el carrito multi-línea queda fuera por decisión); la selección viaja por query desde el catálogo y el guard de `RequireAuth` conserva el `returnTo`*
+- [x] T062 [US4] `checkout-page` con `delivery-step`, `channel-step` (Email por defecto), `coupon-input`, `summary-step` — `src/features/checkout/`
+- [x] T063 [US4] `confirmation-page` (abre `contact.url`, botón de respaldo si el navegador bloquea, estado de la venta) — `src/features/checkout/confirmation-page.jsx`
+- [x] T064 [US4] Manejo de `STOCK_INSUFFICIENT` sin perder la selección — `src/features/checkout/`
+- [x] T065 [US4] Claves i18n `checkout.*` — `src/i18n/locales/`
 
-### Fase 7 — US7: Admin gestiona ventas (P1)
+### Fase 7 — US7: Admin gestiona ventas (P1) _(iteración 7)_
 
-- [ ] T066 [US7] Controller `admin-sales` (listado, detalle, `PATCH status` con transición y movimiento `SaleConfirmed`) + tests de estados y stock — `src/mocks/controllers/admin-sales.controller.js`
-- [ ] T067 [P] [US7] `admin-sales-service` + hooks (invalidan `['catalog']`, `['admin','inventory']`) — `src/api/services/`, `src/features/admin/sales/hooks/`
-- [ ] T068 [US7] `sales-page` con `Tabs` por estado, filtro de canal, `responsive-list`, antigüedad resaltada — `src/features/admin/sales/`
-- [ ] T069 [US7] `sale-detail` (Drawer/página) con cliente, teléfono, logística, canal y acciones con confirmación — `src/features/admin/sales/`
-- [ ] T070 [US7] Claves i18n `admin.sales.*` — `src/i18n/locales/`
+- [x] T066 [US7] Controller `admin-sales` (listado, detalle, `PATCH status` con transición y movimiento `SaleConfirmed`) + tests de estados y stock — `src/mocks/controllers/admin-sales.controller.js`
+- [x] T067 [P] [US7] `admin-sales-service` + hooks (invalidan `['catalog']`, `['admin','inventory']`) — `src/api/services/`, `src/features/admin/sales/hooks/`
+- [x] T068 [US7] `sales-page` con `Tabs` por estado, filtro de canal, `responsive-list`, antigüedad resaltada — `src/features/admin/sales/` · *el umbral de antigüedad es `SETTING.stale_sale_days` (Q-11)*
+- [x] T069 [US7] `sale-detail` (Drawer/página) con cliente, teléfono, logística, canal y acciones con confirmación — `src/features/admin/sales/` · *página + `Modal` de core (no se instaló `@mantine/modals`)*
+- [x] T070 [US7] Claves i18n `admin.sales.*` — `src/i18n/locales/`
 
-**Checkpoint P1:** recorrido completo cliente + admin funcionando (hito de demo con el cliente).
+**Checkpoint P1:** ✅ recorrido completo cliente + admin funcionando (hito de demo con el cliente) — **M2 cerrado**.
 
-### Fase 8 — US5: Perfiles y direcciones (P2)
+### Fase 8 — US5: Perfiles y direcciones (P2) _(iteración 9)_ ✅
 
-- [ ] T071 [US5] Controller `profiles` completo (CRUD, default, baja lógica) + tests — `src/mocks/controllers/profiles.controller.js`
-- [ ] T072 [P] [US5] `profiles-service` + hooks — `src/api/services/profiles-service.js`
-- [ ] T073 [US5] `profile-selector` global y precarga de `fit-form` — `src/components/profile-selector.jsx`, `src/features/fit/`
-- [ ] T074 [P] [US5] `profiles-page` y `save-profile-modal` (desde resultado) — `src/features/account/`, `src/features/fit/`
-- [ ] T075 [P] [US5] `addresses-page` (alta/edición/baja/default) — `src/features/account/addresses-page.jsx`
-- [ ] T076 [US5] Claves i18n `account.*` — `src/i18n/locales/`
+- [x] T071 [US5] Controller `profiles` completo (CRUD, default, baja lógica) + tests — `src/mocks/controllers/profiles.controller.js`
+- [x] T072 [P] [US5] `profiles-service` + hooks — `src/api/services/profiles-service.js`
+- [x] T073 [US5] `profile-selector` global y precarga de `fit-form` — `src/components/profile-selector.jsx`, `src/features/fit/`
+- [x] T074 [P] [US5] `profiles-page` y `save-profile-modal` (desde resultado) — `src/features/account/`, `src/features/fit/`
+- [x] T075 [P] [US5] `addresses-page` (alta/edición/baja/default) — `src/features/account/addresses-page.jsx`
+- [x] T076 [US5] Claves i18n `account.*` — `src/i18n/locales/`
 
-### Fase 9 — US6: Feedback, puntos, cupones, historial (P2)
+### Fase 9 — US6: Feedback, puntos, cupones, historial (P2) _(iteración 10)_ ✅
 
-- [ ] T077 [P] [US6] Dominio `points.js` (probabilidad, tope diario, RNG inyectable) + tests — `src/mocks/domain/points.js`
-- [ ] T078 [US6] Controllers `feedback`, `points`, `rewards` (canje), `me/coupons` — `src/mocks/controllers/`
-- [ ] T079 [P] [US6] `rewards-service` + hooks — `src/api/services/rewards-service.js`
-- [ ] T080 [US6] `feedback-drawer` (chico/correcto/grande + comentario), `points-toast`, integración en resultado e historial — `src/features/feedback/`
-- [ ] T081 [P] [US6] `history-page` (por perfil, pendientes de calificar) y `orders-page` — `src/features/account/`
-- [ ] T082 [P] [US6] `rewards-page` (saldo, movimientos, canje, mis cupones) y aplicación en checkout — `src/features/account/rewards-page.jsx`
-- [ ] T083 [US6] Claves i18n `rewards.*`, `feedback.*` — `src/i18n/locales/`
+- [x] T077 [P] [US6] Dominio `points.js` (probabilidad, tope diario, RNG inyectable) + tests — `src/mocks/domain/points.js`
+- [x] T078 [US6] Controllers `feedback`, `points`, `rewards` (canje), `me/coupons` — `src/mocks/controllers/`
+- [x] T079 [P] [US6] `rewards-service` + hooks — `src/api/services/rewards-service.js`
+- [x] T080 [US6] `feedback-drawer` (chico/correcto/grande + comentario), `points-toast`, integración en resultado e historial — `src/features/feedback/`
+- [x] T081 [P] [US6] `history-page` (por perfil, pendientes de calificar) y `orders-page` — `src/features/account/`
+- [x] T082 [P] [US6] `rewards-page` (saldo, movimientos, canje, mis cupones) y aplicación en checkout — `src/features/account/rewards-page.jsx`
+- [x] T083 [US6] Claves i18n `rewards.*`, `feedback.*` — `src/i18n/locales/`
 
-### Fase 10 — US8: Dashboard (P2)
+### Fase 10 — US8: Dashboard (P2) _(iteración 11)_ ✅
 
-- [ ] T084 [US8] Controllers `admin-analytics` (conversion, precision, critical-stock) + tests — `src/mocks/controllers/admin-analytics.controller.js`
-- [ ] T085 [P] [US8] `admin-analytics-service` + hooks con filtro de fechas — `src/api/services/`
-- [ ] T086 [US8] `dashboard-page` (4 bloques, `DatePickerInput`, `RingProgress`/gráficos lazy, ventas en vuelo con canal y teléfono) — `src/features/admin/dashboard/`
-- [ ] T087 [US8] Claves i18n `admin.dashboard.*` — `src/i18n/locales/`
+- [x] T084 [US8] Controllers `admin-analytics` (conversion, precision, critical-stock) + tests — `src/mocks/controllers/admin-analytics.controller.js`
+- [x] T085 [P] [US8] `admin-analytics-service` + hooks con filtro de fechas — `src/api/services/`
+- [x] T086 [US8] `dashboard-page` (4 bloques, `DatePickerInput`, `RingProgress`/gráficos lazy, ventas en vuelo con canal y teléfono) — `src/features/admin/dashboard/` · *sin `@mantine/dates` instalado: el rango se elige con presets (`SegmentedControl` 7/30/90/todo) que calculan `from`/`to`; los KPIs usan `RingProgress`/`Progress` de core (sin `@mantine/charts`)*
+- [x] T087 [US8] Claves i18n `admin.dashboard.*` — `src/i18n/locales/`
 
-### Fase 11 — US9: Inventario y catálogo (P2)
+### Fase 11 — US9: Inventario y catálogo (P2) _(iteración 12)_ ✅
 
-- [ ] T088 [US9] Controllers `admin-variants`, `admin-products`, `admin-stock-transactions` (motivo obligatorio, reposición dispara alertas) + tests — `src/mocks/controllers/`
-- [ ] T089 [P] [US9] `admin-inventory-service`, `admin-catalog-service` + hooks — `src/api/services/`
-- [ ] T090 [US9] `inventory-page` (filtros, disponible/reservado/físico, alerta crítica) y modal de ajuste con motivo — `src/features/admin/inventory/`
-- [ ] T091 [P] [US9] `movements-page` (auditoría) — `src/features/admin/inventory/movements-page.jsx`
-- [ ] T092 [P] [US9] `products-page` (CRUD producto/variantes, baja lógica) — `src/features/admin/catalog-admin/`
-- [ ] T093 [US9] Claves i18n `admin.inventory.*`, `admin.products.*` — `src/i18n/locales/`
+- [x] T088 [US9] Controllers `admin-variants`, `admin-products`, `admin-stock-transactions` (motivo obligatorio, reposición dispara alertas) + tests — `src/mocks/controllers/`
+- [x] T089 [P] [US9] `admin-inventory-service`, `admin-catalog-service` + hooks — `src/api/services/`
+- [x] T090 [US9] `inventory-page` (filtros, disponible/reservado/físico, alerta crítica) y modal de ajuste con motivo — `src/features/admin/inventory/`
+- [x] T091 [P] [US9] `movements-page` (auditoría) — `src/features/admin/inventory/movements-page.jsx`
+- [x] T092 [P] [US9] `products-page` (CRUD producto/variantes, baja lógica) — `src/features/admin/catalog-admin/`
+- [x] T093 [US9] Claves i18n `admin.inventory.*`, `admin.products.*` — `src/i18n/locales/`
 
 ### Fase 12 — US10, US11, US12 (P3)
 
@@ -905,10 +911,10 @@ OTP en mock: `123456`. Reset de datos: `/dev` → "Restablecer base mock".
 - [ ] T102 [P] Revisión responsive a 360/768/1280 px de todas las pantallas; objetivos táctiles y foco
 - [ ] T103 [P] Accesibilidad: labels, `aria-*` traducidos, contraste, navegación por teclado en modales/drawers
 - [ ] T104 [P] Rendimiento: analizar bundle, verificar chunks lazy (admin, charts, export), Lighthouse mobile en `/` y `/fit`
-- [ ] T105 Verificar que `VITE_API_MODE=http` excluye `src/mocks/` del bundle (SC-005)
-- [ ] T106 Barrido i18n: 0 literales (lint), `i18n:check` verde, revisión de textos es/en
+- [~] T105 Verificar que `VITE_API_MODE=http` excluye `src/mocks/` del bundle (SC-005) · *verificado en cada iteración (build mock + http y barrido de marcadores en `dist/`); conviene repetirlo en el cierre*
+- [~] T106 Barrido i18n: 0 literales (lint), `i18n:check` verde, revisión de textos es/en · *`i18n:check` verde (487 claves con paridad); **falta** la regla `no-literal-string` (T005)*
 - [ ] T107 Estados de error: probar con `VITE_MOCK_FAIL_RATE` en cada pantalla con datos
-- [ ] T108 Ejecutar el recorrido de §7.3 completo y corregir
+- [~] T108 Ejecutar el recorrido de §7.3 completo y corregir · *US1–US4 y US7 cubiertos por tests de componentes; falta el barrido manual en navegador del recorrido completo*
 - [ ] T109 [P] README con arquitectura de la capa API, cómo escribir un controller y cómo pasar a la API real
 - [ ] T110 [P] (Opcional) Smoke E2E con Playwright: US1→US4→US7
 
@@ -929,14 +935,14 @@ F1 Setup → F2 Fundacional ──┬─► US1 ─► US2 ─► US3 ─► US4
 
 ### Hitos de demo
 
-| Hito | Contenido | Tareas |
-|---|---|---|
-| **M0** | Esqueleto navegable, idioma, login mock | F1–F2 |
-| **M1** | Invitado obtiene talle (QR incluido) y se registra | US1, US2 |
-| **M2** | Catálogo filtrado, sin stock, compra coordinada + admin gestiona venta | US3, US4, US7 |
-| **M3** | Perfiles, direcciones, feedback, puntos, cupones | US5, US6 |
-| **M4** | Dashboard, inventario, catálogo admin | US8, US9 |
-| **M5** | Analítica, exportación, reglas, modo asistente, pulido | US10–US12, F13 |
+| Hito | Contenido | Tareas | Estado |
+|---|---|---|---|
+| **M0** | Esqueleto navegable, idioma, login mock | F1–F2 | ✅ *(T007 parcial: faltan carpetas de historias pendientes)* |
+| **M1** | Invitado obtiene talle (QR incluido) y se registra | US1, US2 | ✅ |
+| **M2** | Catálogo filtrado, sin stock, compra coordinada + admin gestiona venta | US3, US4, US7 | ✅ **cerrado (iteración 7)** |
+| **M3** | Perfiles, direcciones, feedback, puntos, cupones | US5, US6 | ✅ **cerrado (iteración 10)** |
+| **M4** | Dashboard, inventario, catálogo admin | US8, US9 | ✅ **cerrado (iteración 12)** |
+| **M5** | Analítica, exportación, reglas, modo asistente, pulido | US10–US12, F13 | 🟡 **siguiente** |
 
 ---
 
@@ -956,7 +962,7 @@ Los supuestos se implementan en el mock tal como se indica, aislados para poder 
 | **Q-08** | Datos demográficos | "Datos demográficos" del registro no se especifican. | Nombre, email, contraseña, WhatsApp. | Bajo |
 | **Q-09** | Destino y composición del mensaje | No se indica el email/número de Vikinga ni quién arma el mensaje. | Claves `coordination_email` / `coordination_whatsapp` en `SETTING`; el controller compone. | Medio |
 | **Q-10** | Nombres de ruta y query | Doc técnica: `/fit?linea=`; regla de FE: rutas en inglés (ejemplo `/generator`). | `/fit?line=` con alias `linea=`; renombrable en `routes.js`. | Bajo |
-| **Q-11** | Vencimiento de reservas | Sin TTL definido: una venta abandonada retiene stock indefinidamente. | Sin TTL; se resalta la antigüedad en admin. Proponer TTL/recordatorio al cliente. | **Alto** (operativo) |
+| **Q-11** | Vencimiento de reservas | Sin TTL definido: una venta abandonada retiene stock indefinidamente. | **Resuelto (iteración 7): sin TTL.** `SETTING.stale_sale_days` (3 por defecto) marca las ventas abiertas y el admin decide si las mueve o las cancela; el dashboard de US8 podrá alertar. | Cerrada |
 | **Q-12** | Mapa de faltantes por color | La doc habla de "talle o color", pero `SIZE_GENERATION` no guarda color. | Agregado por línea × talle. | Medio |
 | **Q-13** | Formato JSON | ERD en `snake_case`; JS idiomático en `camelCase`. | camelCase; si la API usa snake_case, se convierte en `api-client` en un solo punto. | Bajo |
 | **Q-14** | Cambio por talle | `TRANSACTION` tiene una sola `direction`; un cambio implica entrada y salida. | El formulario admite 2 líneas y el controller crea dos transacciones enlazadas. | Bajo |
@@ -977,6 +983,9 @@ Los supuestos se implementan en el mock tal como se indica, aislados para poder 
 
 ## 10. Próximos pasos
 
-1. Validar §9 con el cliente/backend (prioridad Q-01, Q-03, Q-04, Q-06, Q-11).
-2. Ejecutar el flujo de spec-kit de §0 con este documento como insumo.
-3. Empezar por M0 → M1 → M2: al terminar M2 hay un recorrido completo demostrable de cliente y administrador.
+1. Validar §9 con el cliente/backend (prioridad Q-01, Q-03, Q-04, Q-06; Q-11 quedó cerrada en la iteración 7).
+2. Revisar el estado de las tareas en §8 (leyenda `[x]`/`[~]`/`[ ]`/`➖`) y el detalle por iteración en `agents/iteraciones.md`.
+3. Retomar por **M5** (US10–US12 + F13): M3 y M4 quedaron cerrados (US5–US6 en las iteraciones 9–10, US8–US9 en la 11–12). El recorrido cliente (US1→US6) + panel (US7–US9) ya es demostrable.
+4. Al final, integrar el motor de recomendación real (§7).
+
+> El flujo de spec-kit de §0 queda como referencia; `specify init` (T002) se descartó porque el spec lo aporta el equipo.

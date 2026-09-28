@@ -1,21 +1,14 @@
+import { isApiError } from '@api/client/api-error.js'
+import { routes, safeReturnTo } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { useAuth } from '@features/auth/auth-context.js'
+import { registerSchema } from '@features/auth/auth-schema.js'
+import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { useI18n } from '@i18n/context.js'
+import { Anchor, Button, PasswordInput, Stack, Text, TextInput } from '@mantine/core'
+import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
-import {
-  Anchor,
-  Button,
-  PasswordInput,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from './auth-context.js'
-import { routes, safeReturnTo } from '../../app/routes.js'
-import { isApiError } from '../../api/client/api-error.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { collectFieldErrors } from '../../utils/zod-errors.js'
-import { registerSchema } from './auth-schema.js'
-import { AuthShell } from './auth-shell.jsx'
 
 // Registro (FR-009): nombre, email, contraseña y WhatsApp obligatorio.
 // Si el invitado trae generaciones previas, el controller las migra y crea
@@ -38,7 +31,10 @@ export function RegisterPage() {
   const [busy, setBusy] = useState(false)
 
   const setField = (field) => (event) => {
-    setValues((current) => ({ ...current, [field]: event.currentTarget.value }))
+    // Se lee el valor en el momento del evento: React puede ejecutar el updater
+    // más tarde, cuando `currentTarget` ya es null.
+    const { value } = event.currentTarget
+    setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
@@ -102,7 +98,9 @@ export function RegisterPage() {
             required
           />
 
-          {serverError && <ErrorState error={serverError} onRetry={() => setServerError(null)} />}
+          {serverError && (
+            <ErrorState error={serverError} onRetry={() => setServerError(null)} />
+          )}
 
           <Button type="submit" loading={busy}>
             {t('auth.register.submit')}
@@ -115,7 +113,11 @@ export function RegisterPage() {
           {t('auth.register.haveAccount')}{' '}
           <Anchor
             component={Link}
-            to={returnTo ? `${routes.login}?returnTo=${encodeURIComponent(returnTo)}` : routes.login}
+            to={
+              returnTo
+                ? `${routes.login}?returnTo=${encodeURIComponent(returnTo)}`
+                : routes.login
+            }
           >
             {t('auth.login.title')}
           </Anchor>

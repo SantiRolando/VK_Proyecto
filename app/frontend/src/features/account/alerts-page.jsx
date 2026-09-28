@@ -1,11 +1,11 @@
+import { EmptyState } from '@components/feedback/empty-state.jsx'
+import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
+import { PageHeader } from '@components/page-header.jsx'
+import { useCancelRestock } from '@features/catalog/hooks/use-cancel-restock.js'
+import { useRestockAlerts } from '@features/catalog/hooks/use-restock-alerts.js'
+import { useI18n } from '@i18n/context.js'
 import { Badge, Button, Card, Container, Group, Stack, Text } from '@mantine/core'
 import { IconBell } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { PageHeader } from '../../components/page-header.jsx'
-import { QueryBoundary } from '../../components/feedback/query-boundary.jsx'
-import { EmptyState } from '../../components/feedback/empty-state.jsx'
-import { useRestockAlerts } from '../catalog/hooks/use-restock-alerts.js'
-import { useCancelRestock } from '../catalog/hooks/use-cancel-restock.js'
 
 // Mis avisos de reposición (US3): suscripciones agrupadas por línea × talle.
 export function AlertsPage() {

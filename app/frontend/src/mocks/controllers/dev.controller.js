@@ -2,10 +2,10 @@
 // `reset` re-siembra la base y `login-as` emite un token para un usuario
 // sin pasar por el login (plan §7.2).
 
-import { ApiError } from '../../api/client/api-error.js'
-import { getDb, resetDatabase } from '../db/database.js'
-import { register } from '../router/mock-router.js'
-import { issueToken, sanitizeUser } from './auth.controller.js'
+import { ApiError } from '@api/client/api-error.js'
+import { issueToken, sanitizeUser } from '@mocks/controllers/auth.controller.js'
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { register } from '@mocks/router/mock-router.js'
 
 register('POST', '/dev/reset', () => {
   resetDatabase()

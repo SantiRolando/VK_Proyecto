@@ -1,9 +1,9 @@
 // Guard de ruta: requiere sesión activa (FR-004).
 // Redirige a login con `returnTo` para volver al punto donde estaba.
 
+import { routes } from '@app/routes.js'
+import { useAuth } from '@features/auth/auth-context.js'
 import { Navigate, useLocation } from 'react-router'
-import { useAuth } from '../../features/auth/auth-context.js'
-import { routes } from '../routes.js'
 
 export function RequireAuth({ children }) {
   const { isAuthenticated, status } = useAuth()
@@ -14,10 +14,7 @@ export function RequireAuth({ children }) {
   if (!isAuthenticated) {
     const returnTo = location.pathname + location.search
     return (
-      <Navigate
-        to={`${routes.login}?returnTo=${encodeURIComponent(returnTo)}`}
-        replace
-      />
+      <Navigate to={`${routes.login}?returnTo=${encodeURIComponent(returnTo)}`} replace />
     )
   }
 

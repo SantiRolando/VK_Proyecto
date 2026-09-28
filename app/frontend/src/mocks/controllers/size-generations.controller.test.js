@@ -1,7 +1,7 @@
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { getDb, resetDatabase } from '../db/database.js'
-import { configureMockRouter, handle } from '../router/mock-router.js'
-import './register-all.js'
+import '@mocks/controllers/register-all.js'
 
 beforeEach(() => {
   resetDatabase()

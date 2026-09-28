@@ -1,6 +1,6 @@
 // Service de autenticación: solo conoce paths y DTOs del contrato (§6.2).
 
-import { apiClient } from '../client/api-client.js'
+import { apiClient } from '@api/client/api-client.js'
 
 export const authService = {
   register: (payload) => apiClient.post('/auth/register', payload),

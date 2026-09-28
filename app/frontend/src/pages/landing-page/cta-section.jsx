@@ -1,8 +1,8 @@
+import { routes } from '@app/routes.js'
+import { useI18n } from '@i18n/context.js'
 import { Button, Text, Title } from '@mantine/core'
 import { IconLogin, IconPlayerPlay } from '@tabler/icons-react'
 import { useNavigate } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
 
 export function CtaSection() {
   const { t } = useI18n()

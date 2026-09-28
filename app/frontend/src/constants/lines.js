@@ -1,7 +1,7 @@
 // Líneas de prenda: slug de URL (inglés, minúsculas) ↔ valor del ERD.
 // `/fit?line=endurance` (y su alias `linea=`) se resuelve con `slugToLine`.
 
-import { Line } from './enums.js'
+import { Line } from '@constants/enums.js'
 
 export const LINE_SLUGS = {
   endurance: Line.Endurance,

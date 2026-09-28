@@ -1,6 +1,6 @@
 // Helpers compartidos por los controllers mock.
 
-import { ApiError } from '../../api/client/api-error.js'
+import { ApiError } from '@api/client/api-error.js'
 
 export function requireFields(body, fields) {
   const missing = fields.filter(

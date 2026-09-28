@@ -1,9 +1,9 @@
-import { SiteHeader } from './site-header.jsx'
-import { Hero } from './hero.jsx'
-import { HowItWorks } from './how-it-works.jsx'
-import { Benefits } from './benefits.jsx'
-import { Store } from './store.jsx'
-import { CtaSection } from './cta-section.jsx'
+import { Benefits } from '@pages/landing-page/benefits.jsx'
+import { CtaSection } from '@pages/landing-page/cta-section.jsx'
+import { Hero } from '@pages/landing-page/hero.jsx'
+import { HowItWorks } from '@pages/landing-page/how-it-works.jsx'
+import { SiteHeader } from '@pages/landing-page/site-header.jsx'
+import { Store } from '@pages/landing-page/store.jsx'
 
 export function LandingPage() {
   return (

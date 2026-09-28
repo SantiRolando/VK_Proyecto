@@ -1,6 +1,6 @@
 // Service de herramientas de demo (solo responde en modo mock).
 
-import { apiClient } from '../client/api-client.js'
+import { apiClient } from '@api/client/api-client.js'
 
 export const devService = {
   reset: () => apiClient.post('/dev/reset'),

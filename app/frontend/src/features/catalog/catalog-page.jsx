@@ -1,14 +1,14 @@
+import { routes } from '@app/routes.js'
+import { EmptyState } from '@components/feedback/empty-state.jsx'
+import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
+import { PageHeader } from '@components/page-header.jsx'
+import { useCatalog } from '@features/catalog/hooks/use-catalog.js'
+import { NoStockState } from '@features/catalog/no-stock-state.jsx'
+import { ProductCard } from '@features/catalog/product-card.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Button, Container, SimpleGrid } from '@mantine/core'
 import { IconRuler } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { PageHeader } from '../../components/page-header.jsx'
-import { QueryBoundary } from '../../components/feedback/query-boundary.jsx'
-import { EmptyState } from '../../components/feedback/empty-state.jsx'
-import { useCatalog } from './hooks/use-catalog.js'
-import { ProductCard } from './product-card.jsx'
-import { NoStockState } from './no-stock-state.jsx'
 
 // Estado "primero medí tu talle" (FR-012): el catálogo solo muestra lo que
 // hay disponible en el talle recomendado, así que sin talle no hay listado.
@@ -51,9 +51,7 @@ export function CatalogPage() {
       <PageHeader
         title={t('catalog.title')}
         subtitle={
-          meta?.size
-            ? `${t('catalog.size')}: ${meta.size.code}`
-            : t('catalog.subtitle')
+          meta?.size ? `${t('catalog.size')}: ${meta.size.code}` : t('catalog.subtitle')
         }
       />
 

@@ -1,7 +1,7 @@
 // Seed: identidad y contacto (USER, MEASUREMENT_PROFILE, ADDRESS).
 // Credenciales demo del plan §7.2 (solo modo mock).
 
-import { daysAgo } from './helpers.js'
+import { daysAgo } from '@mocks/db/seed/helpers.js'
 
 const users = [
   {
@@ -21,7 +21,7 @@ const users = [
     email: 'ana@example.test',
     password: 'cliente123',
     whatsappPhone: '+59899000002',
-    pointsBalance: 40,
+    pointsBalance: 120,
     createdAt: daysAgo(80),
   },
   {

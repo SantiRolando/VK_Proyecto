@@ -1,12 +1,10 @@
-import { Group, Image, Stack, Text } from '@mantine/core'
-import { Drawer } from '@mantine/core'
-import { useI18n } from '../../i18n/context.js'
-
-import heightImage from '../../assets/altura.jpg'
-import bustImage from '../../assets/pecho.jpg'
-import waistImage from '../../assets/cintura.jpg'
-import hipImage from '../../assets/cadera.jpg'
-import torsoImage from '../../assets/torso.jpg'
+import heightImage from '@assets/altura.jpg'
+import hipImage from '@assets/cadera.jpg'
+import waistImage from '@assets/cintura.jpg'
+import bustImage from '@assets/pecho.jpg'
+import torsoImage from '@assets/torso.jpg'
+import { useI18n } from '@i18n/context.js'
+import { Drawer, Group, Image, Stack, Text } from '@mantine/core'
 
 const MEASURES = [
   { field: 'height', image: heightImage },

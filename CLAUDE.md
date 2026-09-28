@@ -10,6 +10,18 @@
 - Archivos de componentes de React en kebab-case (ejemplo: `landing-page.jsx`).
 - Los componentes en sí en PascalCase (ejemplo: `LandingPage`), según las mejores prácticas de React.
 
+## Imports
+
+- Usa los alias de `vite.aliases.js` en lugar de rutas relativas que suban de nivel: `@app`, `@api`, `@assets`, `@components`, `@config`, `@constants`, `@features`, `@hooks`, `@i18n`, `@mocks`, `@pages`, `@test`, `@theme`, `@utils`.
+- Ejemplo: `import { Money } from '@components/money.jsx'`.
+- `src/mocks/**` solo puede importarse desde `src/api/**` y desde el propio `src/mocks/**` (constitución VI); Biome lo verifica con `noRestrictedImports`.
+
+## Lint y formato
+
+- Biome es el único tool (`biome.json`): `npm run lint` (= `biome check .`) y `npm run format` (= `biome format --write .`).
+- No hay regla automática de "sin literales visibles en JSX" ni de kebab-case: revisalas a mano (ver T005 del plan).
+- Los literales de UI siempre van por `useI18n()`; el gate automático de paridad es `npm run i18n:check`.
+
 ## PWA
 
 - La aplicación es una PWA (Progressive Web App): todo el diseño de la UI debe tenerlo en cuenta (rendimiento, carga rápida, responsive, soporte offline futuro).

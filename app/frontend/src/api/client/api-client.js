@@ -5,19 +5,15 @@
 // dinámico: en el build `http` la rama muerta se elimina y `src/mocks/`
 // no entra al bundle (SC-005).
 
-import { ApiError, isApiError } from './api-error.js'
-import {
-  getGuestSessionId,
-  getSession,
-  notifyUnauthorized,
-} from './session.js'
-import { httpTransport } from './http-transport.js'
+import { ApiError, isApiError } from '@api/client/api-error.js'
+import { httpTransport } from '@api/client/http-transport.js'
+import { getGuestSessionId, getSession, notifyUnauthorized } from '@api/client/session.js'
 
 const API_MODE = import.meta.env.VITE_API_MODE ?? 'mock'
 
 async function getTransport() {
   if (API_MODE === 'http') return httpTransport
-  const module = await import('../../mocks/mock-transport.js')
+  const module = await import('@mocks/mock-transport.js')
   return module.mockTransport
 }
 

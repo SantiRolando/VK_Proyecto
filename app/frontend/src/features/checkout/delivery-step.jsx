@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { AddressForm } from '@components/address-form.jsx'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { ListSkeleton } from '@components/feedback/skeletons.jsx'
+import { useCreateAddress } from '@features/account/hooks/use-addresses.js'
+import { useI18n } from '@i18n/context.js'
 import { Alert, Button, SegmentedControl, Select, Stack, Text } from '@mantine/core'
 import { IconMapPin, IconShoppingBag } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { ListSkeleton } from '../../components/feedback/skeletons.jsx'
-import { AddressForm } from './address-form.jsx'
-import { addressLine, addressFullLine } from './address-utils.js'
+import { addressFullLine, addressLine } from '@utils/address.js'
+import { useState } from 'react'
 
 // Paso 1 del checkout (T062): retiro en local o envío a una dirección de la
 // agenda (con alta rápida si todavía no hay ninguna).
@@ -21,6 +22,7 @@ export function DeliveryStep({
   invalid,
 }) {
   const { t } = useI18n()
+  const createAddress = useCreateAddress()
   const [adding, setAdding] = useState(false)
 
   return (
@@ -71,7 +73,9 @@ export function DeliveryStep({
 
               {adding ? (
                 <AddressForm
-                  onCreated={(address) => {
+                  isPending={createAddress.isPending}
+                  onSubmit={(values) => createAddress.mutateAsync(values)}
+                  onSaved={(address) => {
                     setAdding(false)
                     onAddressChange(address.id)
                   }}
@@ -90,9 +94,7 @@ export function DeliveryStep({
 
               {addressId != null && !adding && (
                 <Text size="xs" c="dimmed">
-                  {addressFullLine(
-                    addresses.find((address) => address.id === addressId),
-                  )}
+                  {addressFullLine(addresses.find((address) => address.id === addressId))}
                 </Text>
               )}
             </>

@@ -1,12 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { ApiError } from '../../api/client/api-error.js'
-import { resetDatabase } from '../db/database.js'
+import { ApiError } from '@api/client/api-error.js'
+import { resetDatabase } from '@mocks/db/database.js'
 import {
   configureMockRouter,
   handle,
   register,
   resetMockRouter,
-} from './mock-router.js'
+} from '@mocks/router/mock-router.js'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 beforeEach(() => {
   resetDatabase()
@@ -47,9 +47,10 @@ describe('mock-router', () => {
 
   it('devuelve 404 si el método no coincide con la ruta', async () => {
     register('GET', '/only-get', () => ({ status: 200, data: null }))
-    await expect(
-      send({ method: 'POST', url: '/only-get' }),
-    ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
+    await expect(send({ method: 'POST', url: '/only-get' })).rejects.toMatchObject({
+      status: 404,
+      code: 'NOT_FOUND',
+    })
   })
 
   it('exige sesión cuando la ruta lo requiere (401)', async () => {
@@ -61,9 +62,14 @@ describe('mock-router', () => {
   })
 
   it('resuelve el usuario a partir de un token válido', async () => {
-    register('GET', '/private', (req) => ({ status: 200, data: { name: req.auth.user.name } }), {
-      auth: 'user',
-    })
+    register(
+      'GET',
+      '/private',
+      (req) => ({ status: 200, data: { name: req.auth.user.name } }),
+      {
+        auth: 'user',
+      },
+    )
 
     const result = await send({
       method: 'GET',
@@ -82,14 +88,18 @@ describe('mock-router', () => {
   })
 
   it('rechaza rol customer en rutas admin (403)', async () => {
-    register('GET', '/admin-thing', () => ({ status: 200, data: null }), { auth: 'admin' })
+    register('GET', '/admin-thing', () => ({ status: 200, data: null }), {
+      auth: 'admin',
+    })
     await expect(
       send({ method: 'GET', url: '/admin-thing', auth: { token: 'vkfit.2.test' } }),
     ).rejects.toMatchObject({ status: 403, code: 'FORBIDDEN' })
   })
 
   it('acepta rol admin con token de admin', async () => {
-    register('GET', '/admin-thing', () => ({ status: 200, data: null }), { auth: 'admin' })
+    register('GET', '/admin-thing', () => ({ status: 200, data: null }), {
+      auth: 'admin',
+    })
     const result = await send({
       method: 'GET',
       url: '/admin-thing',
@@ -110,7 +120,10 @@ describe('mock-router', () => {
   })
 
   it('convierte respuestas con status >= 400 en ApiError', async () => {
-    register('GET', '/conflict', () => ({ status: 409, error: { code: 'ALREADY_RATED' } }))
+    register('GET', '/conflict', () => ({
+      status: 409,
+      error: { code: 'ALREADY_RATED' },
+    }))
     await expect(send({ method: 'GET', url: '/conflict' })).rejects.toMatchObject({
       status: 409,
       code: 'ALREADY_RATED',

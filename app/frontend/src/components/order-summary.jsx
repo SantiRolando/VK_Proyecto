@@ -1,11 +1,11 @@
+import { Money } from '@components/money.jsx'
+import { colorLabel } from '@constants/colors.js'
+import { useI18n } from '@i18n/context.js'
 import { Divider, Group, Stack, Table, Text } from '@mantine/core'
-import { useI18n } from '../../i18n/context.js'
-import { Money } from '../../components/money.jsx'
-import { colorLabel } from '../../constants/colors.js'
 
-// Resumen del pedido (§4.6: "resumen con Table"). Sirve tanto para el
-// checkout (selección local) como para la confirmación (líneas de la venta),
-// porque ambas usan la misma forma de línea.
+// Resumen del pedido (§4.6: "resumen con Table"). Lo comparten el checkout
+// (selección local), la confirmación y el detalle de venta del admin: todas
+// usan la misma forma de línea.
 
 function lineSubtitle(line, t) {
   const size = line.size?.code

@@ -1,17 +1,33 @@
-import { Alert, Badge, Button, Card, Container, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { routes } from '@app/routes.js'
+import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
+import { lineToSlug } from '@constants/lines.js'
+import { useAuth } from '@features/auth/auth-context.js'
+import { FeedbackDrawer } from '@features/feedback/feedback-drawer.jsx'
+import { useGeneration } from '@features/fit/hooks/use-generation.js'
+import { SaveProfileModal } from '@features/fit/save-profile-modal.jsx'
+import { useI18n } from '@i18n/context.js'
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Container,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import {
   IconArrowLeft,
   IconCircleCheck,
   IconCircleOff,
+  IconMessageStar,
+  IconUserCheck,
   IconUserPlus,
 } from '@tabler/icons-react'
 import { useNavigate, useParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from '../auth/auth-context.js'
-import { routes } from '../../app/routes.js'
-import { lineToSlug } from '../../constants/lines.js'
-import { QueryBoundary } from '../../components/feedback/query-boundary.jsx'
-import { useGeneration } from './hooks/use-generation.js'
 
 function SizeCard({ generation }) {
   const { t } = useI18n()
@@ -124,8 +140,87 @@ function RegisterCard() {
   )
 }
 
-// Resultado de la generación (US1): talle, línea, stock y CTA de registro
-// para invitados. El feedback llega en US6.
+// Con sesión, el resultado se puede guardar como perfil de medidas (US5/T074).
+function SaveProfileCard({ generation }) {
+  const { t } = useI18n()
+  const { isAuthenticated } = useAuth()
+  const [opened, { open, close }] = useDisclosure(false)
+
+  if (!isAuthenticated) return null
+
+  return (
+    <Card withBorder radius="md" padding="lg">
+      <Group gap="sm" wrap="nowrap">
+        <IconUserCheck size={28} stroke={1.5} />
+        <div>
+          <Text fw={600}>{t('fit.result.saveProfile')}</Text>
+          <Text size="sm" c="dimmed" mt={2}>
+            {t('fit.result.saveProfileBody')}
+          </Text>
+        </div>
+      </Group>
+      <Button mt="md" fullWidth variant="light" onClick={open}>
+        {t('fit.result.saveProfileCta')}
+      </Button>
+
+      <SaveProfileModal opened={opened} onClose={close} generation={generation} />
+    </Card>
+  )
+}
+
+// Feedback del talle (US6): Chico/Correcto/Grande + comentario. Disponible
+// también para invitados (sin puntos, Q-15).
+function FeedbackCard({ generation, onRated }) {
+  const { t } = useI18n()
+  const [opened, { open, close }] = useDisclosure(false)
+
+  if (generation.rating) {
+    return (
+      <Card withBorder radius="md" padding="lg">
+        <Group gap="sm" wrap="nowrap">
+          <Badge variant="light" color="vikinga">
+            {t(`enums.rating.${generation.rating}`)}
+          </Badge>
+          <Text size="sm" c="dimmed">
+            {t('feedback.thanks')}
+          </Text>
+        </Group>
+        {generation.comment && (
+          <Text size="sm" c="dimmed" mt="sm" fs="italic">
+            “{generation.comment}”
+          </Text>
+        )}
+      </Card>
+    )
+  }
+
+  return (
+    <Card withBorder radius="md" padding="lg">
+      <Group gap="sm" wrap="nowrap">
+        <IconMessageStar size={28} stroke={1.5} />
+        <div>
+          <Text fw={600}>{t('feedback.title')}</Text>
+          <Text size="sm" c="dimmed" mt={2}>
+            {t('feedback.prompt')}
+          </Text>
+        </div>
+      </Group>
+      <Button mt="md" fullWidth variant="light" onClick={open}>
+        {t('feedback.rate')}
+      </Button>
+
+      <FeedbackDrawer
+        opened={opened}
+        onClose={close}
+        generation={generation}
+        onRated={onRated}
+      />
+    </Card>
+  )
+}
+
+// Resultado de la generación (US1): talle, línea, stock, CTA de registro para
+// invitados y feedback (US6).
 export function ResultPage() {
   const { t } = useI18n()
   const { generationId } = useParams()
@@ -146,6 +241,8 @@ export function ResultPage() {
             <SizeCard generation={query.data} />
             <StockState generation={query.data} />
             <RegisterCard />
+            <SaveProfileCard generation={query.data} />
+            <FeedbackCard generation={query.data} onRated={query.refetch} />
             <Button
               variant="subtle"
               leftSection={<IconArrowLeft size={16} />}

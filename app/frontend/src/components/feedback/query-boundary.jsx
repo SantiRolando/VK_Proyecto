@@ -1,5 +1,5 @@
-import { ErrorState } from './error-state.jsx'
-import { ListSkeleton } from './skeletons.jsx'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { ListSkeleton } from '@components/feedback/skeletons.jsx'
 
 // Unifica Skeleton / Error / contenido para cualquier pantalla con datos
 // de TanStack Query (FR-029). Ejemplo:

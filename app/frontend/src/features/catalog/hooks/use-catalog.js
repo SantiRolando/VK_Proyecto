@@ -1,5 +1,5 @@
+import { catalogService } from '@api/services/catalog-service.js'
 import { useQuery } from '@tanstack/react-query'
-import { catalogService } from '../../../api/services/catalog-service.js'
 
 // Catálogo filtrado por talle (US3). Sin `sizeId` no consulta: la pantalla
 // muestra el estado "primero medí tu talle".

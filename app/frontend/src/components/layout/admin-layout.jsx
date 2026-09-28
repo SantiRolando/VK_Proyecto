@@ -1,3 +1,7 @@
+import { routes } from '@app/routes.js'
+import { LanguageSwitch } from '@components/language-switch.jsx'
+import { useAuth } from '@features/auth/auth-context.js'
+import { useI18n } from '@i18n/context.js'
 import { AppShell, Burger, Button, Group, NavLink, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
@@ -14,15 +18,11 @@ import {
 } from '@tabler/icons-react'
 import {
   Link,
-  NavLink as RouterNavLink,
   Outlet,
+  NavLink as RouterNavLink,
   useLocation,
   useNavigate,
 } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from '../../features/auth/auth-context.js'
-import { LanguageSwitch } from '../language-switch.jsx'
-import { routes } from '../../app/routes.js'
 
 const NAV_ITEMS = [
   { to: routes.admin, key: 'nav.dashboard', icon: IconLayoutDashboard },

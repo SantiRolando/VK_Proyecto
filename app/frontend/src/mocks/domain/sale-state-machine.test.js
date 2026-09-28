@@ -1,6 +1,10 @@
+import { ApiError } from '@api/client/api-error.js'
+import {
+  applyTransition,
+  canTransition,
+  SaleStatus,
+} from '@mocks/domain/sale-state-machine.js'
 import { describe, expect, it } from 'vitest'
-import { ApiError } from '../../api/client/api-error.js'
-import { applyTransition, canTransition, SaleStatus } from './sale-state-machine.js'
 
 describe('sale-state-machine', () => {
   it('define las transiciones válidas', () => {

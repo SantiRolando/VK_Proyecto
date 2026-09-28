@@ -1,5 +1,5 @@
+import { alertsService } from '@api/services/alerts-service.js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { alertsService } from '../../../api/services/alerts-service.js'
 
 // Cancela una suscripción completa (todas las alertas del grupo línea × talle).
 export function useCancelRestock() {

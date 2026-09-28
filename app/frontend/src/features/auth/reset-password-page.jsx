@@ -1,15 +1,15 @@
-import { useState } from 'react'
+import { isApiError } from '@api/client/api-error.js'
+import { authService } from '@api/services/auth-service.js'
+import { routes } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { env } from '@config/env.js'
+import { resetPasswordSchema } from '@features/auth/auth-schema.js'
+import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Alert, Button, PasswordInput, Stack, TextInput } from '@mantine/core'
+import { collectFieldErrors } from '@utils/zod-errors.js'
+import { useState } from 'react'
 import { Link } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { env } from '../../config/env.js'
-import { authService } from '../../api/services/auth-service.js'
-import { isApiError } from '../../api/client/api-error.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { collectFieldErrors } from '../../utils/zod-errors.js'
-import { resetPasswordSchema } from './auth-schema.js'
-import { AuthShell } from './auth-shell.jsx'
 
 // Nueva contraseña (FR-010). En modo mock cualquier token es válido.
 export function ResetPasswordPage() {
@@ -21,7 +21,10 @@ export function ResetPasswordPage() {
   const [busy, setBusy] = useState(false)
 
   const setField = (field) => (event) => {
-    setValues((current) => ({ ...current, [field]: event.currentTarget.value }))
+    // Se lee el valor en el momento del evento: React puede ejecutar el updater
+    // más tarde, cuando `currentTarget` ya es null.
+    const { value } = event.currentTarget
+    setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
@@ -87,7 +90,9 @@ export function ResetPasswordPage() {
               error={errorText('password')}
               required
             />
-            {serverError && <ErrorState error={serverError} onRetry={() => setServerError(null)} />}
+            {serverError && (
+              <ErrorState error={serverError} onRetry={() => setServerError(null)} />
+            )}
             <Button type="submit" loading={busy}>
               {t('auth.reset.submit')}
             </Button>

@@ -10,8 +10,8 @@
 // Forma del request:  { method, url, query, body, auth: {token}, guestSessionId }
 // Forma del response: { status, data, meta } (o `ApiError` lanzado).
 
-import { ApiError } from '../../api/client/api-error.js'
-import { getDb } from '../db/database.js'
+import { ApiError } from '@api/client/api-error.js'
+import { getDb } from '@mocks/db/database.js'
 
 const registered = []
 const config = { latencyMs: '250-600', failRate: 0 }

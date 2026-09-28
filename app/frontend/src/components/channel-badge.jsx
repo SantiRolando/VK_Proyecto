@@ -1,6 +1,6 @@
+import { useI18n } from '@i18n/context.js'
 import { Badge } from '@mantine/core'
 import { IconBrandWhatsapp, IconMail } from '@tabler/icons-react'
-import { useI18n } from '../i18n/context.js'
 
 const CHANNEL_ICONS = {
   Email: IconMail,

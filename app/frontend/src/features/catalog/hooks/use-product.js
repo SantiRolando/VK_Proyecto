@@ -1,5 +1,5 @@
+import { catalogService } from '@api/services/catalog-service.js'
 import { useQuery } from '@tanstack/react-query'
-import { catalogService } from '../../../api/services/catalog-service.js'
 
 // Detalle de producto con los colores y su disponibilidad en el talle
 // seleccionado (US3).

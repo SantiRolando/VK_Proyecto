@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import {
   detectBrowserLanguage,
   formatCurrencyValue,
@@ -7,7 +6,8 @@ import {
   interpolate,
   selectPluralForm,
   translateKey,
-} from './i18n-utils.js'
+} from '@i18n/i18n-utils.js'
+import { describe, expect, it } from 'vitest'
 
 const messages = {
   es: {
@@ -59,7 +59,11 @@ describe('i18n utils', () => {
     // es-UY: punto para miles, coma decimal.
     expect(formatNumberValue('es', 1234.5, { maximumFractionDigits: 1 })).toBe('1.234,5')
     const date = new Date('2026-09-23T14:10:00Z')
-    const formatted = formatDateValue('es', date, { year: 'numeric', month: '2-digit', day: '2-digit' })
+    const formatted = formatDateValue('es', date, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
     expect(formatted).toContain('2026')
   })
 
@@ -71,7 +75,10 @@ describe('i18n utils', () => {
       Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true })
       expect(detectBrowserLanguage()).toBe('en')
     } finally {
-      Object.defineProperty(navigator, 'language', { value: original, configurable: true })
+      Object.defineProperty(navigator, 'language', {
+        value: original,
+        configurable: true,
+      })
     }
   })
 })

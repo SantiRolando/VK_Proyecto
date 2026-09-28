@@ -1,5 +1,5 @@
+import { useI18n } from '@i18n/context.js'
 import { Container, Text, Title } from '@mantine/core'
-import { useI18n } from '../i18n/context.js'
 
 // Página placeholder del esqueleto de rutas (T015): título traducido +
 // aviso de "próximamente". Cada pantalla real reemplaza su stub al iterar

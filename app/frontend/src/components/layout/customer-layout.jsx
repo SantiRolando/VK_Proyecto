@@ -1,3 +1,8 @@
+import { routes } from '@app/routes.js'
+import { LanguageSwitch } from '@components/language-switch.jsx'
+import { ProfileSelector } from '@components/profile-selector.jsx'
+import { useAuth } from '@features/auth/auth-context.js'
+import { useI18n } from '@i18n/context.js'
 import { AppShell, Button, Group, Menu, Text, UnstyledButton } from '@mantine/core'
 import {
   IconClock,
@@ -9,10 +14,6 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from '../../features/auth/auth-context.js'
-import { LanguageSwitch } from '../language-switch.jsx'
-import { routes } from '../../app/routes.js'
 
 const NAV_ITEMS = [
   { to: routes.fit(), labelKey: 'nav.fit', icon: IconRuler },
@@ -37,7 +38,11 @@ function CustomerNavItem({ to, labelKey, icon: Icon, vertical = false }) {
           : 'flex items-center gap-1.5 px-2 py-1'
       }
     >
-      <Icon size={vertical ? 22 : 18} stroke={1.5} color={`var(--mantine-color-${color}-6)`} />
+      <Icon
+        size={vertical ? 22 : 18}
+        stroke={1.5}
+        color={`var(--mantine-color-${color}-6)`}
+      />
       <Text size={vertical ? 'xs' : 'sm'} c={color} fw={active ? 600 : 400}>
         {t(labelKey)}
       </Text>
@@ -118,12 +123,7 @@ export function CustomerLayout() {
   const { t } = useI18n()
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      footer={{ height: 60 }}
-      padding="md"
-      withBorder
-    >
+    <AppShell header={{ height: 60 }} footer={{ height: 60 }} padding="md" withBorder>
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           <Group gap="md" wrap="nowrap">
@@ -137,6 +137,7 @@ export function CustomerLayout() {
             </Group>
           </Group>
           <Group gap="sm" wrap="nowrap">
+            <ProfileSelector />
             <AccountMenu />
             <LanguageSwitch />
           </Group>

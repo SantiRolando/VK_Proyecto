@@ -1,7 +1,7 @@
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { getDb, resetDatabase } from '../db/database.js'
-import { configureMockRouter, handle } from '../router/mock-router.js'
-import './register-all.js'
+import '@mocks/controllers/register-all.js'
 
 beforeEach(() => {
   resetDatabase()
@@ -44,7 +44,10 @@ describe('addresses controller', () => {
     expect(result.status).toBe(200)
     expect(result.data).toHaveLength(2)
     expect(result.data[0]).toMatchObject({ street: 'Av. Italia', isDefault: true })
-    expect(result.data[1]).toMatchObject({ street: 'Rambla de los Argentinos', isDefault: false })
+    expect(result.data[1]).toMatchObject({
+      street: 'Rambla de los Argentinos',
+      isDefault: false,
+    })
     // No expone internos del ER.
     expect(result.data[0]).not.toHaveProperty('userId')
     expect(result.data[0]).not.toHaveProperty('active')
@@ -57,7 +60,11 @@ describe('addresses controller', () => {
     })
 
     expect(result.status).toBe(201)
-    expect(result.data).toMatchObject({ street: 'Rivera', reference: 'Apto 4', isDefault: true })
+    expect(result.data).toMatchObject({
+      street: 'Rivera',
+      reference: 'Apto 4',
+      isDefault: true,
+    })
 
     const list = await call('GET', '/me/addresses', { auth: OTHER })
     expect(list.data).toHaveLength(1)
@@ -86,5 +93,71 @@ describe('addresses controller', () => {
     })
 
     expect(getDb().addresses).toHaveLength(2)
+  })
+})
+
+describe('addresses controller — edición, predeterminada y baja', () => {
+  it('edita solo los campos que llegan', async () => {
+    const result = await call('PATCH', '/me/addresses/2', {
+      auth: ANA,
+      body: { city: 'Punta del Este', reference: '' },
+    })
+
+    expect(result.data).toMatchObject({
+      id: 2,
+      street: 'Rambla de los Argentinos',
+      city: 'Punta del Este',
+      reference: '',
+    })
+  })
+
+  it('rechaza dejar vacío un campo obligatorio y las direcciones ajenas', async () => {
+    await expect(
+      call('PATCH', '/me/addresses/2', { auth: ANA, body: { city: '   ' } }),
+    ).rejects.toMatchObject({
+      status: 422,
+      code: 'VALIDATION_ERROR',
+      details: { fields: ['city'] },
+    })
+
+    await expect(
+      call('PATCH', '/me/addresses/1', {
+        auth: OTHER,
+        body: { city: 'Robada' },
+      }),
+    ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
+
+    expect(getDb().addresses.find((item) => item.id === 1).city).toBe('Montevideo')
+  })
+
+  it('cambia la dirección predeterminada', async () => {
+    const result = await call('PUT', '/me/addresses/2/default', { auth: ANA })
+
+    expect(result.data).toMatchObject({ id: 2, isDefault: true })
+    const list = await call('GET', '/me/addresses', { auth: ANA })
+    expect(list.data.filter((address) => address.isDefault)).toHaveLength(1)
+    expect(list.data[0].id).toBe(2)
+  })
+
+  it('da de baja la predeterminada y promueve la más antigua que queda', async () => {
+    const result = await call('DELETE', '/me/addresses/1', { auth: ANA })
+    expect(result.status).toBe(204)
+
+    const list = await call('GET', '/me/addresses', { auth: ANA })
+    expect(list.data).toHaveLength(1)
+    expect(list.data[0]).toMatchObject({ id: 2, isDefault: true })
+
+    // Baja lógica: el registro sigue para las ventas que lo referencian.
+    expect(getDb().addresses.find((item) => item.id === 1).active).toBe(false)
+  })
+
+  it('rechaza bajas y cambios de predeterminada ajenos', async () => {
+    await expect(
+      call('DELETE', '/me/addresses/1', { auth: OTHER }),
+    ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
+
+    await expect(
+      call('PUT', '/me/addresses/1/default', { auth: OTHER }),
+    ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
   })
 })

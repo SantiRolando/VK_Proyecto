@@ -5,11 +5,11 @@
 // La demanda no satisfecha no se registra acá: el ER la deriva de
 // `SIZE_GENERATION.stock_available_at_query = false` (§4.7).
 
-import { ApiError } from '../../api/client/api-error.js'
-import { getDb } from '../db/database.js'
-import { adjacentSizes } from '../domain/size-engine.js'
-import { availableQuantity } from '../domain/stock.js'
-import { register } from '../router/mock-router.js'
+import { ApiError } from '@api/client/api-error.js'
+import { getDb } from '@mocks/db/database.js'
+import { adjacentSizes } from '@mocks/domain/size-engine.js'
+import { availableQuantity } from '@mocks/domain/stock.js'
+import { register } from '@mocks/router/mock-router.js'
 
 function serializeSize(size) {
   return { id: size.id, code: size.code, sortOrder: size.sortOrder }

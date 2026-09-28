@@ -2,15 +2,15 @@
 // La persistencia vive en `api/client/session.js`; el `api-client` registra
 // acá el handler que limpia la sesión ante un 401 (código UNAUTHENTICATED).
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   clearSession,
   getSession,
   setOnUnauthorized,
   setSession,
-} from '../../api/client/session.js'
-import { authService } from '../../api/services/auth-service.js'
-import { AuthContext } from './auth-context.js'
+} from '@api/client/session.js'
+import { authService } from '@api/services/auth-service.js'
+import { AuthContext } from '@features/auth/auth-context.js'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export function AuthProvider({ children }) {
   const [state, setState] = useState(() => {

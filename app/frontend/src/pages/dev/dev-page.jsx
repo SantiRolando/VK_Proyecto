@@ -2,12 +2,12 @@
 // Permite restablecer la base de datos y entrar como un usuario sembrado
 // sin pasar por el login.
 
-import { useState } from 'react'
+import { setSession } from '@api/client/session.js'
+import { devService } from '@api/services/dev-service.js'
+import { routes } from '@app/routes.js'
+import { useI18n } from '@i18n/context.js'
 import { Button, Container, Group, Paper, Stack, Text, Title } from '@mantine/core'
-import { useI18n } from '../../i18n/context.js'
-import { setSession } from '../../api/client/session.js'
-import { devService } from '../../api/services/dev-service.js'
-import { routes } from '../../app/routes.js'
+import { useState } from 'react'
 
 const DEMO_USERS = [
   { id: 1, name: 'Admin', email: 'admin@vikinga.test' },

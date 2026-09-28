@@ -6,7 +6,7 @@
 //                    ▼
 //                Cancelled   (libera reserva; no válido desde Confirmed)
 
-import { ApiError } from '../../api/client/api-error.js'
+import { ApiError } from '@api/client/api-error.js'
 
 export const SaleStatus = {
   PendingCoordination: 'PendingCoordination',

@@ -11,7 +11,7 @@
 //   - una venta pendiente que reserva la variante de 1 unidad (conflicto);
 //   - alertas de stock crítico derivadas de la reserva/stock sembrado.
 
-import { availableQuantity } from '../../domain/stock.js'
+import { findVariant } from '@mocks/db/seed/catalog.js'
 import {
   between,
   createRandom,
@@ -19,8 +19,8 @@ import {
   daysFromNow,
   midpoint,
   pick,
-} from './helpers.js'
-import { findVariant } from './catalog.js'
+} from '@mocks/db/seed/helpers.js'
+import { availableQuantity } from '@mocks/domain/stock.js'
 
 const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
 
@@ -49,8 +49,7 @@ function measuresFor(random, line, size) {
         ? between(random, 165, 190)
         : between(random, 155, 178)
 
-  const torso =
-    line === 'Kids' ? between(random, 100, 130) : between(random, 135, 152)
+  const torso = line === 'Kids' ? between(random, 100, 130) : between(random, 135, 152)
 
   if (line === 'Endurance' || line === 'Soft') {
     const bust = jitter(random, midpoint(size.bust))
@@ -87,62 +86,145 @@ function buildGenerations(sizes, random) {
 
   // Anclas vinculadas a las ventas sembradas más abajo.
   anchor({
-    customerId: 2, guestSessionId: null, profileId: 1, adminId: null,
-    line: 'Endurance', createdAt: daysAgo(1),
-    height: 168, bust: 90, waist: 72, hip: 98, torso: 142,
-    suggestedSizeId: enduranceL.id, stockAvailableAtQuery: true,
-    rating: null, comment: null, ratedAt: null,
-    fitType: 'Training', source: 'QR',
+    customerId: 2,
+    guestSessionId: null,
+    profileId: 1,
+    adminId: null,
+    line: 'Endurance',
+    createdAt: daysAgo(1),
+    height: 168,
+    bust: 90,
+    waist: 72,
+    hip: 98,
+    torso: 142,
+    suggestedSizeId: enduranceL.id,
+    stockAvailableAtQuery: true,
+    rating: null,
+    comment: null,
+    ratedAt: null,
+    fitType: 'Training',
+    source: 'QR',
   })
   anchor({
-    customerId: 2, guestSessionId: null, profileId: 1, adminId: null,
-    line: 'Soft', createdAt: daysAgo(4),
-    height: 165, bust: 85, waist: 67, hip: 92, torso: 140,
-    suggestedSizeId: softS.id, stockAvailableAtQuery: true,
-    rating: 'Correct', comment: 'Perfecto en la cadera', ratedAt: daysAgo(3),
-    fitType: 'Training', source: 'Direct',
+    customerId: 2,
+    guestSessionId: null,
+    profileId: 1,
+    adminId: null,
+    line: 'Soft',
+    createdAt: daysAgo(4),
+    height: 165,
+    bust: 85,
+    waist: 67,
+    hip: 92,
+    torso: 140,
+    suggestedSizeId: softS.id,
+    stockAvailableAtQuery: true,
+    rating: 'Correct',
+    comment: 'Perfecto en la cadera',
+    ratedAt: daysAgo(3),
+    fitType: 'Training',
+    source: 'Direct',
   })
   anchor({
-    customerId: 2, guestSessionId: null, profileId: 2, adminId: null,
-    line: 'Jammer', createdAt: daysAgo(6),
-    height: 178, bust: null, waist: 86, hip: 93, torso: 148,
-    suggestedSizeId: jammerM.id, stockAvailableAtQuery: true,
-    rating: 'Correct', comment: null, ratedAt: daysAgo(5),
-    fitType: 'Training', source: 'Direct',
+    customerId: 2,
+    guestSessionId: null,
+    profileId: 2,
+    adminId: null,
+    line: 'Jammer',
+    createdAt: daysAgo(6),
+    height: 178,
+    bust: null,
+    waist: 86,
+    hip: 93,
+    torso: 148,
+    suggestedSizeId: jammerM.id,
+    stockAvailableAtQuery: true,
+    rating: 'Correct',
+    comment: null,
+    ratedAt: daysAgo(5),
+    fitType: 'Training',
+    source: 'Direct',
   })
   anchor({
-    customerId: 2, guestSessionId: null, profileId: 1, adminId: null,
-    line: 'Endurance', createdAt: daysAgo(9),
-    height: 168, bust: 96, waist: 78, hip: 104, torso: 142,
-    suggestedSizeId: enduranceXL.id, stockAvailableAtQuery: true,
-    rating: 'Large', comment: 'Me quedó grande, pediría un talle menos',
+    customerId: 2,
+    guestSessionId: null,
+    profileId: 1,
+    adminId: null,
+    line: 'Endurance',
+    createdAt: daysAgo(9),
+    height: 168,
+    bust: 96,
+    waist: 78,
+    hip: 104,
+    torso: 142,
+    suggestedSizeId: enduranceXL.id,
+    stockAvailableAtQuery: true,
+    rating: 'Large',
+    comment: 'Me quedó grande, pediría un talle menos',
     ratedAt: daysAgo(7),
-    fitType: 'Competition', source: 'Landing',
+    fitType: 'Competition',
+    source: 'Landing',
   })
   anchor({
-    customerId: 3, guestSessionId: null, profileId: null, adminId: null,
-    line: 'Sunga', createdAt: daysAgo(0, 10),
-    height: 172, bust: null, waist: 80, hip: 88, torso: 145,
-    suggestedSizeId: sungaS.id, stockAvailableAtQuery: true,
-    rating: null, comment: null, ratedAt: null,
-    fitType: 'Training', source: 'Direct',
+    customerId: 3,
+    guestSessionId: null,
+    profileId: null,
+    adminId: null,
+    line: 'Sunga',
+    createdAt: daysAgo(0, 10),
+    height: 172,
+    bust: null,
+    waist: 80,
+    hip: 88,
+    torso: 145,
+    suggestedSizeId: sungaS.id,
+    stockAvailableAtQuery: true,
+    rating: null,
+    comment: null,
+    ratedAt: null,
+    fitType: 'Training',
+    source: 'Direct',
   })
   // Generaciones de invitado (se migran al registrarse con este guest id).
   anchor({
-    customerId: null, guestSessionId: 'guest-demo-1', profileId: null, adminId: null,
-    line: 'Endurance', createdAt: daysAgo(2),
-    height: 167, bust: 85, waist: 68, hip: 94, torso: 141,
-    suggestedSizeId: enduranceM.id, stockAvailableAtQuery: false,
-    rating: null, comment: null, ratedAt: null,
-    fitType: 'Training', source: 'Landing',
+    customerId: null,
+    guestSessionId: 'guest-demo-1',
+    profileId: null,
+    adminId: null,
+    line: 'Endurance',
+    createdAt: daysAgo(2),
+    height: 167,
+    bust: 85,
+    waist: 68,
+    hip: 94,
+    torso: 141,
+    suggestedSizeId: enduranceM.id,
+    stockAvailableAtQuery: false,
+    rating: null,
+    comment: null,
+    ratedAt: null,
+    fitType: 'Training',
+    source: 'Landing',
   })
   anchor({
-    customerId: null, guestSessionId: 'guest-demo-1', profileId: null, adminId: null,
-    line: 'Soft', createdAt: daysAgo(1),
-    height: 167, bust: 90, waist: 72, hip: 96, torso: 141,
-    suggestedSizeId: softM.id, stockAvailableAtQuery: true,
-    rating: null, comment: null, ratedAt: null,
-    fitType: 'Training', source: 'Direct',
+    customerId: null,
+    guestSessionId: 'guest-demo-1',
+    profileId: null,
+    adminId: null,
+    line: 'Soft',
+    createdAt: daysAgo(1),
+    height: 167,
+    bust: 90,
+    waist: 72,
+    hip: 96,
+    torso: 141,
+    suggestedSizeId: softM.id,
+    stockAvailableAtQuery: true,
+    rating: null,
+    comment: null,
+    ratedAt: null,
+    fitType: 'Training',
+    source: 'Direct',
   })
 
   // Relleno determinista hasta ~40 generaciones.
@@ -191,34 +273,74 @@ function buildGenerations(sizes, random) {
 function buildSalesAndCoupons(sizes, products, productVariants) {
   const discountCoupons = [
     {
-      id: 1, productId: null, userId: null, couponCode: 'VIKI10',
-      usageCount: 12, discountType: 'Percentage', discountValue: 10,
-      maxDiscount: 500, pointsCost: 100,
-      validFrom: daysAgo(10), validUntil: daysFromNow(50), active: true,
+      id: 1,
+      productId: null,
+      userId: null,
+      couponCode: 'VIKI10',
+      usageCount: 12,
+      discountType: 'Percentage',
+      discountValue: 10,
+      maxDiscount: 500,
+      pointsCost: 100,
+      validFrom: daysAgo(10),
+      validUntil: daysFromNow(50),
+      active: true,
     },
     {
-      id: 2, productId: null, userId: null, couponCode: 'ENVIO5',
-      usageCount: 4, discountType: 'Fixed', discountValue: 500,
-      maxDiscount: 500, pointsCost: 60,
-      validFrom: daysAgo(10), validUntil: daysFromNow(50), active: true,
+      id: 2,
+      productId: null,
+      userId: null,
+      couponCode: 'ENVIO5',
+      usageCount: 4,
+      discountType: 'Fixed',
+      discountValue: 500,
+      maxDiscount: 500,
+      pointsCost: 60,
+      validFrom: daysAgo(10),
+      validUntil: daysFromNow(50),
+      active: true,
     },
     {
-      id: 3, productId: null, userId: 2, couponCode: 'ANA15',
-      usageCount: 1, discountType: 'Percentage', discountValue: 15,
-      maxDiscount: 600, pointsCost: null,
-      validFrom: daysAgo(30), validUntil: daysFromNow(40), active: true,
+      id: 3,
+      productId: null,
+      userId: 2,
+      couponCode: 'ANA15',
+      usageCount: 1,
+      discountType: 'Percentage',
+      discountValue: 15,
+      maxDiscount: 600,
+      pointsCost: null,
+      validFrom: daysAgo(30),
+      validUntil: daysFromNow(40),
+      active: true,
     },
     {
-      id: 4, productId: null, userId: null, couponCode: 'VERANO15',
-      usageCount: 20, discountType: 'Percentage', discountValue: 15,
-      maxDiscount: 500, pointsCost: null,
-      validFrom: daysAgo(90), validUntil: daysAgo(5), active: true,
+      id: 4,
+      productId: null,
+      userId: null,
+      couponCode: 'VERANO15',
+      usageCount: 20,
+      discountType: 'Percentage',
+      discountValue: 15,
+      maxDiscount: 500,
+      pointsCost: null,
+      validFrom: daysAgo(90),
+      validUntil: daysAgo(5),
+      active: true,
     },
     {
-      id: 5, productId: null, userId: null, couponCode: 'VIP5000',
-      usageCount: 0, discountType: 'Fixed', discountValue: 5000,
-      maxDiscount: 5000, pointsCost: null,
-      validFrom: daysAgo(5), validUntil: daysFromNow(40), active: false,
+      id: 5,
+      productId: null,
+      userId: null,
+      couponCode: 'VIP5000',
+      usageCount: 0,
+      discountType: 'Fixed',
+      discountValue: 5000,
+      maxDiscount: 5000,
+      pointsCost: null,
+      validFrom: daysAgo(5),
+      validUntil: daysFromNow(40),
+      active: false,
     },
   ]
 
@@ -234,52 +356,119 @@ function buildSalesAndCoupons(sizes, products, productVariants) {
   }
 
   const enduranceLNavy = findVariant(
-    sizes, products, productVariants, 'endurance-classic', 'L', 'navy',
+    sizes,
+    products,
+    productVariants,
+    'endurance-classic',
+    'L',
+    'navy',
   )
   const softSBlue = findVariant(
-    sizes, products, productVariants, 'soft-classic', 'S', 'blue',
+    sizes,
+    products,
+    productVariants,
+    'soft-classic',
+    'S',
+    'blue',
   )
   const jammerMBlack = findVariant(
-    sizes, products, productVariants, 'jammer-classic', 'M', 'black',
+    sizes,
+    products,
+    productVariants,
+    'jammer-classic',
+    'M',
+    'black',
   )
   const enduranceXLBlack = findVariant(
-    sizes, products, productVariants, 'endurance-classic', 'XL', 'black',
+    sizes,
+    products,
+    productVariants,
+    'endurance-classic',
+    'XL',
+    'black',
   )
   const sungaSRed = findVariant(
-    sizes, products, productVariants, 'sunga-classic', 'S', 'red',
+    sizes,
+    products,
+    productVariants,
+    'sunga-classic',
+    'S',
+    'red',
   )
 
   addSale({
-    id: 1, userId: 2, couponId: null, addressId: null, generationId: 100,
-    createdAt: daysAgo(1), status: 'PendingCoordination', channel: 'Email',
-    deliveryMethod: 'StorePickup', contactedAt: null, confirmedAt: null, cancelledAt: null,
+    id: 1,
+    userId: 2,
+    couponId: null,
+    addressId: null,
+    generationId: 100,
+    createdAt: daysAgo(1),
+    status: 'PendingCoordination',
+    channel: 'Email',
+    deliveryMethod: 'StorePickup',
+    contactedAt: null,
+    confirmedAt: null,
+    cancelledAt: null,
     _lines: [{ variantId: enduranceLNavy.id, quantity: 1, unitPrice: 1290 }],
   })
   addSale({
-    id: 2, userId: 2, couponId: 3, addressId: 1, generationId: 101,
-    createdAt: daysAgo(4), status: 'Contacted', channel: 'Whatsapp',
-    deliveryMethod: 'HomeDelivery', contactedAt: daysAgo(3),
-    confirmedAt: null, cancelledAt: null,
+    id: 2,
+    userId: 2,
+    couponId: 3,
+    addressId: 1,
+    generationId: 101,
+    createdAt: daysAgo(4),
+    status: 'Contacted',
+    channel: 'Whatsapp',
+    deliveryMethod: 'HomeDelivery',
+    contactedAt: daysAgo(3),
+    confirmedAt: null,
+    cancelledAt: null,
     _lines: [{ variantId: softSBlue.id, quantity: 1, unitPrice: 1390 }],
   })
   addSale({
-    id: 3, userId: 2, couponId: null, addressId: null, generationId: 102,
-    createdAt: daysAgo(6), status: 'Confirmed', channel: 'Email',
-    deliveryMethod: 'StorePickup', contactedAt: daysAgo(5), confirmedAt: daysAgo(5),
+    id: 3,
+    userId: 2,
+    couponId: null,
+    addressId: null,
+    generationId: 102,
+    createdAt: daysAgo(6),
+    status: 'Confirmed',
+    channel: 'Email',
+    deliveryMethod: 'StorePickup',
+    contactedAt: daysAgo(5),
+    confirmedAt: daysAgo(5),
     cancelledAt: null,
     _lines: [{ variantId: jammerMBlack.id, quantity: 1, unitPrice: 1790 }],
   })
   addSale({
-    id: 4, userId: 2, couponId: null, addressId: 2, generationId: 103,
-    createdAt: daysAgo(9), status: 'Cancelled', channel: 'Whatsapp',
-    deliveryMethod: 'HomeDelivery', contactedAt: daysAgo(8),
-    confirmedAt: null, cancelledAt: daysAgo(7),
+    id: 4,
+    userId: 2,
+    couponId: null,
+    addressId: 2,
+    generationId: 103,
+    createdAt: daysAgo(9),
+    status: 'Cancelled',
+    channel: 'Whatsapp',
+    deliveryMethod: 'HomeDelivery',
+    contactedAt: daysAgo(8),
+    confirmedAt: null,
+    cancelledAt: daysAgo(7),
     _lines: [{ variantId: enduranceXLBlack.id, quantity: 1, unitPrice: 1290 }],
   })
   addSale({
-    id: 5, userId: 3, couponId: null, addressId: null, generationId: 104,
-    createdAt: daysAgo(0, 10), status: 'PendingCoordination', channel: 'Whatsapp',
-    deliveryMethod: 'StorePickup', contactedAt: null, confirmedAt: null, cancelledAt: null,
+    id: 5,
+    userId: 3,
+    couponId: null,
+    addressId: null,
+    generationId: 104,
+    createdAt: daysAgo(0, 10),
+    status: 'PendingCoordination',
+    channel: 'Whatsapp',
+    deliveryMethod: 'StorePickup',
+    contactedAt: null,
+    confirmedAt: null,
+    cancelledAt: null,
     _lines: [{ variantId: sungaSRed.id, quantity: 1, unitPrice: 990 }],
   })
 
@@ -288,43 +477,84 @@ function buildSalesAndCoupons(sizes, products, productVariants) {
 
 function buildTransactions(sizes, products, productVariants) {
   const enduranceLNavy = findVariant(
-    sizes, products, productVariants, 'endurance-classic', 'L', 'navy',
+    sizes,
+    products,
+    productVariants,
+    'endurance-classic',
+    'L',
+    'navy',
   )
   const softSBlue = findVariant(
-    sizes, products, productVariants, 'soft-classic', 'S', 'blue',
+    sizes,
+    products,
+    productVariants,
+    'soft-classic',
+    'S',
+    'blue',
   )
   const jammerMBlack = findVariant(
-    sizes, products, productVariants, 'jammer-classic', 'M', 'black',
+    sizes,
+    products,
+    productVariants,
+    'jammer-classic',
+    'M',
+    'black',
   )
   const enduranceCompXLBlack = findVariant(
-    sizes, products, productVariants, 'endurance-comp', 'XL', 'black',
+    sizes,
+    products,
+    productVariants,
+    'endurance-comp',
+    'XL',
+    'black',
   )
   const softXXSBlue = findVariant(
-    sizes, products, productVariants, 'soft-classic', 'XXS', 'blue',
+    sizes,
+    products,
+    productVariants,
+    'soft-classic',
+    'XXS',
+    'blue',
   )
 
   const transactions = [
     {
-      id: 1, userId: 1, saleId: null, direction: 'Inbound',
-      reason: 'GoodsReceipt', createdAt: daysAgo(20),
+      id: 1,
+      userId: 1,
+      saleId: null,
+      direction: 'Inbound',
+      reason: 'GoodsReceipt',
+      createdAt: daysAgo(20),
       _lines: [
         { variantId: enduranceLNavy.id, quantity: 10 },
         { variantId: softSBlue.id, quantity: 8 },
       ],
     },
     {
-      id: 2, userId: 1, saleId: 3, direction: 'Outbound',
-      reason: 'SaleConfirmed', createdAt: daysAgo(5),
+      id: 2,
+      userId: 1,
+      saleId: 3,
+      direction: 'Outbound',
+      reason: 'SaleConfirmed',
+      createdAt: daysAgo(5),
       _lines: [{ variantId: jammerMBlack.id, quantity: 1 }],
     },
     {
-      id: 3, userId: 1, saleId: null, direction: 'Inbound',
-      reason: 'ManualAdjustment', createdAt: daysAgo(10),
+      id: 3,
+      userId: 1,
+      saleId: null,
+      direction: 'Inbound',
+      reason: 'ManualAdjustment',
+      createdAt: daysAgo(10),
       _lines: [{ variantId: enduranceCompXLBlack.id, quantity: 5 }],
     },
     {
-      id: 4, userId: 1, saleId: null, direction: 'Outbound',
-      reason: 'LossDefective', createdAt: daysAgo(3),
+      id: 4,
+      userId: 1,
+      saleId: null,
+      direction: 'Outbound',
+      reason: 'LossDefective',
+      createdAt: daysAgo(3),
       _lines: [{ variantId: softXXSBlue.id, quantity: 1 }],
     },
   ]
@@ -365,7 +595,12 @@ function buildAlerts(db) {
 
   // Aviso de reposición: Ana suscripta al talle M de Endurance (sin stock).
   const enduranceMNavy = findVariant(
-    db.sizes, db.products, db.productVariants, 'endurance-classic', 'M', 'navy',
+    db.sizes,
+    db.products,
+    db.productVariants,
+    'endurance-classic',
+    'M',
+    'navy',
   )
   alerts.push({
     id: alerts.length + 1,
@@ -385,23 +620,73 @@ export function buildHistory({ sizes, products, productVariants }) {
 
   const sizeGenerations = buildGenerations(sizes, random)
   const { sales, saleLines, discountCoupons } = buildSalesAndCoupons(
-    sizes, products, productVariants,
+    sizes,
+    products,
+    productVariants,
   )
   const { transactions, transactionLines } = buildTransactions(
-    sizes, products, productVariants,
+    sizes,
+    products,
+    productVariants,
   )
 
   const db = {
-    sizes, products, productVariants,
-    sales, saleLines,
+    sizes,
+    products,
+    productVariants,
+    sales,
+    saleLines,
   }
   const alerts = buildAlerts(db)
 
   const pointsMovements = [
-    { id: 1, userId: 2, generationId: 101, couponId: null, points: 10, type: 'Feedback', createdAt: daysAgo(3) },
-    { id: 2, userId: 2, generationId: 102, couponId: null, points: 10, type: 'Feedback', createdAt: daysAgo(5) },
-    { id: 3, userId: 2, generationId: null, couponId: null, points: 10, type: 'Feedback', createdAt: daysAgo(12) },
-    { id: 4, userId: 2, generationId: null, couponId: null, points: 10, type: 'Feedback', createdAt: daysAgo(18) },
+    {
+      id: 1,
+      userId: 2,
+      generationId: 101,
+      couponId: null,
+      points: 10,
+      type: 'Feedback',
+      createdAt: daysAgo(3),
+    },
+    {
+      id: 2,
+      userId: 2,
+      generationId: 102,
+      couponId: null,
+      points: 10,
+      type: 'Feedback',
+      createdAt: daysAgo(5),
+    },
+    {
+      id: 3,
+      userId: 2,
+      generationId: null,
+      couponId: null,
+      points: 10,
+      type: 'Feedback',
+      createdAt: daysAgo(12),
+    },
+    {
+      id: 4,
+      userId: 2,
+      generationId: null,
+      couponId: null,
+      points: 10,
+      type: 'Feedback',
+      createdAt: daysAgo(18),
+    },
+    // Ajuste manual de saldo: deja a Ana con 120 puntos (40 de feedback + 80),
+    // suficiente para canjear una plantilla en la demo de US6.
+    {
+      id: 5,
+      userId: 2,
+      generationId: null,
+      couponId: null,
+      points: 80,
+      type: 'Adjustment',
+      createdAt: daysAgo(25),
+    },
   ]
 
   return {

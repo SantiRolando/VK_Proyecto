@@ -1,6 +1,6 @@
 // Service de avisos de reposición (US3).
 
-import { apiClient } from '../client/api-client.js'
+import { apiClient } from '@api/client/api-client.js'
 
 export const alertsService = {
   subscribe: (payload) => apiClient.post('/restock-alerts', payload),

@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { isApiError } from '@api/client/api-error.js'
+import { authService } from '@api/services/auth-service.js'
+import { routes } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { forgotPasswordSchema } from '@features/auth/auth-schema.js'
+import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Alert, Anchor, Button, Stack, TextInput } from '@mantine/core'
+import { collectFieldErrors } from '@utils/zod-errors.js'
+import { useState } from 'react'
 import { Link } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { authService } from '../../api/services/auth-service.js'
-import { isApiError } from '../../api/client/api-error.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { collectFieldErrors } from '../../utils/zod-errors.js'
-import { forgotPasswordSchema } from './auth-schema.js'
-import { AuthShell } from './auth-shell.jsx'
 
 // Recuperación de contraseña (FR-010). En modo mock no se envía nada: el
 // reset se completa en `/reset-password` con cualquier token.
@@ -65,7 +65,9 @@ export function ForgotPasswordPage() {
               error={errors.email ? t(`validation.${errors.email}`) : null}
               required
             />
-            {serverError && <ErrorState error={serverError} onRetry={() => setServerError(null)} />}
+            {serverError && (
+              <ErrorState error={serverError} onRetry={() => setServerError(null)} />
+            )}
             <Button type="submit" loading={busy}>
               {t('auth.forgot.submit')}
             </Button>

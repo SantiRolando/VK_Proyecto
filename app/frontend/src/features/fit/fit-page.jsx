@@ -1,10 +1,14 @@
+import { ListSkeleton } from '@components/feedback/skeletons.jsx'
+import { PageHeader } from '@components/page-header.jsx'
+import { GenerationSource } from '@constants/enums.js'
+import { slugToLine } from '@constants/lines.js'
+import { useResolvedProfile } from '@features/account/hooks/use-profiles.js'
+import { useAuth } from '@features/auth/auth-context.js'
+import { FitForm } from '@features/fit/fit-form.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Card, Container } from '@mantine/core'
+import { measuresFormValues } from '@utils/measures.js'
 import { useSearchParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { PageHeader } from '../../components/page-header.jsx'
-import { slugToLine } from '../../constants/lines.js'
-import { GenerationSource } from '../../constants/enums.js'
-import { FitForm } from './fit-form.jsx'
 
 // Origen de la consulta (FR-003): `?src=` explícito o, si la ruta trae línea
 // preseleccionada (QR), `QR`; por defecto `Direct`.
@@ -17,19 +21,36 @@ function resolveSource(searchParams) {
 }
 
 // Pantalla de medición (US1): acepta `/fit?line=endurance` (alias `linea=`,
-// Q-10) y registra el origen de la consulta.
+// Q-10), registra el origen de la consulta y, con sesión, precarga el perfil
+// activo (US5/T073).
 export function FitPage() {
   const { t } = useI18n()
   const [searchParams] = useSearchParams()
+  const { isAuthenticated } = useAuth()
+  const { profile, isPending } = useResolvedProfile()
 
   const initialLine = slugToLine(searchParams.get('line') ?? searchParams.get('linea'))
   const source = resolveSource(searchParams)
+  // Se espera a los perfiles para no mostrar el formulario vacío y precargarlo
+  // un instante después.
+  const loadingProfile = isAuthenticated && isPending
 
   return (
     <Container size="md" py="xl">
       <PageHeader title={t('fit.title')} subtitle={t('fit.subtitle')} />
       <Card withBorder radius="md" padding="lg">
-        <FitForm initialLine={initialLine} source={source} />
+        {loadingProfile ? (
+          <ListSkeleton rows={3} />
+        ) : (
+          <FitForm
+            // Cambiar de perfil remonta el formulario con las medidas nuevas.
+            key={profile?.id ?? 'guest'}
+            initialLine={initialLine}
+            source={source}
+            profileId={profile?.id ?? null}
+            initialMeasures={profile ? measuresFormValues(profile) : null}
+          />
+        )}
       </Card>
     </Container>
   )

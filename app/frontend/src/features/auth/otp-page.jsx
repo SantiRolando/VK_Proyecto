@@ -1,16 +1,16 @@
-import { useState } from 'react'
+import { isApiError } from '@api/client/api-error.js'
+import { authService } from '@api/services/auth-service.js'
+import { routes, safeReturnTo } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { env } from '@config/env.js'
+import { useAuth } from '@features/auth/auth-context.js'
+import { otpRequestSchema, otpVerifySchema } from '@features/auth/auth-schema.js'
+import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Anchor, Button, Stack, Text, TextInput } from '@mantine/core'
+import { collectFieldErrors } from '@utils/zod-errors.js'
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from './auth-context.js'
-import { routes, safeReturnTo } from '../../app/routes.js'
-import { env } from '../../config/env.js'
-import { authService } from '../../api/services/auth-service.js'
-import { isApiError } from '../../api/client/api-error.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { collectFieldErrors } from '../../utils/zod-errors.js'
-import { otpRequestSchema, otpVerifySchema } from './auth-schema.js'
-import { AuthShell } from './auth-shell.jsx'
 
 // Ingreso por código de un solo uso (FR-010): pedir código al email y
 // verificarlo. En modo mock el código es siempre 123456 (plan §7.2).
@@ -85,7 +85,9 @@ export function OtpPage() {
               error={errors.email ? t(`validation.${errors.email}`) : null}
               required
             />
-            {serverError && <ErrorState error={serverError} onRetry={() => setServerError(null)} />}
+            {serverError && (
+              <ErrorState error={serverError} onRetry={() => setServerError(null)} />
+            )}
             <Button type="submit" loading={busy}>
               {t('auth.otp.request')}
             </Button>
@@ -112,11 +114,18 @@ export function OtpPage() {
                 {t('auth.otp.mockHint')}
               </Text>
             )}
-            {serverError && <ErrorState error={serverError} onRetry={() => setServerError(null)} />}
+            {serverError && (
+              <ErrorState error={serverError} onRetry={() => setServerError(null)} />
+            )}
             <Button type="submit" loading={busy}>
               {t('auth.otp.verify')}
             </Button>
-            <Anchor component="button" type="button" size="sm" onClick={() => setStep('email')}>
+            <Anchor
+              component="button"
+              type="button"
+              size="sm"
+              onClick={() => setStep('email')}
+            >
               {t('auth.otp.changeEmail')}
             </Anchor>
           </Stack>

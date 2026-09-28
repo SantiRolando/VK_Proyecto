@@ -3,17 +3,17 @@
 // interpolación `{{var}}` y plurales (`key.one` / `key.other` según
 // `Intl.PluralRules`) más los formateadores `formatNumber/Date/Currency`.
 
-import { useMemo, useState } from 'react'
-import { I18nContext } from './context.js'
-import en from './locales/en.js'
-import es from './locales/es.js'
+import { I18nContext } from '@i18n/context.js'
 import {
   detectBrowserLanguage,
   formatCurrencyValue,
   formatDateValue,
   formatNumberValue,
   translateKey,
-} from './i18n-utils.js'
+} from '@i18n/i18n-utils.js'
+import en from '@i18n/locales/en.js'
+import es from '@i18n/locales/es.js'
+import { useMemo, useState } from 'react'
 
 const messages = { en, es }
 const STORAGE_KEY = 'vkfit.language'

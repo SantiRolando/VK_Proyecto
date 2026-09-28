@@ -1,6 +1,6 @@
 // Service de catálogo (US3).
 
-import { apiClient } from '../client/api-client.js'
+import { apiClient } from '@api/client/api-client.js'
 
 export const catalogService = {
   // Devuelve `{ items, meta }` porque la pantalla necesita `meta.hasStock`

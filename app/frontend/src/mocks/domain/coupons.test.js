@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
 import {
   computeDiscount,
   couponProblem,
   findCouponByCode,
   saleDiscount,
-} from './coupons.js'
+} from '@mocks/domain/coupons.js'
+import { describe, expect, it } from 'vitest'
 
 const NOW = new Date('2026-09-24T12:00:00Z')
 
@@ -45,9 +45,21 @@ describe('couponProblem', () => {
   })
 
   it('detecta inactivo, vencido y no empezado', () => {
-    expect(couponProblem(coupon({ active: false }), { userId: 2, now: NOW })).toBe('inactive')
-    expect(couponProblem(coupon({ validUntil: '2026-09-01T00:00:00Z' }), { userId: 2, now: NOW })).toBe('expired')
-    expect(couponProblem(coupon({ validFrom: '2026-10-01T00:00:00Z' }), { userId: 2, now: NOW })).toBe('notStarted')
+    expect(couponProblem(coupon({ active: false }), { userId: 2, now: NOW })).toBe(
+      'inactive',
+    )
+    expect(
+      couponProblem(coupon({ validUntil: '2026-09-01T00:00:00Z' }), {
+        userId: 2,
+        now: NOW,
+      }),
+    ).toBe('expired')
+    expect(
+      couponProblem(coupon({ validFrom: '2026-10-01T00:00:00Z' }), {
+        userId: 2,
+        now: NOW,
+      }),
+    ).toBe('notStarted')
   })
 
   it('un cupón con dueño solo sirve para su dueño', () => {

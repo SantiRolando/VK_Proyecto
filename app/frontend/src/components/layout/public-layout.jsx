@@ -1,8 +1,8 @@
+import { routes } from '@app/routes.js'
+import { LanguageSwitch } from '@components/language-switch.jsx'
+import { useI18n } from '@i18n/context.js'
 import { AppShell, Group, Text } from '@mantine/core'
 import { Link, Outlet } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { LanguageSwitch } from '../language-switch.jsx'
-import { routes } from '../../app/routes.js'
 
 // Layout público: header mínimo (logo + idioma) para las pantallas de
 // autenticación. La landing (`/` y `/about`) tiene su propio header.

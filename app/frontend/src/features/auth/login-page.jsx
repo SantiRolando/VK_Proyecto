@@ -1,4 +1,11 @@
-import { useState } from 'react'
+import { isApiError } from '@api/client/api-error.js'
+import { routes, safeReturnTo } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { env } from '@config/env.js'
+import { useAuth } from '@features/auth/auth-context.js'
+import { loginSchema } from '@features/auth/auth-schema.js'
+import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { useI18n } from '@i18n/context.js'
 import {
   Anchor,
   Button,
@@ -9,16 +16,9 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
+import { collectFieldErrors } from '@utils/zod-errors.js'
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from './auth-context.js'
-import { routes, safeReturnTo } from '../../app/routes.js'
-import { env } from '../../config/env.js'
-import { isApiError } from '../../api/client/api-error.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { collectFieldErrors } from '../../utils/zod-errors.js'
-import { loginSchema } from './auth-schema.js'
-import { AuthShell } from './auth-shell.jsx'
 
 // Credenciales demo visibles solo en modo mock (plan §7.2).
 const DEMO_CREDENTIALS = [
@@ -42,7 +42,10 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false)
 
   const setField = (field) => (event) => {
-    setValues((current) => ({ ...current, [field]: event.currentTarget.value }))
+    // Se lee el valor en el momento del evento: React puede ejecutar el updater
+    // más tarde, cuando `currentTarget` ya es null.
+    const { value } = event.currentTarget
+    setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
@@ -91,7 +94,9 @@ export function LoginPage() {
             required
           />
 
-          {serverError && <ErrorState error={serverError} onRetry={() => setServerError(null)} />}
+          {serverError && (
+            <ErrorState error={serverError} onRetry={() => setServerError(null)} />
+          )}
 
           <Button type="submit" loading={busy}>
             {t('auth.login.submit')}
@@ -111,7 +116,11 @@ export function LoginPage() {
           {t('auth.login.noAccount')}{' '}
           <Anchor
             component={Link}
-            to={returnTo ? `${routes.register}?returnTo=${encodeURIComponent(returnTo)}` : routes.register}
+            to={
+              returnTo
+                ? `${routes.register}?returnTo=${encodeURIComponent(returnTo)}`
+                : routes.register
+            }
           >
             {t('auth.register.title')}
           </Anchor>
@@ -126,7 +135,12 @@ export function LoginPage() {
               {t('auth.login.demo')}
             </Text>
             {DEMO_CREDENTIALS.map((credential) => (
-              <Group key={credential.email} justify="space-between" gap="xs" wrap="nowrap">
+              <Group
+                key={credential.email}
+                justify="space-between"
+                gap="xs"
+                wrap="nowrap"
+              >
                 <div>
                   <Text size="xs" fw={600}>
                     {credential.email}

@@ -1,7 +1,7 @@
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { getDb, resetDatabase } from '../db/database.js'
-import { configureMockRouter, handle } from '../router/mock-router.js'
-import './register-all.js'
+import '@mocks/controllers/register-all.js'
 
 beforeEach(() => {
   resetDatabase()
@@ -9,7 +9,14 @@ beforeEach(() => {
 })
 
 function call(method, url, { body } = {}) {
-  return handle({ method, url, query: {}, body: body ?? {}, auth: undefined, guestSessionId: null })
+  return handle({
+    method,
+    url,
+    query: {},
+    body: body ?? {},
+    auth: undefined,
+    guestSessionId: null,
+  })
 }
 
 describe('dev controller', () => {
@@ -20,9 +27,7 @@ describe('dev controller', () => {
     await call('POST', '/dev/reset')
     expect(getDb().users.length).toBe(3)
     expect(getDb().users).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ email: 'admin@vikinga.test' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ email: 'admin@vikinga.test' })]),
     )
   })
 

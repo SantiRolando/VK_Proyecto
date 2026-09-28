@@ -1,13 +1,12 @@
-import { useState } from 'react'
+import { isApiError } from '@api/client/api-error.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { useI18n } from '@i18n/context.js'
 import { Button, Group, SimpleGrid, Stack, TextInput } from '@mantine/core'
-import { useI18n } from '../../i18n/context.js'
-import { isApiError } from '../../api/client/api-error.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { collectFieldErrors } from '../../utils/zod-errors.js'
-import { useCreateAddress } from './hooks/use-addresses.js'
-import { addressSchema } from './checkout-schema.js'
+import { addressSchema } from '@utils/address.js'
+import { collectFieldErrors } from '@utils/zod-errors.js'
+import { useState } from 'react'
 
-const INITIAL_VALUES = {
+const EMPTY_ADDRESS = {
   street: '',
   number: '',
   city: '',
@@ -15,23 +14,35 @@ const INITIAL_VALUES = {
   reference: '',
 }
 
-// Alta de dirección desde el checkout (T059). Al guardarla se selecciona como
-// destino del envío. La agenda completa llega en US5.
-export function AddressForm({ onCreated, onCancel }) {
+// Formulario de dirección (US4/US5), compartido por el checkout y la agenda de
+// la cuenta: alta o edición según `initialValues`. Quien lo usa aporta la
+// mutación (`onSubmit`) y reacciona al guardado (`onSaved`).
+export function AddressForm({
+  initialValues,
+  onSubmit,
+  onSaved,
+  onCancel,
+  submitLabel,
+  isPending = false,
+}) {
   const { t } = useI18n()
-  const createAddress = useCreateAddress()
 
-  const [values, setValues] = useState(INITIAL_VALUES)
+  const [values, setValues] = useState(() => ({
+    ...EMPTY_ADDRESS,
+    ...initialValues,
+  }))
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState(null)
 
   const setField = (field) => (event) => {
-    setValues((current) => ({ ...current, [field]: event.currentTarget.value }))
+    // Se lee el valor en el momento del evento: React puede ejecutar el updater
+    // más tarde, cuando `currentTarget` ya es null.
+    const { value } = event.currentTarget
+    setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
-  const errorText = (field) =>
-    errors[field] ? t(`validation.${errors[field]}`) : null
+  const errorText = (field) => (errors[field] ? t(`validation.${errors[field]}`) : null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -44,9 +55,8 @@ export function AddressForm({ onCreated, onCancel }) {
 
     setServerError(null)
     try {
-      const address = await createAddress.mutateAsync(parsed.data)
-      setValues(INITIAL_VALUES)
-      onCreated(address)
+      const saved = await onSubmit(parsed.data)
+      onSaved?.(saved)
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     }
@@ -57,28 +67,28 @@ export function AddressForm({ onCreated, onCancel }) {
       <Stack gap="sm">
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
           <TextInput
-            label={t('checkout.address.street')}
+            label={t('address.street')}
             value={values.street}
             onChange={setField('street')}
             error={errorText('street')}
             required
           />
           <TextInput
-            label={t('checkout.address.number')}
+            label={t('address.number')}
             value={values.number}
             onChange={setField('number')}
             error={errorText('number')}
             required
           />
           <TextInput
-            label={t('checkout.address.city')}
+            label={t('address.city')}
             value={values.city}
             onChange={setField('city')}
             error={errorText('city')}
             required
           />
           <TextInput
-            label={t('checkout.address.department')}
+            label={t('address.department')}
             value={values.department}
             onChange={setField('department')}
             error={errorText('department')}
@@ -86,7 +96,7 @@ export function AddressForm({ onCreated, onCancel }) {
           />
         </SimpleGrid>
         <TextInput
-          label={t('checkout.address.reference')}
+          label={t('address.reference')}
           value={values.reference}
           onChange={setField('reference')}
           error={errorText('reference')}
@@ -95,8 +105,8 @@ export function AddressForm({ onCreated, onCancel }) {
         {serverError && <ErrorState error={serverError} />}
 
         <Group>
-          <Button type="submit" loading={createAddress.isPending}>
-            {t('checkout.address.submit')}
+          <Button type="submit" loading={isPending}>
+            {submitLabel ?? t('address.save')}
           </Button>
           {onCancel && (
             <Button variant="subtle" type="button" onClick={onCancel}>

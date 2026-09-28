@@ -1,4 +1,10 @@
-import { useState } from 'react'
+import { routes } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { fitSchema } from '@features/fit/fit-schema.js'
+import { useCreateGeneration } from '@features/fit/hooks/use-create-generation.js'
+import { MeasureHelp } from '@features/fit/measure-help.jsx'
+import { OutOfRange } from '@features/fit/out-of-range.jsx'
+import { useI18n } from '@i18n/context.js'
 import {
   Button,
   Group,
@@ -10,14 +16,8 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconHelp } from '@tabler/icons-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { useCreateGeneration } from './hooks/use-create-generation.js'
-import { fitSchema } from './fit-schema.js'
-import { MeasureHelp } from './measure-help.jsx'
-import { OutOfRange } from './out-of-range.jsx'
 
 const LINE_OPTIONS = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
 
@@ -35,7 +35,12 @@ const INITIAL_VALUES = {
 // Formulario de medición (T039): línea + cinco medidas con validación de
 // formato. La precarga de línea (QR) y el origen (`source`) llegan por props
 // desde `fit-page`; el cálculo de talle lo hace la capa de datos.
-export function FitForm({ initialLine, source }) {
+export function FitForm({
+  initialLine,
+  source,
+  profileId = null,
+  initialMeasures = null,
+}) {
   const { t } = useI18n()
   const navigate = useNavigate()
   const createGeneration = useCreateGeneration()
@@ -44,6 +49,8 @@ export function FitForm({ initialLine, source }) {
   const [values, setValues] = useState({
     ...INITIAL_VALUES,
     line: initialLine ?? '',
+    // Con perfil activo, el formulario arranca precargado (US5/T073).
+    ...(initialMeasures ?? {}),
   })
   const [errors, setErrors] = useState({})
   const [outOfRange, setOutOfRange] = useState(false)
@@ -82,6 +89,7 @@ export function FitForm({ initialLine, source }) {
       const generation = await createGeneration.mutateAsync({
         ...parsed.data,
         source,
+        profileId,
       })
       navigate(routes.fitResult(generation.id))
     } catch (error) {
@@ -144,10 +152,7 @@ export function FitForm({ initialLine, source }) {
         </SimpleGrid>
 
         {submitError && (
-          <ErrorState
-            error={submitError}
-            onRetry={() => setSubmitError(null)}
-          />
+          <ErrorState error={submitError} onRetry={() => setSubmitError(null)} />
         )}
 
         <Button type="submit" size="lg" loading={createGeneration.isPending}>

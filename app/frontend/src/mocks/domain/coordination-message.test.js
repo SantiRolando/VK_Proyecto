@@ -1,5 +1,5 @@
+import { buildCoordinationMessage } from '@mocks/domain/coordination-message.js'
 import { describe, expect, it } from 'vitest'
-import { buildCoordinationMessage } from './coordination-message.js'
 
 const settings = [
   { key: 'coordination_email', value: 'ventas@vikinga.com.uy' },

@@ -1,16 +1,16 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { clearSession, setSession } from '@api/client/session.js'
+import { catalogService } from '@api/services/catalog-service.js'
+import { devService } from '@api/services/dev-service.js'
+import { salesService } from '@api/services/sales-service.js'
+import { sizeService } from '@api/services/size-service.js'
+import { Providers } from '@app/providers.jsx'
+import { queryClient } from '@app/query-client.js'
+import { AppRouter } from '@app/router.jsx'
+import { routes } from '@app/routes.js'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
-import { AppRouter } from '../../app/router.jsx'
-import { Providers } from '../../app/providers.jsx'
-import { queryClient } from '../../app/query-client.js'
-import { clearSession, setSession } from '../../api/client/session.js'
-import { catalogService } from '../../api/services/catalog-service.js'
-import { devService } from '../../api/services/dev-service.js'
-import { salesService } from '../../api/services/sales-service.js'
-import { sizeService } from '../../api/services/size-service.js'
-import { routes } from '../../app/routes.js'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Flujo completo de US4 sobre el router y los providers reales: la app habla
 // con el transporte mock (modo mock del `api-client`), así que se navega y se
@@ -78,9 +78,7 @@ describe('checkout (flujo completo)', () => {
       'navy',
     ).available
 
-    renderAt(
-      routes.product(product.id, { sizeId: sizeL.id, generationId: 100 }),
-    )
+    renderAt(routes.product(product.id, { sizeId: sizeL.id, generationId: 100 }))
 
     // Detalle: el color con stock queda seleccionado y se puede coordinar.
     expect(
@@ -111,10 +109,11 @@ describe('checkout (flujo completo)', () => {
 
     // Paso 3 — resumen: cupón aplicado por el mock (10% de 1290, tope 500).
     await user.click(screen.getByRole('button', { name: 'Continuar' }))
-    await user.type(
-      screen.getByPlaceholderText('Código del cupón'),
-      'VIKI10',
-    )
+
+    // Los cupones propios del cliente (US6) quedan a un clic.
+    expect(await screen.findByRole('button', { name: 'ANA15' })).toBeInTheDocument()
+
+    await user.type(screen.getByPlaceholderText('Código del cupón'), 'VIKI10')
     await user.click(screen.getByRole('button', { name: 'Aplicar' }))
 
     expect(await screen.findByText(/Cupón VIKI10: -/)).toBeInTheDocument()
@@ -136,13 +135,9 @@ describe('checkout (flujo completo)', () => {
 
     // Se abre el canal con el mensaje listo, y queda el enlace de respaldo.
     const openLink = screen.getByRole('link', { name: 'Abrir WhatsApp' })
-    expect(openLink.getAttribute('href')).toMatch(
-      /^https:\/\/wa\.me\/59899000000\?text=/,
-    )
+    expect(openLink.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/59899000000\?text=/)
     await waitFor(() => expect(openSpy).toHaveBeenCalled())
-    expect(openSpy.mock.calls[0][0]).toMatch(
-      /^https:\/\/wa\.me\/59899000000\?text=/,
-    )
+    expect(openSpy.mock.calls[0][0]).toMatch(/^https:\/\/wa\.me\/59899000000\?text=/)
 
     // Efectos en el contrato: venta con descuento y stock reservado.
     const sales = await salesService.listMine()
@@ -196,7 +191,9 @@ describe('checkout (flujo completo)', () => {
       ),
     ).toBeInTheDocument()
     expect(
-      screen.getByText('No perdimos tu selección. Ajustá la cantidad o elegí otro color.'),
+      screen.getByText(
+        'No perdimos tu selección. Ajustá la cantidad o elegí otro color.',
+      ),
     ).toBeInTheDocument()
     expect(screen.getByText('Disponible ahora: 0')).toBeInTheDocument()
 
@@ -247,8 +244,6 @@ describe('checkout (flujo completo)', () => {
 
     // Desde el login puede crear la cuenta y volver al checkout.
     const registerLink = screen.getByRole('link', { name: 'Crear cuenta' })
-    expect(registerLink.getAttribute('href')).toContain(
-      encodeURIComponent(target),
-    )
+    expect(registerLink.getAttribute('href')).toContain(encodeURIComponent(target))
   })
 })

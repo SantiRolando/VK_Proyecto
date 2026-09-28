@@ -16,6 +16,9 @@ export function colorHex(color) {
   return COLOR_SWATCHES[color] ?? '#9ca3af'
 }
 
+// Opciones del alta/edición de variantes en el panel (US9).
+export const COLOR_OPTIONS = Object.keys(COLOR_SWATCHES)
+
 // Etiqueta del color tal cual el dato (capitalizada para mostrar).
 export function colorLabel(color) {
   const value = String(color ?? '')

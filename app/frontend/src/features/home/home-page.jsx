@@ -1,3 +1,6 @@
+import { routes } from '@app/routes.js'
+import { useAuth } from '@features/auth/auth-context.js'
+import { useI18n } from '@i18n/context.js'
 import { Button, Container, Group, Paper, Stack, Text, Title } from '@mantine/core'
 import {
   IconClock,
@@ -7,9 +10,6 @@ import {
   IconUserPlus,
 } from '@tabler/icons-react'
 import { useNavigate } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { useAuth } from '../auth/auth-context.js'
-import { routes } from '../../app/routes.js'
 
 // Home (FR-001): tres caminos — probar sin registrarse, crear cuenta o
 // iniciar sesión. Con sesión activa, acceso directo a medir/historial/cuenta.
@@ -88,11 +88,7 @@ export function HomePage() {
         )}
 
         <Paper withBorder radius="md" p="md">
-          <Button
-            variant="subtle"
-            size="xs"
-            onClick={() => navigate(routes.about)}
-          >
+          <Button variant="subtle" size="xs" onClick={() => navigate(routes.about)}>
             {t('home.about')}
           </Button>
         </Paper>

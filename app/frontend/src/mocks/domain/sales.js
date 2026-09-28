@@ -5,9 +5,11 @@
 // derivada de las ventas abiertas (domain/stock.js), no hay tabla de reservas
 // (Q-03).
 
-import { ApiError } from '../../api/client/api-error.js'
-import { round2 } from './money.js'
-import { availableQuantity } from './stock.js'
+import { ApiError } from '@api/client/api-error.js'
+import { round2 } from '@mocks/domain/money.js'
+import { RESERVING_SALE_STATUSES } from '@mocks/domain/sale-state-machine.js'
+import { settingNumber } from '@mocks/domain/settings.js'
+import { availableQuantity } from '@mocks/domain/stock.js'
 
 export const SALE_CHANNELS = ['Email', 'Whatsapp']
 export const DELIVERY_METHODS = ['StorePickup', 'HomeDelivery']
@@ -119,4 +121,44 @@ export function saleLinesWithDetails(db, sale) {
         size: size ? { id: size.id, code: size.code } : null,
       }
     })
+}
+
+// Antigüedad de una venta en días, para que el admin vea las que llevan mucho
+// tiempo abiertas (Q-11: sin TTL, la decisión es suya).
+export function saleAgeDays(sale, now = new Date()) {
+  const created = new Date(sale.createdAt).getTime()
+  return Math.max(0, Math.floor((now.getTime() - created) / 86_400_000))
+}
+
+// ¿La venta sigue reteniendo stock y pasó el umbral `stale_sale_days`?
+export function isStaleSale(db, sale, now = new Date()) {
+  if (!RESERVING_SALE_STATUSES.includes(sale.status)) return false
+  const threshold = settingNumber(db.settings, 'stale_sale_days', 3)
+  return saleAgeDays(sale, now) >= threshold
+}
+
+// Confirmar la venta: descuenta el físico de cada variante (§5.3) y devuelve
+// sus líneas para registrar el movimiento de stock.
+export function applyConfirmationToStock(db, sale) {
+  const lines = db.saleLines.filter((line) => line.saleId === sale.id)
+
+  for (const line of lines) {
+    const variant = db.productVariants.find((item) => item.id === line.variantId)
+    if (!variant) continue
+    variant.quantity = Math.max(0, variant.quantity - line.quantity)
+  }
+
+  return lines
+}
+
+// Cancelar la venta: la reserva se libera sola (es derivada, no hay nada que
+// ajustar) y el cupón recupera su uso.
+export function releaseCouponUsage(db, sale) {
+  if (!sale.couponId) return null
+
+  const coupon = db.discountCoupons.find((item) => item.id === sale.couponId)
+  if (!coupon) return null
+
+  coupon.usageCount = Math.max(0, coupon.usageCount - 1)
+  return coupon
 }

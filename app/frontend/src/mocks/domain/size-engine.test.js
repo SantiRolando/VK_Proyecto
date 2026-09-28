@@ -1,7 +1,7 @@
+import { ApiError } from '@api/client/api-error.js'
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { adjacentSizes, suggestSize } from '@mocks/domain/size-engine.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { ApiError } from '../../api/client/api-error.js'
-import { resetDatabase, getDb } from '../db/database.js'
-import { adjacentSizes, suggestSize } from './size-engine.js'
 
 beforeEach(() => {
   resetDatabase()

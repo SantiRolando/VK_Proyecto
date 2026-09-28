@@ -1,7 +1,7 @@
+import { usePublicContact } from '@features/fit/hooks/use-public-contact.js'
+import { useI18n } from '@i18n/context.js'
 import { Button, Text } from '@mantine/core'
 import { IconBrandWhatsapp, IconMail } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { usePublicContact } from './hooks/use-public-contact.js'
 
 // Estado "fuera de rango" (T042): la capa de datos derivó la consulta a
 // atención personalizada. Se ofrece contacto por mail/WhatsApp de VK (SETTING).

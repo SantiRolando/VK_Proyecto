@@ -1,8 +1,8 @@
 // Transporte HTTP real (VITE_API_MODE=http): `fetch` contra la API REST,
 // con mapeo de errores al contrato `{ error: { code, details? } }` (§6.1).
 
-import { ApiError } from './api-error.js'
-import { env } from '../../config/env.js'
+import { ApiError } from '@api/client/api-error.js'
+import { env } from '@config/env.js'
 
 const FALLBACK_CODES = {
   400: 'VALIDATION_ERROR',

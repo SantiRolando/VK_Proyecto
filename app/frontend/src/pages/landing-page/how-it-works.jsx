@@ -1,7 +1,7 @@
+import { useI18n } from '@i18n/context.js'
 import { Text, Title } from '@mantine/core'
+import { Section } from '@pages/landing-page/section.jsx'
 import { IconCheck, IconRuler, IconSwimming } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { Section } from './section.jsx'
 
 const STEPS = [
   { icon: IconRuler, titleKey: 'how.step1.title', bodyKey: 'how.step1.body' },
@@ -26,10 +26,7 @@ export function HowItWorks() {
         {STEPS.map((step) => {
           const Icon = step.icon
           return (
-            <div
-              key={step.titleKey}
-              className="rounded-lg border border-gray-200 p-6"
-            >
+            <div key={step.titleKey} className="rounded-lg border border-gray-200 p-6">
               <Icon size={28} stroke={1.5} className="text-black" />
               <Title order={4} c="black" mt="md">
                 {t(step.titleKey)}

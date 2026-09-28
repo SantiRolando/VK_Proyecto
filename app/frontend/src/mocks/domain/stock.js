@@ -1,7 +1,7 @@
 // Reglas derivadas de stock (§5.3 del plan). El ER no tiene columna de
 // "reservado": la reserva se deriva de las ventas abiertas.
 
-import { RESERVING_SALE_STATUSES } from './sale-state-machine.js'
+import { RESERVING_SALE_STATUSES } from '@mocks/domain/sale-state-machine.js'
 
 // Σ SaleLine.quantity de ventas en PendingCoordination | Contacted.
 export function reservedQuantity(db, variantId) {
@@ -12,9 +12,7 @@ export function reservedQuantity(db, variantId) {
   )
 
   return db.saleLines
-    .filter(
-      (line) => line.variantId === variantId && reservingSaleIds.has(line.saleId),
-    )
+    .filter((line) => line.variantId === variantId && reservingSaleIds.has(line.saleId))
     .reduce((sum, line) => sum + line.quantity, 0)
 }
 

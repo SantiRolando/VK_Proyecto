@@ -1,4 +1,4 @@
-import { useI18n } from '../i18n/context.js'
+import { useI18n } from '@i18n/context.js'
 
 const LANGUAGES = [
   { code: 'es', label: 'ES' },
@@ -16,9 +16,7 @@ export function LanguageSwitch() {
           type="button"
           onClick={() => setLanguage(code)}
           className={`rounded px-2 py-1 text-sm transition-colors ${
-            language === code
-              ? 'text-white'
-              : 'text-gray-500 hover:text-gray-300'
+            language === code ? 'text-white' : 'text-gray-500 hover:text-gray-300'
           }`}
         >
           {label}

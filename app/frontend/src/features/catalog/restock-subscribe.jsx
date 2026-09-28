@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { isApiError } from '@api/client/api-error.js'
+import { routes } from '@app/routes.js'
+import { ErrorState } from '@components/feedback/error-state.jsx'
+import { useAuth } from '@features/auth/auth-context.js'
+import { useSubscribeRestock } from '@features/catalog/hooks/use-subscribe-restock.js'
+import { useI18n } from '@i18n/context.js'
 import { Alert, Button, Stack, Text } from '@mantine/core'
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { useI18n } from '../../i18n/context.js'
-import { routes } from '../../app/routes.js'
-import { useAuth } from '../auth/auth-context.js'
-import { ErrorState } from '../../components/feedback/error-state.jsx'
-import { isApiError } from '../../api/client/api-error.js'
-import { useSubscribeRestock } from './hooks/use-subscribe-restock.js'
 
 // Suscripción al aviso de reposición (US3). Requiere cuenta: un invitado ve
 // la invitación a ingresar/registrarse y vuelve a este punto.

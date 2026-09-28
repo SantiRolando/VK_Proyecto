@@ -69,12 +69,7 @@ const MESSAGES = {
 }
 
 function formatAddress(address) {
-  return [
-    address?.street,
-    address?.number,
-    address?.city,
-    address?.department,
-  ]
+  return [address?.street, address?.number, address?.city, address?.department]
     .filter(Boolean)
     .join(', ')
 }

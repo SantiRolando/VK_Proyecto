@@ -1,5 +1,5 @@
+import { salesService } from '@api/services/sales-service.js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { salesService } from '../../../api/services/sales-service.js'
 
 // Crea la venta y reserva el stock (T060). La reserva cambia el disponible
 // que muestra el catálogo, así que además de invalidar las otras compras se

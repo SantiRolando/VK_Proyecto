@@ -1,11 +1,11 @@
 // Composición de la seed: construye una DB completa y consistente con el
 // ER nuevo (15 entidades, camelCase — §5.2 del plan).
 
-import { buildIdentity } from './users.js'
-import { buildSizes } from './sizes.js'
-import { buildCatalog } from './catalog.js'
-import { buildSettings } from './settings.js'
-import { buildHistory } from './history.js'
+import { buildCatalog } from '@mocks/db/seed/catalog.js'
+import { buildHistory } from '@mocks/db/seed/history.js'
+import { buildSettings } from '@mocks/db/seed/settings.js'
+import { buildSizes } from '@mocks/db/seed/sizes.js'
+import { buildIdentity } from '@mocks/db/seed/users.js'
 
 export function seedDatabase() {
   const { users, measurementProfiles, addresses } = buildIdentity()

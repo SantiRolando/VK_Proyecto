@@ -14,7 +14,7 @@
 //
 // Se reemplaza íntegro (junto con sus tests) cuando llegue el motor real.
 
-import { ApiError } from '../../api/client/api-error.js'
+import { ApiError } from '@api/client/api-error.js'
 
 export const LINE_MEASURES = {
   Endurance: ['bust', 'waist'],

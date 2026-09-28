@@ -1,5 +1,7 @@
-// Etiquetas de dirección para el checkout y la confirmación. Los datos de la
-// dirección son *dato*, no UI: no se traducen (§4.7).
+// Etiquetas de dirección y su validación de formato. Los datos de la dirección
+// son *dato*, no UI: no se traducen (§4.7).
+
+import { z } from 'zod'
 
 // Una línea corta para selects y listados: "Av. Italia 1234, Montevideo".
 export function addressLine(address) {
@@ -20,3 +22,13 @@ export function addressFullLine(address) {
     .filter(Boolean)
     .join(', ')
 }
+
+const required = z.string().trim().min(1, { message: 'required' })
+
+export const addressSchema = z.object({
+  street: required,
+  number: required,
+  city: required,
+  department: required,
+  reference: z.string().trim().optional(),
+})

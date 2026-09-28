@@ -1,9 +1,9 @@
+import { getDb, resetDatabase } from '@mocks/db/database.js'
+import { findVariant } from '@mocks/db/seed/catalog.js'
+import { availableQuantity, reservedQuantity } from '@mocks/domain/stock.js'
+import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { getDb, resetDatabase } from '../db/database.js'
-import { findVariant } from '../db/seed/catalog.js'
-import { availableQuantity, reservedQuantity } from '../domain/stock.js'
-import { configureMockRouter, handle } from '../router/mock-router.js'
-import './register-all.js'
+import '@mocks/controllers/register-all.js'
 
 beforeEach(() => {
   resetDatabase()
@@ -47,16 +47,21 @@ describe('sales controller — crear venta', () => {
   })
 
   it('valida items, canal y método de entrega', async () => {
-    const base = { items: [{ variantId: variant('endurance-classic', 'L', 'black').id, quantity: 1 }] }
+    const base = {
+      items: [{ variantId: variant('endurance-classic', 'L', 'black').id, quantity: 1 }],
+    }
 
-    await expect(createSale({ ...base, channel: 'Sms', deliveryMethod: 'StorePickup' }))
-      .rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
+    await expect(
+      createSale({ ...base, channel: 'Sms', deliveryMethod: 'StorePickup' }),
+    ).rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
 
-    await expect(createSale({ ...base, channel: 'Email', deliveryMethod: 'Drone' }))
-      .rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
+    await expect(
+      createSale({ ...base, channel: 'Email', deliveryMethod: 'Drone' }),
+    ).rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
 
-    await expect(createSale({ ...base, channel: 'Email', deliveryMethod: 'StorePickup' }))
-      .resolves.toMatchObject({ status: 201 })
+    await expect(
+      createSale({ ...base, channel: 'Email', deliveryMethod: 'StorePickup' }),
+    ).resolves.toMatchObject({ status: 201 })
 
     await expect(
       createSale({ items: [], channel: 'Email', deliveryMethod: 'StorePickup' }),
@@ -105,8 +110,9 @@ describe('sales controller — crear venta', () => {
     expect(result.data.total).toBe(1290)
 
     // Reserva derivada: el físico no cambia, el disponible baja.
-    expect(getDb().productVariants.find((item) => item.id === target.id).quantity)
-      .toBe(physicalBefore)
+    expect(getDb().productVariants.find((item) => item.id === target.id).quantity).toBe(
+      physicalBefore,
+    )
     expect(reservedQuantity(getDb(), target.id)).toBe(1)
     expect(availableQuantity(getDb(), target.id)).toBe(availableBefore - 1)
   })
@@ -131,7 +137,9 @@ describe('sales controller — crear venta', () => {
     })
     expect(whatsapp.data.contact.channel).toBe('Whatsapp')
     expect(whatsapp.data.contact.to).toBe('+59899000000')
-    expect(whatsapp.data.contact.url.startsWith('https://wa.me/59899000000?text=')).toBe(true)
+    expect(whatsapp.data.contact.url.startsWith('https://wa.me/59899000000?text=')).toBe(
+      true,
+    )
     expect(whatsapp.data.contact.subject).toBeNull()
     expect(whatsapp.data.contact.body).toContain('Store pickup')
   })
@@ -145,14 +153,12 @@ describe('sales controller — crear venta', () => {
     const usageBefore = coupon.usageCount
 
     await expect(
-      createSale(
-        {
-          items: [{ variantId: soldOut.id, quantity: 1 }],
-          channel: 'Email',
-          deliveryMethod: 'StorePickup',
-          couponCode: 'VIKI10',
-        },
-      ),
+      createSale({
+        items: [{ variantId: soldOut.id, quantity: 1 }],
+        channel: 'Email',
+        deliveryMethod: 'StorePickup',
+        couponCode: 'VIKI10',
+      }),
     ).rejects.toMatchObject({
       status: 409,
       code: 'STOCK_INSUFFICIENT',
@@ -162,8 +168,9 @@ describe('sales controller — crear venta', () => {
     // Nada se escribió: ni venta, ni líneas, ni consumo del cupón.
     expect(getDb().sales).toHaveLength(salesBefore)
     expect(getDb().saleLines).toHaveLength(saleLinesBefore)
-    expect(getDb().discountCoupons.find((item) => item.couponCode === 'VIKI10').usageCount)
-      .toBe(usageBefore)
+    expect(
+      getDb().discountCoupons.find((item) => item.couponCode === 'VIKI10').usageCount,
+    ).toBe(usageBefore)
   })
 
   it('agrupa ítems repetidos antes de validar el stock', async () => {
@@ -204,7 +211,10 @@ describe('sales controller — crear venta', () => {
       deliveryMethod: 'HomeDelivery',
       addressId: 1,
     })
-    expect(delivery.data.address).toMatchObject({ street: 'Av. Italia', city: 'Montevideo' })
+    expect(delivery.data.address).toMatchObject({
+      street: 'Av. Italia',
+      city: 'Montevideo',
+    })
     expect(delivery.data.contact.body).toContain('Av. Italia')
     expect(delivery.data.contact.body).toContain('Envío a domicilio')
   })
@@ -247,8 +257,9 @@ describe('sales controller — crear venta', () => {
     expect(result.data.discount).toBe(129)
     expect(result.data.total).toBe(1161)
     expect(result.data.contact.body).toContain('Descuento (VIKI10)')
-    expect(getDb().discountCoupons.find((item) => item.couponCode === 'VIKI10').usageCount)
-      .toBe(usageBefore + 1)
+    expect(
+      getDb().discountCoupons.find((item) => item.couponCode === 'VIKI10').usageCount,
+    ).toBe(usageBefore + 1)
   })
 
   it('rechaza cupón inexistente, vencido o de otro dueño', async () => {
@@ -269,7 +280,9 @@ describe('sales controller — crear venta', () => {
       details: { reason: 'expired' },
     })
     // ANA15 es de Ana (usuario 2).
-    await expect(createSale({ ...body, couponCode: 'ANA15' }, OTHER)).rejects.toMatchObject({
+    await expect(
+      createSale({ ...body, couponCode: 'ANA15' }, OTHER),
+    ).rejects.toMatchObject({
       status: 422,
       code: 'COUPON_INVALID',
       details: { reason: 'notOwner' },
@@ -358,7 +371,12 @@ describe('coupons controller', () => {
     })
 
     expect(result.status).toBe(200)
-    expect(result.data).toMatchObject({ valid: true, discount: 129, subtotal: 1290, total: 1161 })
+    expect(result.data).toMatchObject({
+      valid: true,
+      discount: 129,
+      subtotal: 1290,
+      total: 1161,
+    })
   })
 
   it('sin líneas el descuento es 0 (todavía no hay subtotal)', async () => {

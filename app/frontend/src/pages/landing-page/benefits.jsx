@@ -1,7 +1,7 @@
+import { useI18n } from '@i18n/context.js'
 import { Text, Title } from '@mantine/core'
+import { Section } from '@pages/landing-page/section.jsx'
 import { IconShieldCheck, IconSwimming, IconTarget } from '@tabler/icons-react'
-import { useI18n } from '../../i18n/context.js'
-import { Section } from './section.jsx'
 
 const BENEFITS = [
   {
