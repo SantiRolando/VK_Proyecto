@@ -3,7 +3,7 @@ import { LanguageSwitch } from '@components/language-switch.jsx'
 import { ProfileSelector } from '@components/profile-selector.jsx'
 import { useAuth } from '@features/auth/auth-context.js'
 import { useI18n } from '@i18n/context.js'
-import { AppShell, Button, Group, Menu, Text, UnstyledButton } from '@mantine/core'
+import { AppShell, Box, Button, Group, Menu, Text, UnstyledButton } from '@mantine/core'
 import {
   IconClock,
   IconHistory,
@@ -26,7 +26,8 @@ function CustomerNavItem({ to, labelKey, icon: Icon, vertical = false }) {
   const { t } = useI18n()
   const location = useLocation()
   const active = location.pathname === to
-  const color = active ? 'vikinga' : 'gray.6'
+  const color = active ? 'vikinga' : 'gray'
+  const shade = active ? 6 : 7
 
   return (
     <UnstyledButton
@@ -41,9 +42,9 @@ function CustomerNavItem({ to, labelKey, icon: Icon, vertical = false }) {
       <Icon
         size={vertical ? 22 : 18}
         stroke={1.5}
-        color={`var(--mantine-color-${color}-6)`}
+        color={`var(--mantine-color-${color}-${shade})`}
       />
-      <Text size={vertical ? 'xs' : 'sm'} c={color} fw={active ? 600 : 400}>
+      <Text size={vertical ? 'xs' : 'sm'} c={`${color}.${shade}`} fw={active ? 600 : 400}>
         {t(labelKey)}
       </Text>
     </UnstyledButton>
@@ -68,7 +69,7 @@ function AccountMenu() {
         component={Link}
         to={routes.login}
         variant="subtle"
-        size="xs"
+        size="sm"
         leftSection={<IconUser size={16} />}
       >
         {t('auth.login.title')}
@@ -79,8 +80,8 @@ function AccountMenu() {
   return (
     <Menu position="bottom-end" withinPortal shadow="sm">
       <Menu.Target>
-        <Button variant="subtle" size="xs" leftSection={<IconUser size={16} />}>
-          {user?.name}
+        <Button variant="subtle" size="sm" leftSection={<IconUser size={16} />}>
+          <span className="max-w-[6rem] truncate">{user?.name}</span>
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
@@ -125,7 +126,13 @@ export function CustomerLayout() {
   return (
     <AppShell header={{ height: 60 }} footer={{ height: 60 }} padding="md" withBorder>
       <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between" wrap="nowrap">
+        <Group
+          h="100%"
+          px={{ base: 'xs', sm: 'md' }}
+          justify="space-between"
+          gap="xs"
+          wrap="nowrap"
+        >
           <Group gap="md" wrap="nowrap">
             <Text component={Link} to={routes.home} fw={700}>
               {t('app.name')}
@@ -136,8 +143,10 @@ export function CustomerLayout() {
               ))}
             </Group>
           </Group>
-          <Group gap="sm" wrap="nowrap">
-            <ProfileSelector />
+          <Group gap="xs" wrap="nowrap">
+            <Box visibleFrom="sm">
+              <ProfileSelector />
+            </Box>
             <AccountMenu />
             <LanguageSwitch />
           </Group>

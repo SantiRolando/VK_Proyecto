@@ -36,6 +36,8 @@ export function ProductCard({ product, sizeId, generationId }) {
               key={variant.id}
               color={colorHex(variant.color)}
               size={20}
+              role="img"
+              aria-label={colorLabel(variant.color)}
               title={colorLabel(variant.color)}
             />
           ))}

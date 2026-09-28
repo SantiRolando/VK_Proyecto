@@ -2,7 +2,8 @@
 // con el motor placeholder, lista el historial y expone el detalle al dueño.
 //
 // Regla del ER: una generación pertenece a un cliente (`customerId`) o a un
-// invitado (`guestSessionId`). El modo asistente (adminId) llega en US12.
+// invitado (`guestSessionId`). En modo asistente (US12) el admin la genera
+// (`adminId`) para un tercero, opcionalmente vinculada a un cliente.
 
 import { ApiError } from '@api/client/api-error.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
@@ -35,11 +36,21 @@ export function serializeGeneration(db, generation) {
     comment: generation.comment ?? null,
     ratedAt: generation.ratedAt ?? null,
     source: generation.source ?? null,
+    // El FE oculta las tarjetas personales (guardar perfil / feedback) cuando la
+    // generación la hizo el personal para un tercero.
+    onBehalf: generation.adminId != null,
   }
 }
 
 register('POST', '/size-generations', (req) => {
-  const { line, fitType = 'Training', source = 'Direct', profileId = null } = req.body
+  const {
+    line,
+    fitType = 'Training',
+    source = 'Direct',
+    profileId = null,
+    onBehalf = false,
+    customerId = null,
+  } = req.body
   requireFields(req.body, ['line'])
 
   if (!LINES.includes(line)) {
@@ -55,29 +66,54 @@ register('POST', '/size-generations', (req) => {
     throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['profileId'] })
   }
 
+  // Modo asistente (US12): solo el personal puede generar para terceros.
+  const isOnBehalf = Boolean(onBehalf)
+  if (isOnBehalf && req.auth?.user?.type !== 'Admin') {
+    throw new ApiError(403, 'FORBIDDEN')
+  }
+
+  const hasCustomer = customerId !== null && customerId !== ''
+  const customerIdNumber = hasCustomer ? Number(customerId) : null
+  if (hasCustomer && !Number.isInteger(customerIdNumber)) {
+    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['customerId'] })
+  }
+  // Vincular a un cliente solo tiene sentido en modo asistente.
+  if (!isOnBehalf && hasCustomer) {
+    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['customerId'] })
+  }
+
   return mutate((db) => {
-    // El perfil debe ser del propio cliente: así el historial se separa por
-    // perfil (US5). Un invitado no puede atribuir la generación a un perfil.
+    // El perfil debe ser del dueño de la generación: el propio cliente, o el
+    // cliente vinculado cuando la genera el personal (US5/US12).
+    const profileOwnerId = isOnBehalf ? customerIdNumber : (req.auth?.user?.id ?? null)
     if (profileIdNumber) {
       const owns =
-        req.auth?.user &&
+        profileOwnerId &&
         db.measurementProfiles.some(
           (profile) =>
             profile.id === profileIdNumber &&
-            profile.userId === req.auth.user.id &&
+            profile.userId === profileOwnerId &&
             profile.active !== false,
         )
       if (!owns) throw new ApiError(404, 'NOT_FOUND', { profileId: profileIdNumber })
+    }
+
+    if (isOnBehalf && customerIdNumber) {
+      const customer = db.users.find(
+        (user) => user.id === customerIdNumber && user.type === 'Customer',
+      )
+      if (!customer)
+        throw new ApiError(404, 'NOT_FOUND', { customerId: customerIdNumber })
     }
 
     const { size, dominantMeasure } = suggestSize(db, { line, ...measures })
 
     const generation = {
       id: nextId(db.sizeGenerations),
-      customerId: req.auth?.user?.id ?? null,
+      customerId: isOnBehalf ? customerIdNumber : (req.auth?.user?.id ?? null),
       guestSessionId: req.auth?.user ? null : req.guestSessionId,
       profileId: profileIdNumber,
-      adminId: null,
+      adminId: isOnBehalf ? req.auth.user.id : null,
       line,
       createdAt: new Date().toISOString(),
       ...measures,
@@ -123,10 +159,12 @@ register('GET', '/size-generations/:id', (req) => {
   const db = getDb()
   const generation = db.sizeGenerations.find((item) => item.id === id)
 
-  // Acceso solo para el dueño (cliente o invitado con el mismo session id).
+  // Acceso para el dueño (cliente o invitado con el mismo session id) y para el
+  // admin que la generó en modo asistente (US12).
   const isOwner =
     generation &&
     ((req.auth?.user && generation.customerId === req.auth.user.id) ||
+      (req.auth?.user && generation.adminId === req.auth.user.id) ||
       (!req.auth?.user &&
         req.guestSessionId &&
         generation.guestSessionId === req.guestSessionId))

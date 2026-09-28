@@ -65,7 +65,7 @@ export function CouponInput({ applied, invalid, isLoading, onApply, onRemove }) 
               <Button
                 key={coupon.id}
                 variant="light"
-                size="compact-xs"
+                size="compact-sm"
                 onClick={() => onApply(coupon.code)}
               >
                 {coupon.code}

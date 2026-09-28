@@ -24,11 +24,11 @@ export function ProfileSelector() {
       <Menu.Target>
         <Button
           variant="light"
-          size="compact-sm"
+          size="compact-md"
           leftSection={<IconUserCog size={14} />}
           maw={160}
         >
-          {profile.name}
+          <span className="max-w-[7rem] truncate">{profile.name}</span>
         </Button>
       </Menu.Target>
 

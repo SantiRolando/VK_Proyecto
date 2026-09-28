@@ -35,11 +35,16 @@ const INITIAL_VALUES = {
 // Formulario de medición (T039): línea + cinco medidas con validación de
 // formato. La precarga de línea (QR) y el origen (`source`) llegan por props
 // desde `fit-page`; el cálculo de talle lo hace la capa de datos.
+//
+// En modo asistente (US12) se agrega `onBehalf` (+ `customerId` opcional): el
+// personal genera la medición para un tercero.
 export function FitForm({
   initialLine,
   source,
   profileId = null,
   initialMeasures = null,
+  onBehalf = false,
+  customerId = null,
 }) {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -90,6 +95,9 @@ export function FitForm({
         ...parsed.data,
         source,
         profileId,
+        onBehalf: Boolean(onBehalf),
+        // Sin vínculo, el controller deja la generación sin cliente.
+        ...(onBehalf && customerId ? { customerId } : {}),
       })
       navigate(routes.fitResult(generation.id))
     } catch (error) {

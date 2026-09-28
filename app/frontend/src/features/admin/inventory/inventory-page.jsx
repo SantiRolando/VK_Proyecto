@@ -83,7 +83,13 @@ function AdjustModal({ variant, opened, onClose }) {
   }
 
   return (
-    <Modal opened={open} onClose={onClose} title={t('admin.inventory.adjust')} centered>
+    <Modal
+      closeButtonProps={{ 'aria-label': t('common.close') }}
+      opened={open}
+      onClose={onClose}
+      title={t('admin.inventory.adjust')}
+      centered
+    >
       {variant && (
         <form onSubmit={handleSubmit} noValidate>
           <Stack gap="md">
@@ -317,7 +323,7 @@ export function InventoryPage() {
                 data={items}
                 getKey={(item) => item.id}
                 columns={columns}
-                minWidth={1000}
+                minWidth={900}
                 cardTitle={(item) => (
                   <div>
                     <Text fw={600} size="sm">

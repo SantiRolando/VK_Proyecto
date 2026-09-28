@@ -132,7 +132,11 @@ export function AdminSaleDetailPage() {
                   <Text size="sm" c="dimmed">
                     {t('admin.sales.detail.phone')}: {sale.customer?.whatsappPhone}
                   </Text>
-                  <Anchor size="sm" href={`mailto:${sale.customer?.email}`}>
+                  <Anchor
+                    size="sm"
+                    href={`mailto:${sale.customer?.email}`}
+                    style={{ wordBreak: 'break-all' }}
+                  >
                     {sale.customer?.email}
                   </Anchor>
                 </Stack>
@@ -206,6 +210,7 @@ export function AdminSaleDetailPage() {
             </Card>
 
             <Modal
+              closeButtonProps={{ 'aria-label': t('common.close') }}
               opened={pendingAction !== null}
               onClose={closeModal}
               title={t('admin.sales.confirm.title')}

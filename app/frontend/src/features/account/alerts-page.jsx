@@ -47,7 +47,7 @@ export function AlertsPage() {
                     <Button
                       variant="subtle"
                       color="red"
-                      size="xs"
+                      size="sm"
                       loading={cancel.isPending}
                       onClick={() => cancel.mutate(group.ids)}
                     >

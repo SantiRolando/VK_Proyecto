@@ -79,6 +79,7 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
 
   return (
     <Drawer
+      closeButtonProps={{ 'aria-label': t('common.close') }}
       opened={opened}
       onClose={onClose}
       position="bottom"
@@ -113,6 +114,7 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
 
             <SegmentedControl
               fullWidth
+              aria-label={t('feedback.rate')}
               value={rating ?? ''}
               onChange={setRating}
               data={RATINGS.map((value) => ({
@@ -131,7 +133,7 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
             />
 
             {fieldError && (
-              <Text c="red" size="sm">
+              <Text c="red" size="sm" role="alert">
                 {fieldError}
               </Text>
             )}

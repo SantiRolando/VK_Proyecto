@@ -28,7 +28,7 @@ export function HowItWorks() {
           return (
             <div key={step.titleKey} className="rounded-lg border border-gray-200 p-6">
               <Icon size={28} stroke={1.5} className="text-black" />
-              <Title order={4} c="black" mt="md">
+              <Title order={3} c="black" mt="md">
                 {t(step.titleKey)}
               </Title>
               <Text c="gray.6" mt="xs" size="sm">

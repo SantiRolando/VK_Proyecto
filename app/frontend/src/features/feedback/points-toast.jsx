@@ -15,13 +15,15 @@ export function PointsToast({ points, onClose, autoHideMs = 5000 }) {
   }, [autoHideMs, onClose])
 
   return (
-    <Affix position={{ bottom: 24, right: 24 }} zIndex={400}>
+    <Affix position={{ bottom: 76, right: 16 }} zIndex={400}>
       <Notification
+        role="status"
         color="teal"
         icon={<IconSparkles size={18} />}
         title={t('feedback.toast.title')}
         onClose={onClose}
-        w={320}
+        closeButtonProps={{ 'aria-label': t('common.close') }}
+        w={{ base: 280, xs: 320 }}
       >
         {t('feedback.toast.body', { points })}
       </Notification>

@@ -20,35 +20,34 @@ import {
   Group,
   Progress,
   RingProgress,
-  SegmentedControl,
   SimpleGrid,
+  Skeleton,
   Stack,
   Text,
   Title,
 } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
 import {
   IconAlertTriangle,
   IconClock,
   IconPercentage,
   IconTrendingUp,
 } from '@tabler/icons-react'
-import { useState } from 'react'
+import 'dayjs/locale/es'
+import { lazy, Suspense, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-// Presets de fecha (el `DatePickerInput` de @mantine/dates no está instalado
-// todavía; el contrato acepta `from`/`to` y estos presets los calculan).
-const RANGES = [
-  { value: '7', days: 7 },
-  { value: '30', days: 30 },
-  { value: '90', days: 90 },
-  { value: 'all', days: null },
-]
+// Los gráficos entran en un chunk aparte (§4.6): no pesan en el arranque.
+const BarChart = lazy(() =>
+  import('@mantine/charts').then((module) => ({ default: module.BarChart })),
+)
 
+const DEFAULT_RANGE_DAYS = 30
 const CRITICAL_PREVIEW = 6
 
-function isoDaysAgo(days) {
-  if (!days) return null
-  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10)
+function toIso(date) {
+  if (!date) return undefined
+  return new Date(date).toISOString().slice(0, 10)
 }
 
 function percentOf(group) {
@@ -79,38 +78,55 @@ function ConversionBlock({ query }) {
         onRetry={query.refetch}
       >
         {query.data && (
-          <Group gap="lg" wrap="nowrap" align="center">
-            <RingProgress
-              size={120}
-              thickness={12}
-              roundCaps
-              sections={[
-                {
-                  value: Math.min(100, Math.round(query.data.ratio * 100)),
-                  color: 'vikinga',
-                },
-              ]}
-              label={
-                <Text ta="center" fw={700}>
-                  {Math.round(query.data.ratio * 100)}%
-                </Text>
-              }
-            />
-            <Stack gap="xs">
-              <div>
-                <Text size="xs" c="dimmed">
-                  {t('admin.dashboard.generations')}
-                </Text>
-                <Text fw={700}>{formatNumber(query.data.generations)}</Text>
-              </div>
-              <div>
-                <Text size="xs" c="dimmed">
-                  {t('admin.dashboard.sales')}
-                </Text>
-                <Text fw={700}>{formatNumber(query.data.sales)}</Text>
-              </div>
-            </Stack>
-          </Group>
+          <Stack gap="lg">
+            <Group gap="lg" wrap="nowrap" align="center">
+              <RingProgress
+                size={120}
+                thickness={12}
+                roundCaps
+                sections={[
+                  {
+                    value: Math.min(100, Math.round(query.data.ratio * 100)),
+                    color: 'vikinga',
+                  },
+                ]}
+                label={
+                  <Text ta="center" fw={700}>
+                    {Math.round(query.data.ratio * 100)}%
+                  </Text>
+                }
+              />
+              <Stack gap="xs">
+                <div>
+                  <Text size="xs" c="dimmed">
+                    {t('admin.dashboard.generations')}
+                  </Text>
+                  <Text fw={700}>{formatNumber(query.data.generations)}</Text>
+                </div>
+                <div>
+                  <Text size="xs" c="dimmed">
+                    {t('admin.dashboard.sales')}
+                  </Text>
+                  <Text fw={700}>{formatNumber(query.data.sales)}</Text>
+                </div>
+              </Stack>
+            </Group>
+
+            <Suspense fallback={<Skeleton height={200} />}>
+              <BarChart
+                h={200}
+                data={[
+                  {
+                    metric: t('admin.dashboard.generations'),
+                    value: query.data.generations,
+                  },
+                  { metric: t('admin.dashboard.sales'), value: query.data.sales },
+                ]}
+                dataKey="metric"
+                series={[{ name: 'value', color: 'vikinga' }]}
+              />
+            </Suspense>
+          </Stack>
         )}
       </QueryBoundary>
     </Card>
@@ -267,15 +283,17 @@ function InFlightBlock({ query }) {
 }
 
 // Dashboard de control (US8/T086, FR-021): conversión, precisión, stock crítico
-// y ventas en vuelo, con filtro de fechas.
+// y ventas en vuelo, con rango de fechas.
 export function DashboardPage() {
-  const { t } = useI18n()
-  const [rangeKey, setRangeKey] = useState('30')
-  const days = RANGES.find((item) => item.value === rangeKey)?.days ?? null
-  const range = days ? { from: isoDaysAgo(days) } : {}
+  const { t, language } = useI18n()
+  const [range, setRange] = useState(() => [
+    new Date(Date.now() - DEFAULT_RANGE_DAYS * 86_400_000),
+    new Date(),
+  ])
+  const params = { from: toIso(range[0]), to: toIso(range[1]) }
 
-  const conversion = useConversion(range)
-  const precision = usePrecision(range)
+  const conversion = useConversion(params)
+  const precision = usePrecision(params)
   const critical = useCriticalStock()
   const inFlight = useAdminSales({ open: true, pageSize: 20 })
 
@@ -286,14 +304,15 @@ export function DashboardPage() {
         subtitle={t('admin.dashboard.subtitle')}
       />
 
-      <SegmentedControl
+      <DatePickerInput
+        type="range"
+        label={t('admin.dashboard.range')}
+        value={range}
+        onChange={setRange}
+        locale={language}
+        clearable
         mb="lg"
-        value={rangeKey}
-        onChange={setRangeKey}
-        data={RANGES.map((item) => ({
-          value: item.value,
-          label: t(`admin.dashboard.range.${item.value}`),
-        }))}
+        maw={360}
       />
 
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">

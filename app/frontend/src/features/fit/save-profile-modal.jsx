@@ -21,6 +21,7 @@ export function SaveProfileModal({ opened, onClose, generation }) {
 
   return (
     <Modal
+      closeButtonProps={{ 'aria-label': t('common.close') }}
       opened={opened}
       onClose={handleClose}
       title={t('fit.result.saveProfile')}

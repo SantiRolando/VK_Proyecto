@@ -84,7 +84,7 @@ export function DeliveryStep({
               ) : (
                 <Button
                   variant="light"
-                  size="compact-sm"
+                  size="sm"
                   leftSection={<IconMapPin size={14} />}
                   onClick={() => setAdding(true)}
                 >

@@ -1,8 +1,6 @@
 // Alias de imports (`@components/...`, `@api/...`). Los comparten Vite y Vitest
 // para que el build y los tests resuelvan igual; `jsconfig.json` los replica
 // para el editor.
-//
-// `@hooks` todavía no tiene carpeta: queda listo para §4.4 del plan.
 
 import { fileURLToPath } from 'node:url'
 

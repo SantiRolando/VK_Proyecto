@@ -96,10 +96,10 @@ export function SummaryStep({
               })}
             </Text>
             <Group gap="xs">
-              <Button size="compact-sm" variant="light" onClick={onRetry}>
+              <Button size="sm" variant="light" onClick={onRetry}>
                 {t('common.retry')}
               </Button>
-              <Button size="compact-sm" variant="subtle" onClick={onBackToProduct}>
+              <Button size="sm" variant="subtle" onClick={onBackToProduct}>
                 {t('checkout.stock.chooseOther')}
               </Button>
             </Group>

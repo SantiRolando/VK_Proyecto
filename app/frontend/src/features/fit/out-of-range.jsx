@@ -39,7 +39,7 @@ export function OutOfRange({ onReset }) {
             color="teal"
             leftSection={<IconBrandWhatsapp size={16} />}
           >
-            WhatsApp
+            {t('enums.channel.Whatsapp')}
           </Button>
         )}
       </div>

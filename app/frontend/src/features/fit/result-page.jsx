@@ -241,8 +241,14 @@ export function ResultPage() {
             <SizeCard generation={query.data} />
             <StockState generation={query.data} />
             <RegisterCard />
-            <SaveProfileCard generation={query.data} />
-            <FeedbackCard generation={query.data} onRated={query.refetch} />
+            {/* En modo asistente la generación es de un tercero: el personal no
+                guarda perfiles ni califica. */}
+            {!query.data.onBehalf && (
+              <>
+                <SaveProfileCard generation={query.data} />
+                <FeedbackCard generation={query.data} onRated={query.refetch} />
+              </>
+            )}
             <Button
               variant="subtle"
               leftSection={<IconArrowLeft size={16} />}

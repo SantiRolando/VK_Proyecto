@@ -34,7 +34,7 @@ export function SiteHeader() {
               href={link.target}
               aria-label={t(link.key)}
               onClick={(event) => handleNavClick(event, link.target)}
-              className="flex items-center gap-2 text-gray-400 transition-colors hover:text-white"
+              className="flex items-center gap-2 p-2 -m-2 text-gray-400 transition-colors hover:text-white"
             >
               <Icon size={20} stroke={1.5} />
               <span className="hidden md:inline">{t(link.key)}</span>

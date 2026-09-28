@@ -81,7 +81,7 @@ export function AddressesPage() {
           <Stack gap="sm">
             {addresses.map((address) => (
               <Card key={address.id} withBorder radius="md" padding="md">
-                <Group justify="space-between" wrap="nowrap">
+                <Group justify="space-between" gap="sm" wrap="wrap">
                   <div>
                     <Text fw={600}>{addressFullLine(address)}</Text>
                     {address.isDefault && (
@@ -91,7 +91,7 @@ export function AddressesPage() {
                     )}
                   </div>
 
-                  <Group gap="xs" wrap="nowrap">
+                  <Group gap="xs" wrap="wrap">
                     {!address.isDefault && (
                       <Button
                         variant="subtle"
@@ -130,6 +130,7 @@ export function AddressesPage() {
       </QueryBoundary>
 
       <Modal
+        closeButtonProps={{ 'aria-label': t('common.close') }}
         opened={editing !== null}
         onClose={() => setEditing(null)}
         title={
@@ -151,6 +152,7 @@ export function AddressesPage() {
       </Modal>
 
       <Modal
+        closeButtonProps={{ 'aria-label': t('common.close') }}
         opened={removing !== null}
         onClose={() => setRemoving(null)}
         title={t('account.addresses.removeTitle')}

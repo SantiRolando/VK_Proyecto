@@ -21,6 +21,7 @@ export function MeasureHelp({ opened, onClose }) {
 
   return (
     <Drawer
+      closeButtonProps={{ 'aria-label': t('common.close') }}
       opened={opened}
       onClose={onClose}
       title={t('fit.measure.title')}

@@ -1,27 +1,24 @@
 import { useI18n } from '@i18n/context.js'
+import { SegmentedControl } from '@mantine/core'
 
+// Mismo ancho y contraste en cualquier superficie (header oscuro de la landing
+// y headers claros de la app); `SegmentedControl` aporta el rol de radiogroup y
+// el estado seleccionado para lectores de pantalla (T103).
 const LANGUAGES = [
-  { code: 'es', label: 'ES' },
-  { code: 'en', label: 'EN' },
+  { value: 'es', label: 'ES' },
+  { value: 'en', label: 'EN' },
 ]
 
 export function LanguageSwitch() {
-  const { language, setLanguage } = useI18n()
+  const { language, setLanguage, t } = useI18n()
 
   return (
-    <div className="flex gap-2">
-      {LANGUAGES.map(({ code, label }) => (
-        <button
-          key={code}
-          type="button"
-          onClick={() => setLanguage(code)}
-          className={`rounded px-2 py-1 text-sm transition-colors ${
-            language === code ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-          }`}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
+    <SegmentedControl
+      size="xs"
+      value={language}
+      onChange={setLanguage}
+      data={LANGUAGES}
+      aria-label={t('nav.language')}
+    />
   )
 }

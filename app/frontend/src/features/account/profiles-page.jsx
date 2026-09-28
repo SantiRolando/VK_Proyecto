@@ -96,7 +96,7 @@ export function ProfilesPage() {
             {profiles.map((profile) => (
               <Card key={profile.id} withBorder radius="md" padding="md">
                 <Stack gap="sm">
-                  <Group justify="space-between" wrap="nowrap">
+                  <Group justify="space-between" gap="sm" wrap="wrap">
                     <Group gap="xs" wrap="nowrap">
                       <Text fw={600}>{profile.name}</Text>
                       {profile.isDefault && (
@@ -106,7 +106,7 @@ export function ProfilesPage() {
                       )}
                     </Group>
 
-                    <Group gap="xs" wrap="nowrap">
+                    <Group gap="xs" wrap="wrap">
                       {!profile.isDefault && (
                         <Button
                           variant="subtle"
@@ -158,6 +158,7 @@ export function ProfilesPage() {
       </QueryBoundary>
 
       <Modal
+        closeButtonProps={{ 'aria-label': t('common.close') }}
         opened={editing !== null}
         onClose={() => setEditing(null)}
         title={
@@ -177,6 +178,7 @@ export function ProfilesPage() {
       </Modal>
 
       <Modal
+        closeButtonProps={{ 'aria-label': t('common.close') }}
         opened={removing !== null}
         onClose={() => setRemoving(null)}
         title={t('account.profiles.removeTitle')}

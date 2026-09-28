@@ -1,4 +1,4 @@
-import heroImage from '@assets/indoor-swimming-pool.png'
+import heroImage from '@assets/indoor-swimming-pool.jpg'
 import { useI18n } from '@i18n/context.js'
 import { Text, Title } from '@mantine/core'
 

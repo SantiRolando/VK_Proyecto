@@ -143,6 +143,7 @@ export function ConfirmationPage() {
                       variant="light"
                       leftSection={<IconCopy size={16} />}
                       onClick={handleCopy}
+                      aria-live="polite"
                     >
                       {copied
                         ? t('checkout.confirmation.copied')
@@ -157,7 +158,7 @@ export function ConfirmationPage() {
                   )}
 
                   {contact.to && (
-                    <Text size="xs" c="dimmed">
+                    <Text size="xs" c="dimmed" style={{ wordBreak: 'break-word' }}>
                       {t('checkout.confirmation.target', { target: contact.to })}
                     </Text>
                   )}

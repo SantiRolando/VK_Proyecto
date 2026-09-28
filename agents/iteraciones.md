@@ -20,6 +20,8 @@
 | 10 | M3 | US6 | Feedback, puntos, cupones e historial |
 | 11 | M4 | US8 | Dashboard de control |
 | 12 | M4 | US9 | Inventario y catálogo admin |
+| 13 | — | — | Deps de Mantine + DatePickerInput y gráfico en el dashboard |
+| 14 | M5 | US10–US12 | Reportes, reglas/cupones y modo asistente |
 
 > Las iteraciones 1 (capa de datos) y 2 (base UI) están resumidas en la tabla de la
 > Fase 2 de `scan-vkfit-estado-y-pendientes.md` (§6).
@@ -209,9 +211,10 @@
 - Test de componentes `dashboard.test.jsx` (2 tests): los cuatro bloques con datos de la seed (precisión 2/2, stock
   crítico presente, ventas en vuelo #1/#2/#5 con teléfono y sin las cerradas) y el filtro de fechas (verifica que el
   rango pedido cambie a 7 días y a «todo»).
-- **Desvío consciente**: `@mantine/dates`/`dayjs` no están instalados, así que el rango se elige con presets
-  (`SegmentedControl`) y los KPIs usan solo componentes de core (sin `@mantine/charts`): menos bundle y testeable en jsdom.
-  Cuando el usuario instale las deps, `DatePickerInput` y los gráficos son un cambio local.
+- **Desvío consciente**: el rango se elige con presets (`SegmentedControl`) y los KPIs usan solo componentes de core
+  (`RingProgress`/`Progress`): menos bundle y testeable en jsdom. `@mantine/dates`/`@mantine/charts`/`dayjs` se
+  instalaron después (iteración 13); `DatePickerInput` es un popover que jsdom no maneja bien, así que pasarlo y sumar
+  un gráfico lazy queda como mejora de UI (el contrato `from`/`to` no cambia).
 - Ajuste de tooling: los tests de componentes son lentos (jsdom + router/providers reales + formularios de Mantine) y el
   default de Vitest (5 s) se quedaba corto en paralelo (`Test timed out`); `testTimeout`/`hookTimeout` pasan a 20 s.
 - Verificación: `biome check` ✅, 198 tests ✅, `i18n:check` ✅ (433 claves), build mock ✅ y http ✅ con SC-005.
@@ -244,3 +247,169 @@
   lugar de dos transacciones enlazadas en un solo POST; el contrato `{reason, direction, lines}` queda igual.
 - Verificación: `biome check` ✅, 222 tests ✅, `i18n:check` ✅ (487 claves), build mock ✅ y http ✅ con SC-005.
 - **Checkpoint M4**: recorrido cliente (US1→US6) + panel (US7–US9) demostrable.
+
+## Iteración 13 — Deps de Mantine + DatePickerInput y gráfico en el dashboard ✅
+
+- Se corrió `npm install` (quedaba pendiente desde la iteración 8): entraron `@mantine/dates`, `@mantine/form`,
+  `@mantine/modals`, `@mantine/notifications`, `dayjs` y `mantine-form-zod-resolver` (más `@mantine/store` transitivo).
+- **Ajuste de versiones**: el lockfile fijaba `@mantine/core@9.6.0` mientras los paquetes nuevos resolvían a `9.6.3`, lo
+  que daba `ERESOLVE` (los paquetes de Mantine exigen la misma versión entre sí). Se alinearon los siete `@mantine/*` a
+  `^9.6.3` y se regeneró el lock; quedan core/hooks/charts/dates/form/modals/notifications en **9.6.3**.
+- **Dashboard**: el rango de fechas pasa a `DatePickerInput type="range"` de `@mantine/dates` (defaults de la librería +
+  `locale` del idioma activo, con `dayjs/locale/es` registrado) y la conversión suma un `BarChart` de `@mantine/charts`
+  cargado con `import()` en su propio chunk (`React.lazy`) — así recharts (~395 kB) no entra al bundle de arranque. Se
+  agregó `@mantine/dates/styles.layer.css` al `index.css`.
+- El test del dashboard deja de clickear presets: verifica los cuatro bloques y que los KPIs se pidan con el rango por
+  defecto (últimos 30 días). El efecto del rango sobre los datos sigue cubierto por los tests de contrato (`date-range`,
+  `admin-analytics`), porque el popover de `DatePickerInput` y el `ResponsiveContainer` de recharts no se manejan bien en
+  jsdom (recharts avisa `width(0)/height(0)`, inofensivo).
+- Verificación: `biome check` ✅, 222 tests ✅, `i18n:check` ✅ (484 claves), build mock ✅ y http ✅ con SC-005 (el http
+  sigue sin `src/mocks/`; el gráfico queda en un chunk aparte).
+
+## Iteración 14 — M5: US10, US11 y US12 ✅
+
+### US10 — Demanda no satisfecha y comentarios
+
+- Controllers en `admin-analytics` (T094): `GET /admin/analytics/missing-sizes` agrega las generaciones con
+  `stockAvailableAtQuery === false` por línea × talle (Q-12) y devuelve la grilla completa en `meta` para dibujar los
+  ceros; `GET /admin/analytics/comments` filtra por calificación, línea y rango.
+- `missing-sizes-page` (mapa de calor con `Table` coloreada por intensidad, una fila por línea) y `comments-page`
+  (filtros + tarjetas con calificación y comentario) (T095).
+- Exportación (T096): `utils/download.js` (CSV propio, con BOM y escapado) y `utils/excel.js` (SpreadsheetML 2003 que
+  Excel abre sin dependencias), orquestados por `hooks/use-export.js`; el Excel se carga con `import()` y queda en su
+  propio chunk (0,8 kB). Botones en ambos reportes.
+
+### US11 — Reglas del juego y cupones
+
+- `admin-settings` (T097): `GET/PATCH /admin/settings` con DTO en camelCase (probabilidad, puntos por feedback, tope
+  diario, contacto de coordinación, `stale_sale_days`) y validación de rangos; editar la probabilidad a 100 hace que todo
+  feedback otorgue puntos (verificado de punta a punta).
+- `admin-coupons` (T097): `GET/POST/PATCH /admin/coupons` con validación de código único y tipos de descuento. Editar el
+  `pointsCost` de una plantilla se refleja al instante en `GET /rewards` del cliente (test independiente de US11).
+- `settings-page` (formulario por bloques con confirmación de guardado) y `coupons-page` (tabla con alta/edición en
+  modal) (T098).
+
+### US12 — Modo asistente
+
+- `POST /size-generations` acepta `onBehalf` + `customerId` (T099): solo el personal puede generarlas, la generación
+  queda con `adminId` (y `customerId` si se vincula), valida que el `profileId` sea del cliente vinculado y el detalle
+  es accesible para el admin que la creó. El serializador expone `onBehalf`.
+- `assistant-page` (T100) reusa `fit-form` con el switch “Para terceros”, vínculo opcional a un cliente
+  (`GET /admin/customers`, endpoint nuevo) y acepta `?line=` como `/fit`.
+- En el resultado, una generación `onBehalf` no ofrece guardar perfil ni calificar (es de un tercero). El test verifica
+  que cuenta en las métricas globales y **no** en el historial personal del admin.
+- i18n (T101): `admin.{analytics,missingSizes,comments,settings,coupons,assistant}.*`; paridad en **547 claves**.
+- Tests nuevos: 17 de controllers (analytics 3, settings 5, coupons 6, size-generations 3), 6 de exportación
+  (`buildCsv`/`buildExcelXml` + descarga) y 6 de componentes (`analytics`, `settings`, `coupons`, `assistant`).
+- Verificación: `biome check` ✅, 251 tests ✅, `i18n:check` ✅ (547 claves), build mock ✅ y http ✅ con SC-005.
+- **Checkpoint M5**: recorrido completo cliente (US1→US6) + panel (US7→US12) demostrable. Queda F13 (pulido).
+
+## Iteración 15 — F13: pulido y validación (T102–T110) ✅
+
+Cierre del prototipo: responsive, accesibilidad, rendimiento, estados de error, README y verificación final.
+
+### Responsive y accesibilidad (T102/T103)
+
+- **Auditorías**: barrido estático de las ~85 pantallas/componentes a 360/768/1280 px y de accesibilidad; los hallazgos se corrigieron en el lugar.
+- **Desbordes en 360 px**: las cards que enfrentaban un bloque de texto con 2–3 botones en
+  `Group wrap="nowrap"` pasan a `wrap="wrap"` (direcciones, perfiles, catálogo admin); el header del cliente
+  reduce densidad (gap menor, nombre de usuario y perfil truncados con `max-w`/`truncate`, selector de perfil oculto
+  por debajo de `sm`). El `ResponsiveList` (table↔cards) conmuta en `md` (62em) y las tablas del panel bajan su
+  `minWidth` a 900 px: se evita el scroll interno a 1280 px.
+- **Tablas y cabeceras**: el resumen del pedido (`OrderSummary`) queda en `Table.ScrollContainer`; los tabs de ventas
+  pasan a `Scroller` dentro de `Tabs.List` (patrón de Mantine para listas que no caben) y los links del header de la
+  landing ganan área táctil (`p-2 -m-2`).
+- **Objetivos táctiles**: los botones que se tocan en móvil suben de `xs`/`compact-sm` a `sm`/`compact-md`
+  (login/logout, reinicio de error, acciones del checkout, feedback de historial, alertas, canje de cupones).
+- **Accesibilidad**: los selectores de talle sin stock y del detalle de producto dejan de ser `Badge` con `onClick`
+  (mouse-only) y pasan a botones; `LanguageSwitch` pasa a `SegmentedControl` con `aria-label` traducido (antes el
+  idioma activo era texto blanco sobre header blanco y el estado solo se leía por color); `<html lang>` y
+  `document.documentElement.lang` acompañan al idioma activo; los 15 `Modal`/`Drawer` ganan
+  `closeButtonProps` con `aria-label` traducido; esqueletos y loader exponen `role="status"` + `aria-busy`;
+  el toast de puntos es un live region; la calificación del feedback tiene nombre accesible y su error `role="alert"`;
+  saltos de encabezado corregidos en la landing (`order={3}`) y valores largos (emails) con `wordBreak`.
+- **Contraste**: `theme.js` + `cssVariablesResolver` oscurecen `--mantine-color-dimmed` (gray-7) y
+  `--mantine-color-placeholder` (gray-6) en esquema claro; el resolver se mergea sobre el default de Mantine
+  (`getMergedVariables`), así que no se pierde ningún token.
+- **Decisión de producto**: se mantiene la apertura automática del canal en la confirmación (cubierta por test) y solo
+  se marca el aviso de copiado como live region.
+
+### Rendimiento (T104)
+
+- El hero pasa de `indoor-swimming-pool.png` (2.552 MB) a `.jpg` 1600×900 q82 (**294 kB**) re-codificado con
+  `System.Drawing`; revisado a ojo, sigue nítido.
+- Bundle del build mock: `index` 520 kB (159 kB gzip), `esm` (recharts) 405 kB **en su propio chunk** cargado por
+  `import()` solo en el dashboard, páginas admin en chunks por ruta (dashboard 75 kB, ventas 11,5 kB, productos 10,8 kB),
+  `mock-transport` 63 kB **lazy**, `excel` 0,8 kB lazy, CSS 289 kB. Imágenes de medidas 65–301 kB.
+- Sin `Lighthouse` en la caja de trabajo (sin navegador): queda como parte de la revisión manual del usuario.
+
+### Estados de error (T107)
+
+- `POST /dev/router { latencyMs?, failRate? }` reconfigura el router en caliente y `/dev/*` está exento de la
+  simulación de fallos, así que la propia app (o un test) siempre puede apagarla.
+- `src/test/error-states.test.jsx` (4 tests) enciende `failRate=1`, verifica el estado de error y reintenta hasta
+  recuperar en cuatro pantallas con datos: detalle de producto (invitado), historial del cliente, catálogo (invitado) y
+  direcciones del cliente.
+
+### Verificación de cierre (T105/T106/T108/T109/T110)
+
+- **SC-005**: en el build `VITE_API_MODE=http` no aparecen los marcadores `mock-transport` ni `guest-demo-1`
+  (el mock queda fuera del bundle). Nota menor: las credenciales demo siguen como *strings* muertos en el chunk de
+  `login-page` (la rama está detrás de `env.isMock`); no ejecutan nada, se deja documentado.
+- **i18n**: barrido de literales en JSX → 0 coincidencias; `i18n:check` ✅ con **548 claves** (nueva `nav.language`).
+- **README** (`app/frontend/README.md`): arquitectura de la capa de datos, cómo escribir un controller/service/hook,
+  cómo pasar a la API real y variables de entorno.
+- **T108** (recorrido §7.3 en navegador) y **T110** (smoke Playwright opcional) quedan del lado del usuario: el
+  recorrido manual de las 12 historias es la revisión previa a la demo.
+- Verificación: `biome check` ✅, **256 tests** ✅ (41 archivos, corridos 3 veces seguidas), `i18n:check` ✅ (548 claves),
+  build mock ✅ y http ✅ con SC-005.
+
+## Iteración 16 — Fase 14: PWA instalable y offline ✅
+
+Pedido explícito del usuario; en el spec original la PWA estaba **fuera de alcance** (principio V). Se implementa y se
+actualizan constitución/plan.
+
+### Decisión de tooling
+
+- **`vite-plugin-pwa@1.3.0`** (dev dependency; arrastra `workbox-build`/`workbox-window`). Se eligió sobre un service
+  worker a mano porque el precache necesita la lista de assets **hasheados** del build: hacerlo sin el plugin obliga a
+  estrategias de runtime y pierde el “todo el shell offline”. Alternativas descartadas: MSW (SW de otra cosa, no precache),
+  `@vite-pwa/assets-generator` (los íconos son placeholders, no vale una dependencia más).
+- **`registerType: 'autoUpdate'` + `injectRegister: 'auto'`**: el plugin inyecta `registerSW.js` en el `index.html`, así
+  que **no** se importa `virtual:pwa-register` y jsdom/Vitest quedan intactos (0 cambios en tests).
+
+### Manifest y documento (T111)
+
+- Manifest en la config de Vite: `name`/`short_name`, `description`, `lang: es`, `display: standalone`, `orientation`,
+  `start_url`/`scope`/`id` = `/`, `theme_color` `#134379` (vikinga-7) y `background_color` `#E8F0FA`.
+- Íconos **placeholder** (Q-16: la marca real está pendiente) generados con `scripts/generate-pwa-icons.ps1`
+  (System.Drawing, solo Windows): `pwa-192x192`, `pwa-512x512`, `pwa-maskable-512x512` (arte dentro de la zona segura)
+  y `apple-touch-icon` 180. El script queda en el repo para regenerarlos cuando llegue el logo.
+- `index.html`: `description`, `theme-color`, `apple-touch-icon` y `apple-mobile-web-app-*`. **No** se activó
+  `viewport-fit=cover`: sin poder probar en dispositivo, extiende el contenido bajo el status bar y el header queda tapado;
+  queda documentado con el plan de safe-area insets al probar.
+
+### Service worker y política de caché (T112)
+
+- **Precache de todo el build** (128 entradas, ~3,3 MB: shell + chunks de todas las rutas + imágenes de medidas + fuentes).
+  Como cada ruta es un chunk propio ya precacheado, la app completa queda navegable sin conexión, no solo lo visitado.
+- **Navegación SPA offline**: `NavigationRoute` a `index.html` con `denylist` de `/^\/api\//` (una ruta de API nunca se
+  resuelve con el shell).
+- **API**: `NetworkFirst` para `GET /api/` (caché `vkfit-api-get`, timeout 3 s, expiración 24 h, 50 entradas, solo 200).
+  Las escrituras no se cachean. En modo `mock` no hay red en juego: el offline es total.
+- Sin push y sin prompt de actualización (`skipWaiting` + `clientsClaim`); para avisar de una versión nueva con texto
+  traducido alcanza con `registerType: 'prompt'` + `virtual:pwa-register/react`.
+
+### Verificación (T113)
+
+- `npm run build` ✅ genera `manifest.webmanifest`, `sw.js`, `workbox-*.js` y `registerSW.js`; `dist/index.html` sale con
+  `<link rel="manifest">`, `theme-color`, los meta de Apple y el script de registro.
+- **SC-005 intacto**: el build `http` no contiene `mock-transport`, `guest-demo-1` ni `vkfit.mockdb` (0 coincidencias), y
+  su `sw.js` no menciona el mock (el precache del build http es de 133 entradas, ~3,24 MB).
+- `biome check` ✅ (incluye `vite.config.js`), **259 tests** ✅ (42 archivos: los 3 nuevos de `src/test/pwa.test.js`
+  verifican que los íconos del manifest existan, que el documento declare los metas de instalación y que el SW siga en
+  `autoUpdate` con precache) y `i18n:check` ✅ (548 claves: no hubo claves nuevas porque la PWA no agrega UI propia).
+- **No verificable acá**: instalación real en un navegador/dispositivo. Queda `npm run build && npm run preview -- --host`
+  y, en DevTools → Application, comprobar manifest, SW activo, Cache Storage y el modo offline.
+- Docs actualizadas: `CLAUDE.md` (regla PWA reescrita), `app/frontend/README.md` (sección “PWA (instalable y offline)”),
+  plan (principio V, alcance, §4.1/§4.2, §7.1, Fase 14) y `scan-vkfit-estado-y-pendientes.md`.

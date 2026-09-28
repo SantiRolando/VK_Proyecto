@@ -52,8 +52,8 @@ Ningún string visible para el usuario aparece como literal en el código. Todo 
 **IV. Rutas en inglés y centralizadas.**
 Las rutas se definen en inglés sin importar el idioma del cliente (`/generator`, no `/generador`). Viven en un único módulo (`src/app/routes.js`); ningún componente escribe paths a mano.
 
-**V. Diseñado para PWA, sin implementar PWA todavía.**
-Mobile-first, rendimiento y carga rápida como requisito de diseño (code-splitting por ruta, dependencias livianas, estados de carga con skeletons, datos con caché declarativa). **No** se agrega service worker, manifest, ni plugin PWA en esta iteración. Se evita cualquier decisión que bloquee un soporte offline futuro.
+**V. Diseñado para PWA e implementado (iteración 16).**
+Mobile-first, rendimiento y carga rápida como requisito de diseño (code-splitting por ruta, dependencias livianas, estados de carga con skeletons, datos con caché declarativa). La app es instalable y navegable sin conexión: manifest + service worker con precache del shell (`vite-plugin-pwa`, ver Fase 14). El diseño sigue evitando cualquier decisión que complique el soporte offline (assets en `public/`, rutas client-side, datos por HTTP).
 
 **VI. FE agnóstico de su fuente de datos.**
 Los componentes jamás importan de `src/mocks/`. Todo dato pasa por `services → apiClient → transport`. El transporte *mock* y sus *controllers* imitan un servidor REST y son descartables: pasar a la API real debe requerir cambiar una variable de entorno y, a lo sumo, ajustar mapeos localizados.
@@ -88,7 +88,7 @@ Scan VKFit reemplaza la tabla de medidas estática de Vikinga por una recomendac
 
 **Objetivo del prototipo:** un FE navegable de punta a punta (cliente y administrador) que permita **validar el alcance funcional con el cliente**, alimentado por datos mock y con una capa de datos lista para conectarse a la API REST.
 
-**Fuera de alcance:** backend real, PWA (service worker/manifest/offline), envío real de emails/WhatsApp desde servidor, pagos, notificaciones push, TypeScript.
+**Fuera de alcance:** backend real, envío real de emails/WhatsApp desde servidor, pagos, notificaciones push, TypeScript. *(La PWA dejó de estar fuera de alcance en la iteración 16: manifest + service worker, sin push.)*
 
 ### 2.2 Actores
 
@@ -279,6 +279,7 @@ Cada historia es independiente y testeable por sí sola (formato spec-kit).
 | Validación | zod |
 | Testing | Vitest, Testing Library, jsdom |
 | Plataforma objetivo | Navegadores móviles modernos; escritorio para admin |
+| PWA | `vite-plugin-pwa` (manifest + service worker Workbox, precache del shell, `autoUpdate`) — iteración 16 |
 | Tipo de proyecto | SPA frontend única (sin backend en el repo) |
 | Objetivos de rendimiento | Ver constitución (JS inicial ≤ ~200 KB gzip, Lighthouse mobile ≥ 90) |
 | Restricciones | Sin PWA aún; rutas en inglés; i18n total; nombres kebab-case/PascalCase |
@@ -292,7 +293,7 @@ Cada historia es independiente y testeable por sí sola (formato spec-kit).
 | II Nombres | ⚠️ | Convención en `CLAUDE.md` + revisión (Biome no tiene regla de nombres de archivo) |
 | III i18n | ⚠️ | `useI18n()`, `i18n:check` + test de paridad; **sin** lint `no-literal-string` (Biome no lo tiene) |
 | IV Rutas en inglés | ✅ | `routes.js` único; test que verifica que todos los paths son ASCII en inglés |
-| V PWA-ready sin PWA | ✅ | Lazy routes, skeletons, sin SW/manifest; Query como capa de datos |
+| V PWA | ✅ | Instalable y offline: manifest + íconos en `public/`, service worker con precache de todo el build (`vite-plugin-pwa`), navegación SPA offline y API con NetworkFirst (iteración 16) |
 | VI FE agnóstico | ✅ | `noRestrictedImports` de Biome para `**/mocks/**` y `@mocks/**` fuera de `src/api/` y `src/mocks/` |
 | VII Sin lógica de negocio | ✅ | Motor de talles, puntos y stock en `src/mocks/domain/` |
 | VIII Simplicidad | ✅ | 2 contextos, sin store global |
@@ -371,6 +372,8 @@ register('POST', '/sales', createSale, { auth: 'customer' });
 ├── .specify/memory/constitution.md
 ├── specs/001-scan-vkfit-fe-prototype/   # spec, plan, research, data-model, contracts, quickstart, tasks
 ├── scripts/check-i18n.mjs               # paridad de claves es/en
+├── scripts/generate-pwa-icons.ps1       # íconos placeholder de la PWA (Windows)
+├── public/ favicon.svg · pwa-192x192.png · pwa-512x512.png · pwa-maskable-512x512.png · apple-touch-icon.png
 ├── .env.example · jsconfig.json · biome.json
 ├── vite.config.js · vite.aliases.js · vitest.config.js
 └── src/
@@ -709,7 +712,7 @@ npm i @mantine/core @mantine/hooks @mantine/form @mantine/notifications @mantine
       zustand lenis tailwindcss @tailwindcss/vite @fontsource/inter
 
 # Dev
-npm i -D @biomejs/biome vitest jsdom \
+npm i -D @biomejs/biome vitest jsdom vite-plugin-pwa \
          @testing-library/react @testing-library/dom @testing-library/user-event @testing-library/jest-dom
 ```
 > `react-router` (v7 unificó `react-router-dom`). No hace falta PostCSS de Mantine: los estilos entran por `src/index.css`. Verificar versiones contra `agents/llms-full.txt`.
@@ -758,17 +761,17 @@ OTP en mock: `123456`. Reset de datos: `/dev` → "Restablecer base mock".
 
 **Notación:** `T###` id estable · `[P]` paralelizable (archivos distintos, sin dependencia) · `[USn]` historia · rutas exactas. Antes de **toda** tarea que toque Mantine: consultar la sección correspondiente de `agents/llms-full.txt`. Toda tarea de UI incluye sus claves en `es.js` y `en.js`.
 
-> **Estado:** `[x]` hecha · `[~]` parcial o con desvío (se aclara al lado) · `[ ]` pendiente · `➖` descartada. Última actualización: **iteración 7 (M2 cerrado)**. El detalle de cada iteración está en `agents/iteraciones.md` y el estado consolidado en `agents/scan-vkfit-estado-y-pendientes.md`.
+> **Estado:** `[x]` hecha · `[~]` parcial o con desvío (se aclara al lado) · `[ ]` pendiente · `➖` descartada. Última actualización: **iteración 15 (M5 y F13 cerrados)**. El detalle de cada iteración está en `agents/iteraciones.md` y el estado consolidado en `agents/scan-vkfit-estado-y-pendientes.md`.
 
 ### Fase 1 — Setup
 
 - [x] T001 Crear proyecto Vite + React (JS) y copiar `CLAUDE.md` y `agents/llms-full.txt` — raíz
 - ➖ T002 Ejecutar `specify init`, cargar constitución (§1) — `.specify/memory/constitution.md` · *descartada: el usuario aporta su propio spec*
-- [~] T003 [P] Instalar dependencias de §7.1 y configurar PostCSS de Mantine — `package.json`, `postcss.config.cjs` · *§7.1 completo declarado en `package.json` (Mantine entero, `dayjs`, `recharts`, `mantine-form-zod-resolver`); **la instalación la corre el usuario** (el lock queda desactualizado hasta entonces). Sin PostCSS: `src/index.css` importa los estilos*
+- [x] T003 [P] Instalar dependencias de §7.1 y configurar PostCSS de Mantine — `package.json`, `postcss.config.cjs` · *§7.1 completo declarado e **instalado** (iteración 13: `@mantine/*` alineados a 9.6.3 + `dayjs`; el lock quedó en sync). Sin PostCSS: `src/index.css` importa los estilos*
 - [x] T004 [P] Configurar alias `@`→`src`, env tipadas y `.env.example` — `vite.config.js`, `src/config/env.js`, `.env.example` · *alias por carpeta (`vite.aliases.js`: `@components`, `@api`, `@features`, …) compartidos con Vitest + `jsconfig.json`; env tipadas y `.env.example`*
 - [~] T005 [P] ESLint + Prettier: `no-literal-string`, kebab-case (`check-file`), `no-restricted-imports` de `src/mocks/**` fuera de `src/api/` y `src/mocks/` — `eslint.config.js` · *reemplazados por **Biome** (`biome.json`: lint + format + `noRestrictedImports` para `**/mocks/**` y `@mocks/**`). Pendiente: no hay regla de `no-literal-string` ni de kebab-case en Biome (quedan por revisión)*
 - [x] T006 [P] Vitest + jsdom + setup — `vitest.config.js`, `src/test/setup.js` · *+ Testing Library (`react`/`dom`/`user-event`/`jest-dom`) en la iteración 6*
-- [~] T007 Crear árbol de carpetas de §4.4 (archivos `.gitkeep`) — `src/**` · *existe el árbol de todo lo implementado; falta lo que corresponde a historias pendientes: `profile-selector`, `features/feedback/`, `features/admin/{dashboard,inventory,catalog-admin,analytics,settings,coupons,assistant}`, `hooks/`, `utils/{format,download,query-keys}.js`, `config/features.js`. Desvíos de §4.4: `.specify/` y `specs/` descartados con T002; `i18n/context.js` en lugar de `use-i18n.js`; `/dev` en `pages/dev/dev-page.jsx`*
+- [~] T007 Crear árbol de carpetas de §4.4 (archivos `.gitkeep`) — `src/**` · *existe todo lo implementado (incluidas `features/feedback`, `features/admin/{dashboard,inventory,catalog-admin,analytics,settings,coupons,assistant}` y `hooks/`). Faltan solo piezas opcionales de §4.4 que no llegaron a usarse: `utils/{format,query-keys}.js`, `config/features.js`, `hooks/use-media.js`. Desvíos: `.specify/` y `specs/` descartados con T002; `i18n/context.js` en lugar de `use-i18n.js`; `/dev` en `pages/dev/dev-page.jsx`; `utils/download.js` + `utils/excel.js` en lugar de `utils/download.js` solo*
 
 ### Fase 2 — Fundacional (bloquea todas las historias)
 
@@ -842,7 +845,7 @@ OTP en mock: `123456`. Reset de datos: `/dev` → "Restablecer base mock".
 
 - [x] T057 [P] [US4] Dominio `coordination-message.js` (asunto/cuerpo/URL `mailto:`/`wa.me` desde settings) + tests — `src/mocks/domain/` · *+ `coupons.js`, `sales.js` y `money.js`*
 - [x] T058 [US4] Controllers `sales` (`POST /sales` atómico con reserva, `GET /me/sales`) y `coupons/validate` + tests de conflicto — `src/mocks/controllers/sales.controller.js` · *`coupons/validate` quedó en `coupons.controller.js`; se agregó `GET /me/sales/:id` para la confirmación*
-- [~] T059 [P] [US4] Controllers `profiles`/`addresses` mínimos para checkout (alta de dirección) — `src/mocks/controllers/addresses.controller.js` · *solo `addresses` (listar + alta); el CRUD de `profiles` y de direcciones llega en US5/T071–T075*
+- [x] T059 [P] [US4] Controllers `profiles`/`addresses` mínimos para checkout (alta de dirección) — `src/mocks/controllers/addresses.controller.js` · *superado por US5: el CRUD completo de `profiles` y direcciones quedó en T071–T075*
 - [x] T060 [P] [US4] `sales-service`, `addresses-service` + hooks; invalidar `['catalog']` al crear venta — `src/api/services/`, `src/features/checkout/hooks/`
 - [x] T061 [US4] Carrito/selección de línea (estado local de checkout) y redirección de invitado a registro con `returnTo` — `src/features/checkout/` · *una línea por venta (el carrito multi-línea queda fuera por decisión); la selección viaja por query desde el catálogo y el guard de `RequireAuth` conserva el `returnTo`*
 - [x] T062 [US4] `checkout-page` con `delivery-step`, `channel-step` (Email por defecto), `coupon-input`, `summary-step` — `src/features/checkout/`
@@ -883,7 +886,7 @@ OTP en mock: `123456`. Reset de datos: `/dev` → "Restablecer base mock".
 
 - [x] T084 [US8] Controllers `admin-analytics` (conversion, precision, critical-stock) + tests — `src/mocks/controllers/admin-analytics.controller.js`
 - [x] T085 [P] [US8] `admin-analytics-service` + hooks con filtro de fechas — `src/api/services/`
-- [x] T086 [US8] `dashboard-page` (4 bloques, `DatePickerInput`, `RingProgress`/gráficos lazy, ventas en vuelo con canal y teléfono) — `src/features/admin/dashboard/` · *sin `@mantine/dates` instalado: el rango se elige con presets (`SegmentedControl` 7/30/90/todo) que calculan `from`/`to`; los KPIs usan `RingProgress`/`Progress` de core (sin `@mantine/charts`)*
+- [x] T086 [US8] `dashboard-page` (4 bloques, `DatePickerInput`, `RingProgress`/gráficos lazy, ventas en vuelo con canal y teléfono) — `src/features/admin/dashboard/` · *rango con `DatePickerInput type="range"` (`@mantine/dates`, defaults + locale) y `BarChart` de `@mantine/charts` cargado con `import()` en su propio chunk; los KPIs usan `RingProgress`/`Progress` de core*
 - [x] T087 [US8] Claves i18n `admin.dashboard.*` — `src/i18n/locales/`
 
 ### Fase 11 — US9: Inventario y catálogo (P2) _(iteración 12)_ ✅
@@ -895,28 +898,34 @@ OTP en mock: `123456`. Reset de datos: `/dev` → "Restablecer base mock".
 - [x] T092 [P] [US9] `products-page` (CRUD producto/variantes, baja lógica) — `src/features/admin/catalog-admin/`
 - [x] T093 [US9] Claves i18n `admin.inventory.*`, `admin.products.*` — `src/i18n/locales/`
 
-### Fase 12 — US10, US11, US12 (P3)
+### Fase 12 — US10, US11, US12 (P3) _(iteración 14)_ ✅
 
-- [ ] T094 [US10] Controllers `missing-sizes` y `comments` — `src/mocks/controllers/admin-analytics.controller.js`
-- [ ] T095 [P] [US10] `missing-sizes-page` (mapa de calor con `Table` coloreada) y `comments-page` (filtros) — `src/features/admin/analytics/`
-- [ ] T096 [P] [US10] `use-export` + `download.js` (CSV propio, Excel por `import()`), botones en cada reporte — `src/hooks/use-export.js`, `src/utils/download.js`
-- [ ] T097 [P] [US11] Controllers `admin-settings`, `admin-coupons` — `src/mocks/controllers/`
-- [ ] T098 [US11] `settings-page` (probabilidad, puntos, tope diario, contacto) y `coupons-page` (costo de canje, vigencia) — `src/features/admin/settings/`, `.../coupons/`
-- [ ] T099 [US12] Soporte `onBehalf`/`customerId` en `size-generations` y exclusión de historial/métricas personales — `src/mocks/controllers/size-generations.controller.js`
-- [ ] T100 [US12] `assistant-page` reutilizando `fit-form` con switch "Para terceros" y vínculo opcional a cliente — `src/features/admin/assistant/`
-- [ ] T101 [P] Claves i18n `admin.analytics.*`, `admin.settings.*`, `admin.assistant.*` — `src/i18n/locales/`
+- [x] T094 [US10] Controllers `missing-sizes` y `comments` — `src/mocks/controllers/admin-analytics.controller.js`
+- [x] T095 [P] [US10] `missing-sizes-page` (mapa de calor con `Table` coloreada) y `comments-page` (filtros) — `src/features/admin/analytics/`
+- [x] T096 [P] [US10] `use-export` + `download.js` (CSV propio, Excel por `import()`), botones en cada reporte — `src/hooks/use-export.js`, `src/utils/download.js` · *el Excel es SpreadsheetML generado en `utils/excel.js`, importado dinámicamente (chunk propio de 0,8 kB), sin dependencia nueva*
+- [x] T097 [P] [US11] Controllers `admin-settings`, `admin-coupons` — `src/mocks/controllers/`
+- [x] T098 [US11] `settings-page` (probabilidad, puntos, tope diario, contacto) y `coupons-page` (costo de canje, vigencia) — `src/features/admin/settings/`, `.../coupons/`
+- [x] T099 [US12] Soporte `onBehalf`/`customerId` en `size-generations` y exclusión de historial/métricas personales — `src/mocks/controllers/size-generations.controller.js`
+- [x] T100 [US12] `assistant-page` reutilizando `fit-form` con switch "Para terceros" y vínculo opcional a cliente — `src/features/admin/assistant/` · *+ `GET /admin/customers` (listado mínimo para vincular)*
+- [x] T101 [P] Claves i18n `admin.analytics.*`, `admin.settings.*`, `admin.assistant.*` — `src/i18n/locales/`
 
-### Fase 13 — Pulido y validación
+### Fase 13 — Pulido y validación _(iteración 15)_ ✅
 
-- [ ] T102 [P] Revisión responsive a 360/768/1280 px de todas las pantallas; objetivos táctiles y foco
-- [ ] T103 [P] Accesibilidad: labels, `aria-*` traducidos, contraste, navegación por teclado en modales/drawers
-- [ ] T104 [P] Rendimiento: analizar bundle, verificar chunks lazy (admin, charts, export), Lighthouse mobile en `/` y `/fit`
-- [~] T105 Verificar que `VITE_API_MODE=http` excluye `src/mocks/` del bundle (SC-005) · *verificado en cada iteración (build mock + http y barrido de marcadores en `dist/`); conviene repetirlo en el cierre*
-- [~] T106 Barrido i18n: 0 literales (lint), `i18n:check` verde, revisión de textos es/en · *`i18n:check` verde (487 claves con paridad); **falta** la regla `no-literal-string` (T005)*
-- [ ] T107 Estados de error: probar con `VITE_MOCK_FAIL_RATE` en cada pantalla con datos
-- [~] T108 Ejecutar el recorrido de §7.3 completo y corregir · *US1–US4 y US7 cubiertos por tests de componentes; falta el barrido manual en navegador del recorrido completo*
-- [ ] T109 [P] README con arquitectura de la capa API, cómo escribir un controller y cómo pasar a la API real
-- [ ] T110 [P] (Opcional) Smoke E2E con Playwright: US1→US4→US7
+- [x] T102 [P] Revisión responsive a 360/768/1280 px de todas las pantallas; objetivos táctiles y foco · *auditadas las ~85 pantallas/componentes; se corrigieron los desbordes de las cards (`Group wrap`), la densidad del header del cliente, el breakpoint del `ResponsiveList` (md), las tablas en `ScrollContainer`/`Scroller` y los objetivos táctiles de móvil*
+- [x] T103 [P] Accesibilidad: labels, `aria-*` traducidos, contraste, navegación por teclado en modales/drawers · *selectores de talle y de idioma como controles reales, `aria-label` en los 15 `Modal`/`Drawer`, `role="status"` en carga, live regions, `lang` sincronizado y `dimmed`/`placeholder` con contraste AA por resolver de variables*
+- [x] T104 [P] Rendimiento: analizar bundle, verificar chunks lazy (admin, charts, export), Lighthouse mobile en `/` y `/fit` · *hero re-codificado a jpg (2,5 MB → 294 kB); chunks por ruta + recharts (`import()`) + export + mock lazy confirmados en el build; **Lighthouse queda del lado del usuario** (la caja de trabajo no tiene navegador)*
+- [x] T105 Verificar que `VITE_API_MODE=http` excluye `src/mocks/` del bundle (SC-005) · *cerrado en la iteración 15 (barrido de `mock-transport`/`guest-demo-1` sobre el build http: sin coincidencias)*
+- [~] T106 Barrido i18n: 0 literales (lint), `i18n:check` verde, revisión de textos es/en · *barrido de literales en JSX ✅ (0) e `i18n:check` verde (548 claves con paridad); **falta** la regla `no-literal-string` (T005)*
+- [x] T107 Estados de error: probar con `VITE_MOCK_FAIL_RATE` en cada pantalla con datos · *`POST /dev/router` permite cambiar la tasa en caliente; `src/test/error-states.test.jsx` cubre 4 pantallas (detalle de producto, historial, catálogo y direcciones)*
+- [~] T108 Ejecutar el recorrido de §7.3 completo y corregir · *US1–US12 cubiertos por tests de contrato y de componentes; **falta el barrido manual en navegador**, que es la revisión del usuario antes de la demo*
+- [x] T109 [P] README con arquitectura de la capa API, cómo escribir un controller y cómo pasar a la API real · *`app/frontend/README.md`*
+- ➖ T110 [P] (Opcional) Smoke E2E con Playwright: US1→US4→US7 · *descartado: los flujos equivalentes ya están cubiertos con Testing Library sobre el router real y agregar Playwright implicaría dependencias y CI nuevos*
+
+### Fase 14 — PWA _(iteración 16)_ ✅
+
+- [x] T111 [P] Manifest + íconos placeholder (192/512 + maskable + apple-touch) y metadatos del documento (`description`, `apple-mobile-web-app-*`, `theme-color`) — `public/`, `index.html`, `vite.config.js` · *detalle en `agents/iteraciones.md`*
+- [x] T112 [P] Service worker con precache del shell, `autoUpdate`, fallback de navegación y política de API (NetworkFirst para GET `/api/`) — `vite.config.js` · *`vite-plugin-pwa` 1.3 (Workbox)*
+- [x] T113 Verificar instalabilidad y navegación offline en el build, sin romper SC-005 ni los tests; documentar cómo probarla — `app/frontend/README.md`
 
 ### Dependencias y orden de ejecución
 
@@ -942,7 +951,7 @@ F1 Setup → F2 Fundacional ──┬─► US1 ─► US2 ─► US3 ─► US4
 | **M2** | Catálogo filtrado, sin stock, compra coordinada + admin gestiona venta | US3, US4, US7 | ✅ **cerrado (iteración 7)** |
 | **M3** | Perfiles, direcciones, feedback, puntos, cupones | US5, US6 | ✅ **cerrado (iteración 10)** |
 | **M4** | Dashboard, inventario, catálogo admin | US8, US9 | ✅ **cerrado (iteración 12)** |
-| **M5** | Analítica, exportación, reglas, modo asistente, pulido | US10–US12, F13 | 🟡 **siguiente** |
+| **M5** | Analítica, exportación, reglas, modo asistente, pulido | US10–US12, F13 | ✅ **cerrado (iteración 15)** |
 
 ---
 
@@ -985,7 +994,7 @@ Los supuestos se implementan en el mock tal como se indica, aislados para poder 
 
 1. Validar §9 con el cliente/backend (prioridad Q-01, Q-03, Q-04, Q-06; Q-11 quedó cerrada en la iteración 7).
 2. Revisar el estado de las tareas en §8 (leyenda `[x]`/`[~]`/`[ ]`/`➖`) y el detalle por iteración en `agents/iteraciones.md`.
-3. Retomar por **M5** (US10–US12 + F13): M3 y M4 quedaron cerrados (US5–US6 en las iteraciones 9–10, US8–US9 en la 11–12). El recorrido cliente (US1→US6) + panel (US7–US9) ya es demostrable.
+3. **Último bloque:** **F13** (pulido y validación) **✅ cerrada en la iteración 15**. US10–US12 ✅ (iteración 14) cerraron M5: el recorrido completo cliente (US1→US6) + panel (US7–US12) es demostrable y el prototipo queda listo para la **revisión manual del usuario** (T108: recorrido §7.3 en navegador + Lighthouse). Extra: **Fase 14 — PWA instalable y offline ✅ (iteración 16)**. Lo único diferido: el motor de recomendación real (§7), la regla `no-literal-string` (T005) y la validación en dispositivo de los safe-area insets (`viewport-fit=cover`).
 4. Al final, integrar el motor de recomendación real (§7).
 
 > El flujo de spec-kit de §0 queda como referencia; `specify init` (T002) se descartó porque el spec lo aporta el equipo.

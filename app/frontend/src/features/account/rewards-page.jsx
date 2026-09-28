@@ -90,7 +90,7 @@ function Templates({ balance }) {
                     {t('account.rewards.cost', { points: template.pointsCost })}
                   </Badge>
                   <Button
-                    size="compact-sm"
+                    size="compact-md"
                     disabled={balance < template.pointsCost}
                     loading={redeem.isPending && redeem.variables === template.id}
                     onClick={() => handleRedeem(template.id)}

@@ -45,4 +45,19 @@ describe('dev controller', () => {
       call('POST', '/dev/login-as', { body: { userId: 999 } }),
     ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
   })
+
+  it('router ajusta la simulación de fallos y /dev sigue disponible con failRate = 1', async () => {
+    await call('POST', '/dev/router', { body: { failRate: 1 } })
+
+    // Una ruta cualquiera falla…
+    await expect(call('GET', '/sizes')).rejects.toMatchObject({
+      status: 500,
+      code: 'SERVER_ERROR',
+    })
+
+    // …y las herramientas de /dev siguen disponibles para apagarla.
+    const off = await call('POST', '/dev/router', { body: { failRate: 0 } })
+    expect(off.data).toMatchObject({ failRate: 0 })
+    await expect(call('GET', '/sizes')).resolves.toBeTruthy()
+  })
 })

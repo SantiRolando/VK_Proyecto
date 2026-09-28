@@ -21,7 +21,7 @@ export function ResponsiveList({
   cardActions,
   ...tableProps
 }) {
-  const isSmall = useMediaQuery('(max-width: 48em)')
+  const isSmall = useMediaQuery('(max-width: 62em)')
 
   if (isSmall) {
     return (

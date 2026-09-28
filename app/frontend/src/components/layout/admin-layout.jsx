@@ -97,7 +97,7 @@ export function AdminLayout() {
             <Text size="sm" fw={600} truncate>
               {user?.name}
             </Text>
-            <Button variant="light" size="xs" onClick={handleLogout}>
+            <Button variant="light" size="sm" onClick={handleLogout}>
               {t('nav.logout')}
             </Button>
           </Stack>

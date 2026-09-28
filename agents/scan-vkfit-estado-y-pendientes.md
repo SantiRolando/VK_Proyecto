@@ -114,7 +114,7 @@ Puntos no negociables (constitución del plan §1):
 | `src/components/actions-menu.jsx` | OK, genérico | Mantener (admin lo reutiliza) |
 | `src/components/responsive-table.jsx` | OK, genérico (Table↔Card) | Mantener; el plan lo llama `responsive-list` |
 | `src/components/route-fallback.jsx` | Loader de Suspense | Mantener |
-| `src/assets/` | Imágenes de medidas + hero | Reutilizar en `fit-form` / measure-help; **ojo:** `indoor-swimming-pool.png` pesa ~2.6 MB (optimizar o usar placeholder) |
+| `src/assets/` | Imágenes de medidas + hero | Reutilizar en `fit-form` / measure-help; el hero ya está optimizado (`indoor-swimming-pool.jpg`, 1600×900, 294 kB en la iteración 15; antes el PNG pesaba 2,5 MB) |
 
 ### Notas de contenido pendientes (deuda menor, al iterar)
 
@@ -132,7 +132,7 @@ Mapeo contra las fases del plan (§8). Se marca lo ya resuelto y lo que falta.
 
 | Estado | Tareas |
 |---|---|
-| ✅ Hecho | T001 (Vite+React+CLAUDE.md+llms-full.txt), T003 (deps de §7.1 declaradas en `package.json`, Mantine completo incluido; la instalación la corre el usuario), T004 (alias por carpeta en `vite.aliases.js` + `jsconfig.json`, env y `.env.example`), T005 (**Biome** como único tool de lint + formato, con `noRestrictedImports` de `src/mocks`/`@mocks`), T006 (Vitest + jsdom + setup; Testing Library en la iteración 6) |
+| ✅ Hecho | T001 (Vite+React+CLAUDE.md+llms-full.txt), T003 (deps de §7.1 declaradas e **instaladas** — iteración 13: `@mantine/*` 9.6.3 + `dayjs`, lock en sync), T004 (alias por carpeta en `vite.aliases.js` + `jsconfig.json`, env y `.env.example`), T005 (**Biome** como único tool de lint + formato, con `noRestrictedImports` de `src/mocks`/`@mocks`), T006 (Vitest + jsdom + setup; Testing Library en la iteración 6) |
 | ❌ Pendiente | T007 (árbol §4.4 completo) · sin regla automática de *no literales en JSX* ni de kebab-case (Biome no las tiene) |
 | ➖ Descartado | T002 (`specify init` + constitución): el spec propio reemplaza ese paso |
 
@@ -143,16 +143,20 @@ Mapeo contra las fases del plan (§8). Se marca lo ya resuelto y lo que falta.
 | ✅ Hecho | **Iteración 1 (capa de datos):** T013 (routes.js), T014 (providers), T019–T034 (ApiError, transports, api-client, mock-router, mock-transport, database + persistencia, seed del ER nuevo, dominio stock y sale-state-machine, auth controller/service + migración de invitado, auth-context + guards, active-profile-context, tests, `/dev`) · **Iteración 2 (base UI):** T008 (tema con paleta placeholder vikinga), T009 (i18n con interpolación, plurales, formatos y persistencia), T010 (locales base: common/nav/validation/enums/títulos + dev + errors), T011 (script `i18n:check` + test de paridad), T012 (enums y lines con slug↔valor), T015 (router con todas las rutas lazy + páginas stub + 404), T016 (layouts público/cliente/admin con barra inferior móvil), T017 (query-boundary, empty-state, error-state, skeletons), T018 (page-header, money, date-time, badges de talle/stock/estado/canal, responsive-list) |
 | ❌ Pendiente (Fase 2) | T007 (árbol §4.4 completo) |
 
-### Verificación (iteraciones 1–12)
+### Verificación (iteraciones 1–16)
 
-- `npm test` ✅ (222 tests: mock-router, stock, alerts, sale-state-machine, coupons, coordination-message, points,
-  date-range, inventory, size-engine placeholder, controllers auth/dev/size-generations/catalog/sales/addresses/profiles/
-  feedback/points/rewards/admin-sales/admin-analytics/admin-variants/admin-products/admin-stock-transactions, rutas, i18n
-  y los flujos de checkout, ventas del panel, perfiles/direcciones, recompensas, dashboard e inventario de punta a punta
-  con Testing Library).
+- `npm test` ✅ (259 tests en 42 archivos: mock-router, stock, alerts, sale-state-machine, coupons, coordination-message, points,
+  date-range, inventory, size-engine placeholder, export, controllers auth/dev/size-generations/catalog/sales/addresses/
+  profiles/feedback/points/rewards/admin-sales/admin-analytics/admin-variants/admin-products/admin-stock-transactions/
+  admin-settings/admin-coupons, rutas, i18n, PWA y los flujos de checkout, ventas del panel, perfiles/direcciones,
+  recompensas, dashboard, inventario, reportes, reglas, modo asistente y estados de error de punta a punta con Testing Library).
 - `npm run lint` ✅ (**Biome**: `biome check` = lint + formato + `noRestrictedImports`; reemplaza a ESLint/Prettier).
-- `npm run i18n:check` ✅ (487 claves con paridad es/en).
-- `npm run build` ✅ en modo mock y en modo http; **el build http no incluye `src/mocks/`** (SC-005, verificado con alias).
+- `npm run i18n:check` ✅ (548 claves con paridad es/en) y barrido de literales en JSX ✅ (0).
+- `npm run build` ✅ en modo mock y en modo http; **el build http no incluye `src/mocks/`** (SC-005, verificado barriendo
+  `dist/` por `mock-transport` y `guest-demo-1`: sin coincidencias).
+- `npm run build` ✅ genera la PWA: `manifest.webmanifest`, `sw.js` (+ `workbox-*.js`) y precache de **128 entradas
+  (~3,3 MB)**; `manifest`/`registerSW.js` inyectados en `dist/index.html`; el `sw.js` del build http no menciona el mock
+  ni el `mock-transport` (iteración 16).
 
 ### Fase 3+ — Historias (US1–US12)
 
@@ -164,8 +168,9 @@ Ninguna historia estaba implementada (las pantallas borradas eran CRUD placehold
 | M2 | US3, US4, US7 | ~~US3~~ ✅ · ~~US4~~ ✅ (iteración 6) · ~~US7~~ ✅ (iteración 7) — **M2 cerrado** |
 | M3 | US5, US6 | ~~US5~~ ✅ (iteración 9) · ~~US6~~ ✅ (iteración 10) — **M3 cerrado** |
 | M4 | US8, US9 | ~~US8~~ ✅ (iteración 11) · ~~US9~~ ✅ (iteración 12) — **M4 cerrado** |
-| M5 | US10–US12 | T094–T101 — analítica, exportación, reglas, modo asistente |
-| F13 | Pulido | T102–T110 |
+| M5 | US10–US12 | ~~US10~~ ✅ · ~~US11~~ ✅ · ~~US12~~ ✅ (iteración 14) — **M5 cerrado**; F13 ✅ (iteración 15) |
+| F13 | Pulido | ✅ T102–T109 en la iteración 15 · ➖ T110 (Playwright opcional) · ⏳ T108: queda el recorrido manual del usuario |
+| F14 | PWA | ✅ T111–T113 (iteración 16): manifest instalable, service worker con precache del shell y navegación offline · ⏳ probar la instalación en dispositivo |
 
 ### Detalle por iteración
 
@@ -199,10 +204,12 @@ recomendación (`agents/context/recommendation-engine.txt`) se implementa **al f
 1. ✅ Fase 1 + Fase 2 completas (setup, capa de datos y base UI).
 2. ✅ **M1 + M2 (iteraciones 3–7):** US1–US4 (cliente) y US7 (admin). El recorrido completo cliente + admin está
    demostrable (**hito M2**).
-3. **Próximo:** **M5** (T094–T101): US10 (talles faltantes, comentarios, exportación), US11 (reglas y cupones) y US12
-   (modo asistente). M3 ✅ (US5–US6) y M4 ✅ (US8–US9) quedaron cerrados.
-4. **Después:** F13 (pulido: responsive, accesibilidad, rendimiento, README).
-5. **Al final:** integrar el motor de recomendación definitivo (`recommendation-engine.txt`).
+3. **Último bloque:** **F13** (T102–T110: responsive, accesibilidad, rendimiento, estados de error, README y el barrido
+   manual) **✅ cerrada en la iteración 15**. US10–US12 ✅ (iteración 14) cerraron M5: el recorrido completo cliente
+   (US1→US6) + panel (US7→US12) es demostrable y el prototipo queda listo para la **revisión manual del usuario**
+   (T108: recorrido §7.3 en navegador + Lighthouse) y la demo. M3 ✅ (US5–US6) y M4 ✅ (US8–US9) ya estaban cerrados.
+   **F14 — PWA ✅ (iteración 16):** la app es instalable y navegable sin conexión.
+4. **Al final:** integrar el motor de recomendación definitivo (`recommendation-engine.txt`).
 
 ---
 

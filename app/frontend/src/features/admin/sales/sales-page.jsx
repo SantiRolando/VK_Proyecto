@@ -13,6 +13,7 @@ import {
   Button,
   Container,
   Group,
+  Scroller,
   SegmentedControl,
   Stack,
   Tabs,
@@ -127,12 +128,14 @@ export function AdminSalesPage() {
       <Stack gap="md">
         <Tabs value={status} onChange={(value) => setStatus(value ?? ALL)}>
           <Tabs.List>
-            <Tabs.Tab value={ALL}>{t('admin.sales.filter.all')}</Tabs.Tab>
-            {STATUSES.map((value) => (
-              <Tabs.Tab key={value} value={value}>
-                {t(`enums.saleStatus.${value}`)}
-              </Tabs.Tab>
-            ))}
+            <Scroller>
+              <Tabs.Tab value={ALL}>{t('admin.sales.filter.all')}</Tabs.Tab>
+              {STATUSES.map((value) => (
+                <Tabs.Tab key={value} value={value}>
+                  {t(`enums.saleStatus.${value}`)}
+                </Tabs.Tab>
+              ))}
+            </Scroller>
           </Tabs.List>
         </Tabs>
 
@@ -168,7 +171,7 @@ export function AdminSalesPage() {
                 data={sales}
                 getKey={(sale) => sale.id}
                 columns={columns}
-                minWidth={1000}
+                minWidth={900}
                 cardTitle={(sale) => (
                   <div>
                     <Group gap="xs" wrap="nowrap">

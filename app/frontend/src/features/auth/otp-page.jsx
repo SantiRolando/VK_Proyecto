@@ -96,7 +96,7 @@ export function OtpPage() {
       ) : (
         <form onSubmit={handleVerify} noValidate>
           <Stack gap="md">
-            <Text c="dimmed" size="sm">
+            <Text c="dimmed" size="sm" style={{ wordBreak: 'break-word' }}>
               {t('auth.otp.sent')} <b>{email}</b>
             </Text>
             <TextInput

@@ -145,3 +145,67 @@ describe('size-generations controller', () => {
     })
   })
 })
+
+describe('modo asistente (US12)', () => {
+  const ADMIN = { token: 'vkfit.1.test' }
+  const ANA = { token: 'vkfit.2.test' }
+
+  it('genera para un tercero sin vincular: queda fuera del historial personal', async () => {
+    const result = await call('POST', '/size-generations', {
+      body: { ...GUEST_MEASURES, onBehalf: true },
+      auth: ADMIN,
+    })
+
+    expect(result.data.onBehalf).toBe(true)
+    const stored = getDb().sizeGenerations.find((item) => item.id === result.data.id)
+    expect(stored).toMatchObject({ adminId: 1, customerId: null, guestSessionId: null })
+
+    // El historial personal del admin no la incluye.
+    const adminHistory = await call('GET', '/size-generations', { auth: ADMIN })
+    expect(adminHistory.data.some((item) => item.id === result.data.id)).toBe(false)
+
+    // Pero el admin que la generó sí puede ver el detalle.
+    const detail = await call('GET', `/size-generations/${result.data.id}`, {
+      auth: ADMIN,
+    })
+    expect(detail.data.id).toBe(result.data.id)
+  })
+
+  it('vinculada a un cliente: aparece en su historial y acepta su perfil', async () => {
+    const result = await call('POST', '/size-generations', {
+      body: { ...GUEST_MEASURES, onBehalf: true, customerId: 2, profileId: 1 },
+      auth: ADMIN,
+    })
+
+    const stored = getDb().sizeGenerations.find((item) => item.id === result.data.id)
+    expect(stored).toMatchObject({ adminId: 1, customerId: 2, profileId: 1 })
+
+    const history = await call('GET', '/size-generations', { auth: ANA })
+    expect(history.data.some((item) => item.id === result.data.id)).toBe(true)
+
+    // El perfil debe ser del cliente vinculado, no de otro.
+    await expect(
+      call('POST', '/size-generations', {
+        body: { ...GUEST_MEASURES, onBehalf: true, customerId: 3, profileId: 1 },
+        auth: ADMIN,
+      }),
+    ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
+  })
+
+  it('solo el personal puede generar para terceros', async () => {
+    await expect(
+      call('POST', '/size-generations', {
+        body: { ...GUEST_MEASURES, onBehalf: true },
+        auth: ANA,
+      }),
+    ).rejects.toMatchObject({ status: 403, code: 'FORBIDDEN' })
+
+    // Vincular un cliente sin `onBehalf` no tiene sentido.
+    await expect(
+      call('POST', '/size-generations', {
+        body: { ...GUEST_MEASURES, customerId: 2 },
+        auth: ANA,
+      }),
+    ).rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
+  })
+})

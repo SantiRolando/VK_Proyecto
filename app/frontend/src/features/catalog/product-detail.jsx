@@ -141,7 +141,7 @@ export function ProductDetailPage() {
                     </Text>
                     <Group gap="xs">
                       {product.sizes.map((size) => (
-                        <Badge
+                        <Button
                           key={size.id}
                           variant={
                             size.id === product.selectedSize?.id ? 'filled' : 'outline'
@@ -149,7 +149,7 @@ export function ProductDetailPage() {
                           color={
                             size.id === product.selectedSize?.id ? 'vikinga' : 'gray'
                           }
-                          style={{ cursor: 'pointer' }}
+                          size="compact-md"
                           onClick={() =>
                             navigate(
                               routes.product(product.id, {
@@ -160,7 +160,7 @@ export function ProductDetailPage() {
                           }
                         >
                           {size.code}
-                        </Badge>
+                        </Button>
                       ))}
                     </Group>
                   </div>

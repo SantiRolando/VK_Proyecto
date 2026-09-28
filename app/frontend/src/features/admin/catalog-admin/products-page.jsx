@@ -102,6 +102,7 @@ function ProductFormModal({ product, opened, onClose }) {
 
   return (
     <Modal
+      closeButtonProps={{ 'aria-label': t('common.close') }}
       opened={opened}
       onClose={onClose}
       title={product ? t('admin.products.edit') : t('admin.products.new')}
@@ -221,6 +222,7 @@ function VariantFormModal({ product, variant, opened, onClose }) {
 
   return (
     <Modal
+      closeButtonProps={{ 'aria-label': t('common.close') }}
       opened={opened}
       onClose={onClose}
       title={variant ? t('admin.products.variant.edit') : t('admin.products.variant.new')}
@@ -316,6 +318,7 @@ function VariantsModal({ product, opened, onClose }) {
 
   return (
     <Modal
+      closeButtonProps={{ 'aria-label': t('common.close') }}
       opened={opened}
       onClose={onClose}
       title={`${t('admin.products.variants')} · ${product?.model ?? ''}`}
@@ -462,7 +465,7 @@ export function ProductsPage() {
           <Stack gap="sm">
             {products.map((product) => (
               <Card key={product.id} withBorder radius="md" padding="md">
-                <Group justify="space-between" wrap="nowrap" align="flex-start">
+                <Group justify="space-between" gap="sm" wrap="wrap" align="flex-start">
                   <div>
                     <Group gap="xs" wrap="nowrap">
                       <Text fw={600}>{product.model}</Text>
@@ -490,7 +493,7 @@ export function ProductsPage() {
                     </Group>
                   </div>
 
-                  <Group gap="xs" wrap="nowrap">
+                  <Group gap="xs" wrap="wrap">
                     <Button
                       variant="subtle"
                       size="compact-sm"
@@ -559,6 +562,7 @@ export function ProductsPage() {
       )}
 
       <Modal
+        closeButtonProps={{ 'aria-label': t('common.close') }}
         opened={removing !== null}
         onClose={() => setRemoving(null)}
         title={t('admin.products.removeTitle')}

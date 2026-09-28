@@ -13,7 +13,7 @@ import {
 } from '@i18n/i18n-utils.js'
 import en from '@i18n/locales/en.js'
 import es from '@i18n/locales/es.js'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const messages = { en, es }
 const STORAGE_KEY = 'vkfit.language'
@@ -32,6 +32,11 @@ export function I18nProvider({ children }) {
   const [language, setLanguageState] = useState(
     () => readStoredLanguage() ?? detectBrowserLanguage(),
   )
+
+  // El idioma del documento acompaña al idioma activo (lectores de pantalla).
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
 
   const value = useMemo(() => {
     const setLanguage = (next) => {

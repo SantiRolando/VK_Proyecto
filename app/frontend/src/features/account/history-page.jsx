@@ -103,7 +103,7 @@ export function HistoryPage() {
                     ) : (
                       <Button
                         variant="light"
-                        size="compact-sm"
+                        size="compact-md"
                         leftSection={<IconRulerMeasure size={14} />}
                         onClick={() => setRating(generation)}
                       >

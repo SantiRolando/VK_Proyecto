@@ -19,37 +19,39 @@ export function OrderSummary({ lines, subtotal, discount, total }) {
 
   return (
     <Stack gap="sm">
-      <Table withRowBorders={false} verticalSpacing="xs">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('checkout.summary.product')}</Table.Th>
-            <Table.Th ta="center">{t('checkout.summary.quantity')}</Table.Th>
-            <Table.Th ta="right">{t('checkout.summary.lineTotal')}</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {lines.map((line) => (
-            <Table.Tr key={line.variantId}>
-              <Table.Td>
-                <Text size="sm" fw={600}>
-                  {line.product?.model}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {lineSubtitle(line, t)}
-                </Text>
-              </Table.Td>
-              <Table.Td ta="center">
-                <Text size="sm">{line.quantity}</Text>
-              </Table.Td>
-              <Table.Td ta="right">
-                <Text size="sm">
-                  <Money value={line.lineTotal} />
-                </Text>
-              </Table.Td>
+      <Table.ScrollContainer minWidth={320}>
+        <Table withRowBorders={false} verticalSpacing="xs">
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>{t('checkout.summary.product')}</Table.Th>
+              <Table.Th ta="center">{t('checkout.summary.quantity')}</Table.Th>
+              <Table.Th ta="right">{t('checkout.summary.lineTotal')}</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+          </Table.Thead>
+          <Table.Tbody>
+            {lines.map((line) => (
+              <Table.Tr key={line.variantId}>
+                <Table.Td>
+                  <Text size="sm" fw={600}>
+                    {line.product?.model}
+                  </Text>
+                  <Text size="xs" c="dimmed">
+                    {lineSubtitle(line, t)}
+                  </Text>
+                </Table.Td>
+                <Table.Td ta="center">
+                  <Text size="sm">{line.quantity}</Text>
+                </Table.Td>
+                <Table.Td ta="right">
+                  <Text size="sm">
+                    <Money value={line.lineTotal} />
+                  </Text>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
 
       <Divider />
 

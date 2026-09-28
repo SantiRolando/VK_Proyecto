@@ -6,13 +6,14 @@ import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Dashboard de US8 sobre el router y los providers reales: los cuatro bloques
-// con datos de la seed y el filtro de fechas. Los números están acotados por la
-// seed (ver `mocks/db/seed/history.js`).
+// con datos de la seed y el rango de fechas por defecto. El filtro se elige con
+// `DatePickerInput` de `@mantine/dates` (popover difícil de manejar en jsdom):
+// su efecto sobre los datos está cubierto por los tests de contrato
+// (`date-range` + `admin-analytics`).
 
 const ADMIN = 1
 
@@ -66,19 +67,19 @@ describe('dashboard (US8)', () => {
     expect(screen.getAllByText(/\+59899000002/).length).toBeGreaterThan(0)
   })
 
-  it('respeta el filtro de fechas', async () => {
+  it('pide los KPIs con el rango de fechas por defecto', async () => {
     const conversion = vi.spyOn(adminAnalyticsService, 'conversion')
-    const user = userEvent.setup()
     await signInAs(ADMIN)
     renderAt(routes.admin)
 
-    // Por defecto pide los últimos 30 días.
-    await waitFor(() => expect(conversion).toHaveBeenCalledWith({ from: isoDaysAgo(30) }))
+    // El filtro está en pantalla y arranca en los últimos 30 días.
+    expect(await screen.findByLabelText('Rango de fechas')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('radio', { name: '7 días' }))
-    await waitFor(() => expect(conversion).toHaveBeenCalledWith({ from: isoDaysAgo(7) }))
-
-    await user.click(screen.getByRole('radio', { name: 'Todo' }))
-    await waitFor(() => expect(conversion).toHaveBeenCalledWith({}))
+    await waitFor(() =>
+      expect(conversion).toHaveBeenCalledWith({
+        from: isoDaysAgo(30),
+        to: isoDaysAgo(0),
+      }),
+    )
   })
 })

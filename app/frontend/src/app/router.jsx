@@ -144,6 +144,36 @@ const ProductsPage = lazy(() =>
   })),
 )
 
+const MissingSizesPage = lazy(() =>
+  import('@features/admin/analytics/missing-sizes-page.jsx').then((module) => ({
+    default: module.MissingSizesPage,
+  })),
+)
+
+const CommentsPage = lazy(() =>
+  import('@features/admin/analytics/comments-page.jsx').then((module) => ({
+    default: module.CommentsPage,
+  })),
+)
+
+const CouponsPage = lazy(() =>
+  import('@features/admin/coupons/coupons-page.jsx').then((module) => ({
+    default: module.CouponsPage,
+  })),
+)
+
+const SettingsPage = lazy(() =>
+  import('@features/admin/settings/settings-page.jsx').then((module) => ({
+    default: module.SettingsPage,
+  })),
+)
+
+const AssistantPage = lazy(() =>
+  import('@features/admin/assistant/assistant-page.jsx').then((module) => ({
+    default: module.AssistantPage,
+  })),
+)
+
 const AdminSaleDetailPage = lazy(() =>
   import('@features/admin/sales/sale-detail-page.jsx').then((module) => ({
     default: module.AdminSaleDetailPage,
@@ -232,26 +262,11 @@ export function AppRouter() {
           <Route path={routes.adminInventory} element={<InventoryPage />} />
           <Route path={routes.adminMovements} element={<MovementsPage />} />
           <Route path={routes.adminProducts} element={<ProductsPage />} />
-          <Route
-            path={routes.adminMissingSizes}
-            element={<StubPage titleKey="admin.missingSizes.title" />}
-          />
-          <Route
-            path={routes.adminComments}
-            element={<StubPage titleKey="admin.comments.title" />}
-          />
-          <Route
-            path={routes.adminCoupons}
-            element={<StubPage titleKey="admin.coupons.title" />}
-          />
-          <Route
-            path={routes.adminSettings}
-            element={<StubPage titleKey="admin.settings.title" />}
-          />
-          <Route
-            path={routes.adminAssistant}
-            element={<StubPage titleKey="admin.assistant.title" />}
-          />
+          <Route path={routes.adminMissingSizes} element={<MissingSizesPage />} />
+          <Route path={routes.adminComments} element={<CommentsPage />} />
+          <Route path={routes.adminCoupons} element={<CouponsPage />} />
+          <Route path={routes.adminSettings} element={<SettingsPage />} />
+          <Route path={routes.adminAssistant} element={<AssistantPage />} />
         </Route>
 
         {/* Herramientas de demo */}

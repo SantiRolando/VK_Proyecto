@@ -7,11 +7,11 @@ import { AuthProvider } from '@features/auth/auth-provider.jsx'
 import { I18nProvider } from '@i18n/i18n-provider.jsx'
 import { MantineProvider } from '@mantine/core'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { theme } from '@theme/theme.js'
+import { cssVariablesResolver, theme } from '@theme/theme.js'
 
 export function Providers({ children }) {
   return (
-    <MantineProvider theme={theme}>
+    <MantineProvider theme={theme} cssVariablesResolver={cssVariablesResolver}>
       <I18nProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
