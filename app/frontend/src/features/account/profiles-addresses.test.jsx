@@ -208,8 +208,9 @@ describe('perfiles de medidas (US5)', () => {
     expect(await screen.findByLabelText(/Altura/)).toHaveValue('168 cm')
     expect(screen.getByLabelText(/Cadera/)).toHaveValue('98 cm')
 
-    // El selector del header muestra el perfil activo y permite cambiarlo.
-    const trigger = await screen.findByRole('button', { name: 'Training' })
+    // El perfil activo se cambia desde el menú del avatar de cuenta, que ahora
+    // reúne el menú de cuenta y el selector de perfil (bug squash sesión #1).
+    const trigger = await screen.findByRole('button', { name: 'Cuenta' })
     fireEvent.click(await openProfileMenu(trigger, 'Son'))
 
     // Cambiar de perfil remonta el formulario con las medidas del nuevo perfil.

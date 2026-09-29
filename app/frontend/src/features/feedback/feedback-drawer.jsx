@@ -7,11 +7,13 @@ import {
   Alert,
   Button,
   Drawer,
+  Modal,
   SegmentedControl,
   Stack,
   Text,
   Textarea,
 } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { useState } from 'react'
 
 const RATINGS = ['Small', 'Correct', 'Large']
@@ -31,6 +33,10 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
   const { t } = useI18n()
   const { isAuthenticated } = useAuth()
   const submit = useSubmitFeedback()
+  // En móvil el drawer desde abajo es cómodo (zona del pulgar); en desktop un
+  // modal centrado se lee mejor que una hoja pegada al borde inferior
+  // (bug squash sesión #1).
+  const isDesktop = useMediaQuery('(min-width: 48em)', false)
 
   const [rating, setRating] = useState(null)
   const [comment, setComment] = useState('')
@@ -77,15 +83,9 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
     }
   }
 
-  return (
-    <Drawer
-      closeButtonProps={{ 'aria-label': t('common.close') }}
-      opened={opened}
-      onClose={onClose}
-      position="bottom"
-      size="md"
-      title={t('feedback.title')}
-    >
+  // El cuerpo es el mismo; solo cambia el contenedor según el ancho.
+  const body = (
+    <>
       {reward ? (
         <Stack gap="md">
           <Alert
@@ -151,6 +151,23 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
       {showToast && reward?.awarded && (
         <PointsToast points={reward.points} onClose={() => setShowToast(false)} />
       )}
+    </>
+  )
+
+  const wrapperProps = {
+    opened,
+    onClose,
+    title: t('feedback.title'),
+    closeButtonProps: { 'aria-label': t('common.close') },
+  }
+
+  return isDesktop ? (
+    <Modal {...wrapperProps} centered size="lg">
+      {body}
+    </Modal>
+  ) : (
+    <Drawer {...wrapperProps} position="bottom" size="md">
+      {body}
     </Drawer>
   )
 }

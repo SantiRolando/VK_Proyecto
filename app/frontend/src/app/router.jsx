@@ -2,15 +2,13 @@ import { GuestOnly } from '@app/guards/guest-only.jsx'
 import { RequireAuth } from '@app/guards/require-auth.jsx'
 import { RequireRole } from '@app/guards/require-role.jsx'
 import { routes } from '@app/routes.js'
-import { AdminLayout } from '@components/layout/admin-layout.jsx'
-import { CustomerLayout } from '@components/layout/customer-layout.jsx'
+import { AppShellLayout } from '@components/layout/app-shell-layout.jsx'
 import { PublicLayout } from '@components/layout/public-layout.jsx'
+import { NotFoundPage } from '@components/not-found-page.jsx'
 import { RouteFallback } from '@components/route-fallback.jsx'
-import { StubPage } from '@components/stub-page.jsx'
-import { HomePage } from '@features/home/home-page.jsx'
 import { LandingPage } from '@pages/landing-page/landing-page.jsx'
 import { lazy, Suspense } from 'react'
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 
 const FitPage = lazy(() =>
   import('@features/fit/fit-page.jsx').then((module) => ({
@@ -72,15 +70,9 @@ const AlertsPage = lazy(() =>
   })),
 )
 
-const ProfilesPage = lazy(() =>
-  import('@features/account/profiles-page.jsx').then((module) => ({
-    default: module.ProfilesPage,
-  })),
-)
-
-const AddressesPage = lazy(() =>
-  import('@features/account/addresses-page.jsx').then((module) => ({
-    default: module.AddressesPage,
+const AccountInfoPage = lazy(() =>
+  import('@features/account/account-info-page.jsx').then((module) => ({
+    default: module.AccountInfoPage,
   })),
 )
 
@@ -168,9 +160,9 @@ const SettingsPage = lazy(() =>
   })),
 )
 
-const AssistantPage = lazy(() =>
-  import('@features/admin/assistant/assistant-page.jsx').then((module) => ({
-    default: module.AssistantPage,
+const UsersPage = lazy(() =>
+  import('@features/admin/users/users-page.jsx').then((module) => ({
+    default: module.UsersPage,
   })),
 )
 
@@ -198,9 +190,8 @@ export function AppRouter() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        {/* Público */}
-        <Route path={routes.home} element={<HomePage />} />
-        <Route path={routes.about} element={<LandingPage />} />
+        {/* Público: la landing es el entry point */}
+        <Route path={routes.home} element={<LandingPage />} />
 
         {/* Autenticación (solo sin sesión) */}
         <Route
@@ -218,7 +209,7 @@ export function AppRouter() {
         </Route>
 
         {/* Cliente: invitado o logueado */}
-        <Route element={<CustomerLayout />}>
+        <Route element={<AppShellLayout />}>
           <Route path={routes.fit()} element={<FitPage />} />
           <Route path={routes.fitResult(':generationId')} element={<ResultPage />} />
           <Route path={routes.catalog()} element={<CatalogPage />} />
@@ -229,7 +220,7 @@ export function AppRouter() {
         <Route
           element={
             <RequireAuth>
-              <CustomerLayout />
+              <AppShellLayout />
             </RequireAuth>
           }
         >
@@ -238,12 +229,22 @@ export function AppRouter() {
             path={routes.checkoutConfirmation(':saleId')}
             element={<ConfirmationPage />}
           />
-          <Route path={routes.accountProfiles} element={<ProfilesPage />} />
-          <Route path={routes.accountAddresses} element={<AddressesPage />} />
+          <Route path={routes.account} element={<HistoryPage />} />
+          <Route path={routes.accountInfo} element={<AccountInfoPage />} />
           <Route path={routes.accountHistory} element={<HistoryPage />} />
           <Route path={routes.accountOrders} element={<OrdersPage />} />
           <Route path={routes.accountAlerts} element={<AlertsPage />} />
           <Route path={routes.accountRewards} element={<RewardsPage />} />
+          {/* Rutas viejas de la agenda: redirigen a la pestaña correspondiente de
+              la información de cuenta para no romper enlaces existentes. */}
+          <Route
+            path={routes.accountProfiles}
+            element={<Navigate to={`${routes.accountInfo}?tab=agenda`} replace />}
+          />
+          <Route
+            path={routes.accountAddresses}
+            element={<Navigate to={`${routes.accountInfo}?tab=agenda`} replace />}
+          />
         </Route>
 
         {/* Administración */}
@@ -251,7 +252,7 @@ export function AppRouter() {
           element={
             <RequireAuth>
               <RequireRole requiredRole="Admin">
-                <AdminLayout />
+                <AppShellLayout />
               </RequireRole>
             </RequireAuth>
           }
@@ -264,16 +265,16 @@ export function AppRouter() {
           <Route path={routes.adminProducts} element={<ProductsPage />} />
           <Route path={routes.adminMissingSizes} element={<MissingSizesPage />} />
           <Route path={routes.adminComments} element={<CommentsPage />} />
+          <Route path={routes.adminUsers} element={<UsersPage />} />
           <Route path={routes.adminCoupons} element={<CouponsPage />} />
           <Route path={routes.adminSettings} element={<SettingsPage />} />
-          <Route path={routes.adminAssistant} element={<AssistantPage />} />
         </Route>
 
         {/* Herramientas de demo */}
         {DevPage && <Route path={routes.dev} element={<DevPage />} />}
 
         {/* 404 */}
-        <Route path="*" element={<StubPage titleKey="notFound.title" />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   )

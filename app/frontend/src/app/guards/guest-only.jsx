@@ -11,7 +11,7 @@ export function GuestOnly({ children }) {
   if (status === 'hydrating') return null
 
   if (isAuthenticated) {
-    return <Navigate to={routes.home} replace />
+    return <Navigate to={routes.account} replace />
   }
 
   return children

@@ -16,6 +16,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
+import { IconLogin } from '@tabler/icons-react'
 import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
@@ -66,7 +67,7 @@ export function LoginPage() {
     setServerError(null)
     try {
       const user = await login(parsed.data.email, parsed.data.password)
-      navigate(user.type === 'Admin' ? routes.admin : (returnTo ?? routes.home))
+      navigate(user.type === 'Admin' ? routes.admin : (returnTo ?? routes.account))
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     } finally {
@@ -98,7 +99,7 @@ export function LoginPage() {
             <ErrorState error={serverError} onRetry={() => setServerError(null)} />
           )}
 
-          <Button type="submit" loading={busy}>
+          <Button type="submit" loading={busy} leftSection={<IconLogin size={18} />}>
             {t('auth.login.submit')}
           </Button>
         </Stack>

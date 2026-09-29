@@ -20,7 +20,7 @@ export function ChannelStep({ channel, onChannelChange }) {
         ]}
       />
 
-      <Alert variant="light" color="vikinga" icon={<IconMessage size={18} />}>
+      <Alert variant="light" color="blue" icon={<IconMessage size={18} />}>
         <Text size="sm">{t('checkout.channel.hint')}</Text>
       </Alert>
     </Stack>

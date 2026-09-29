@@ -1,0 +1,94 @@
+import { apiClient } from '@api/client/api-client.js'
+import { setSession } from '@api/client/session.js'
+import { devService } from '@api/services/dev-service.js'
+import { Providers } from '@app/providers.jsx'
+import { queryClient } from '@app/query-client.js'
+import { AppRouter } from '@app/router.jsx'
+import { routes } from '@app/routes.js'
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+// Bug squash sesión #1: la información de cuenta no existía como pantalla. Ahora
+// vive en `/account/info` con dos pestañas, y las rutas viejas de la agenda
+// redirigen ahí para no romper enlaces.
+const ANA = 2
+
+describe('información de cuenta', () => {
+  const signInAs = async (userId) => {
+    const { user, token } = await devService.loginAs(userId)
+    setSession(token, user)
+  }
+
+  beforeEach(async () => {
+    window.localStorage.setItem('vkfit.language', 'es')
+    queryClient.clear()
+    await devService.reset()
+  })
+
+  const renderAt = (path) =>
+    render(
+      <Providers>
+        <MemoryRouter initialEntries={[path]}>
+          <AppRouter />
+        </MemoryRouter>
+      </Providers>,
+    )
+
+  // El contenido vive en <main>; el header tiene sus propios controles, as� que se
+  // acotan las consultas para no chocar con ellos.
+  const main = async () => within(await screen.findByRole('main'))
+
+  it('muestra los datos de la cuenta en la pestaña Cuenta', async () => {
+    await signInAs(ANA)
+    renderAt(routes.accountInfo)
+
+    const view = await main()
+    expect(await view.findByText('Mi cuenta')).toBeInTheDocument()
+    // Datos reales de la seed: Ana Rodríguez / ana@example.test.
+    expect(view.getByText('Ana Rodríguez')).toBeInTheDocument()
+    expect(view.getByText('ana@example.test')).toBeInTheDocument()
+  })
+
+  it('la pestaña de agenda muestra perfiles y direcciones de la seed', async () => {
+    await signInAs(ANA)
+    renderAt(`${routes.accountInfo}?tab=agenda`)
+
+    const view = await main()
+    // Perfiles de Ana en la seed: Training (predeterminado) y Son.
+    expect(await view.findByText('Training')).toBeInTheDocument()
+    expect(view.getByText('Son')).toBeInTheDocument()
+    // Direcciones de la seed.
+    expect(view.getByText(/Av\. Italia/)).toBeInTheDocument()
+  })
+
+  it('las pestañas se pueden cambiar y reflejan el estado en la URL', async () => {
+    const user = userEvent.setup()
+    await signInAs(ANA)
+    renderAt(routes.accountInfo)
+
+    const view = await main()
+    expect(view.getByText('ana@example.test')).toBeInTheDocument()
+
+    await user.click(view.getByRole('tab', { name: /Perfiles y direcciones/ }))
+
+    await waitFor(() => {
+      expect(within(view.getByRole('tabpanel')).getByText('Training')).toBeInTheDocument()
+    })
+  })
+
+  it('la ruta vieja /account/profiles redirige a la pestaña de agenda', async () => {
+    await signInAs(ANA)
+    // El controlador de perfiles debe responder: si la redirección no ocurre, la
+    // pantalla muestra el 404 y no hay perfiles.
+    const profiles = await apiClient.get('/me/profiles')
+    expect(profiles.length).toBeGreaterThan(0)
+
+    renderAt(routes.accountProfiles)
+
+    const view = await main()
+    expect(await view.findByText('Training')).toBeInTheDocument()
+    expect(screen.queryByText('404')).not.toBeInTheDocument()
+  })
+})

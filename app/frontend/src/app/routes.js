@@ -22,8 +22,24 @@ export function safeReturnTo(returnTo) {
 }
 
 export const routes = {
+  // La landing pública es el entry point (bug squash sesión #1, F1).
   home: '/',
-  about: '/about',
+
+  // Destino post-login / post-logout del cliente. No puede ser `home` porque
+  // `home` es la landing pública: mandar ahí a un cliente logueado lo dejaría
+  // en la página de marketing.
+  //
+  // Apunta al resumen (`/account/overview`) y no a `/account` a secas: el layout
+  // autenticado no tiene `path`, y el `index` de una ruta sin path matchea la
+  // ruta del padre (o sea `/`), no `/account`. Con un `index`, `/account` caía en
+  // el catch-all y mostraba el 404. Con una ruta con path real, resuelve siempre.
+  account: '/account/overview',
+  accountRoot: '/account',
+
+  // Información de cuenta: datos del usuario y agenda de perfiles/direcciones.
+  // Antes no existía ninguna pantalla para ver los datos de la cuenta.
+  accountInfo: '/account/info',
+  accountInfoProfiles: '/account/info/perfiles',
 
   login: '/login',
   loginOtp: '/login/otp',
@@ -55,9 +71,9 @@ export const routes = {
   adminProducts: '/admin/products',
   adminMissingSizes: '/admin/analytics/missing-sizes',
   adminComments: '/admin/analytics/comments',
+  adminUsers: '/admin/users',
   adminCoupons: '/admin/coupons',
   adminSettings: '/admin/settings',
-  adminAssistant: '/admin/assistant',
 
   dev: '/dev',
 }

@@ -1,0 +1,17 @@
+/* Los tokens del tema viven en `theme.js` (`cssVariablesResolver`), que es el
+ * mecanismo propio de Mantine para emitir variables por esquema.
+ *
+ * NO se define `--button-color` acá. Se intentó para forzar el color de texto del
+ * primario monocromo y el resultado fue pelearse con el valor inline que Mantine
+ * escribe en cada botón. Con el primario en azul, Mantine resuelve el contraste
+ * solo: el shade del tema y el relleno pintado son el mismo color. */
+
+/* Los controles nativos (scrollbars, date pickers, autofill) siguen
+ * `color-scheme`, y el resolver no emite esa propiedad. */
+[data-mantine-color-scheme="dark"] {
+  color-scheme: dark;
+}
+
+[data-mantine-color-scheme="light"] {
+  color-scheme: light;
+}

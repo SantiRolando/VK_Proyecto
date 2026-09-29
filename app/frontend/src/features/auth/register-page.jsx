@@ -55,7 +55,7 @@ export function RegisterPage() {
     setServerError(null)
     try {
       await register(parsed.data)
-      navigate(returnTo ?? routes.home)
+      navigate(returnTo ?? routes.account)
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     } finally {

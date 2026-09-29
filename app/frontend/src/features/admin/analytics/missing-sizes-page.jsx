@@ -28,7 +28,7 @@ function cellStyle(theme, count, maxCount) {
   const ratio = count / maxCount
   return {
     textAlign: 'center',
-    backgroundColor: alpha(theme.colors.vikinga[6], 0.15 + ratio * 0.55),
+    backgroundColor: alpha(theme.colors.blue[6], 0.15 + ratio * 0.55),
     fontWeight: 600,
   }
 }
@@ -143,7 +143,7 @@ export function MissingSizesPage() {
                   .map((lineValue) => (
                     <Card key={lineValue} withBorder radius="md" padding="md">
                       <Group justify="space-between" mb="xs">
-                        <Badge variant="light" color="vikinga">
+                        <Badge variant="light" color="blue">
                           {t(`enums.line.${lineValue}`)}
                         </Badge>
                         <Text size="xs" c="dimmed">

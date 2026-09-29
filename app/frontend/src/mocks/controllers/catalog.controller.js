@@ -31,11 +31,37 @@ function variantsOfSize(db, productId, sizeId) {
 
 register('GET', '/catalog', (req) => {
   const { sizeId, line } = req.query
+  const db = getDb()
+
+  // Sin talle: se puede explorar el catálogo igual (bug squash sesión #1). Antes
+  // esta rama devolvía 422 y la pantalla quedaba bloqueada. Ahora se listan los
+  // productos activos de la línea, sin filtrar por disponibilidad, y el meta
+  // marca `hasStock: null` para que el FE sepa que no hubo filtro de talle.
   if (!sizeId) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['sizeId'] })
+    const lineValue = line ?? null
+    const items = db.products
+      .filter((product) => product.active && (!lineValue || product.line === lineValue))
+      .map((product) => ({
+        id: product.id,
+        line: product.line,
+        model: product.model,
+        description: product.description,
+        price: product.price,
+        variants: [],
+      }))
+
+    return {
+      status: 200,
+      data: items,
+      meta: {
+        line: lineValue,
+        size: null,
+        hasStock: null,
+        adjacentSizes: [],
+      },
+    }
   }
 
-  const db = getDb()
   const size = db.sizes.find((item) => item.id === Number(sizeId))
   if (!size) throw new ApiError(404, 'NOT_FOUND')
 

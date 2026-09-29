@@ -29,7 +29,7 @@ import { useNavigate, useParams } from 'react-router'
 // (`allowedTransitions`): el FE no conoce la máquina de estados.
 const ACTIONS = {
   Contacted: {
-    color: 'vikinga',
+    color: 'primary',
     labelKey: 'admin.sales.actions.contacted',
     bodyKey: 'admin.sales.confirm.body.contacted',
   },

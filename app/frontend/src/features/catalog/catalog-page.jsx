@@ -1,43 +1,21 @@
 import { routes } from '@app/routes.js'
-import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { PageHeader } from '@components/page-header.jsx'
 import { useCatalog } from '@features/catalog/hooks/use-catalog.js'
 import { NoStockState } from '@features/catalog/no-stock-state.jsx'
 import { ProductCard } from '@features/catalog/product-card.jsx'
 import { useI18n } from '@i18n/context.js'
-import { Button, Container, SimpleGrid } from '@mantine/core'
-import { IconRuler } from '@tabler/icons-react'
+import { Alert, Button, Container, SimpleGrid, Stack } from '@mantine/core'
+import { IconInfoCircle, IconRuler } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router'
 
-// Estado "primero medí tu talle" (FR-012): el catálogo solo muestra lo que
-// hay disponible en el talle recomendado, así que sin talle no hay listado.
-function NeedSizeState() {
-  const { t } = useI18n()
-  const navigate = useNavigate()
-
-  return (
-    <EmptyState
-      icon={IconRuler}
-      title={t('catalog.needSize.title')}
-      description={t('catalog.needSize.body')}
-      action={
-        <Button
-          mt="sm"
-          leftSection={<IconRuler size={16} />}
-          onClick={() => navigate(routes.fit())}
-        >
-          {t('catalog.needSize.cta')}
-        </Button>
-      }
-    />
-  )
-}
-
-// Catálogo filtrado por talle (US3): solo productos con unidades disponibles
-// en el talle recomendado; sin stock → estado explícito con adyacentes.
+// Catálogo (US3). Sin talle recomendado se puede explorar igual: se listan los
+// productos de la línea y se avisa que la experiencia mejora eligiendo un talle,
+// porque el catálogo filtrado solo muestra lo disponible en ese talle
+// (bug squash sesión #1: antes esta pantalla quedaba bloqueada).
 export function CatalogPage() {
   const { t } = useI18n()
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const sizeId = searchParams.get('sizeId')
   const line = searchParams.get('line')
@@ -45,6 +23,8 @@ export function CatalogPage() {
   const query = useCatalog({ line, sizeId })
 
   const meta = query.data?.meta
+  // `hasStock` es `null` cuando no se filtró por talle.
+  const filteredBySize = Boolean(sizeId)
 
   return (
     <Container size="lg" py="xl">
@@ -55,9 +35,27 @@ export function CatalogPage() {
         }
       />
 
-      {!sizeId ? (
-        <NeedSizeState />
-      ) : (
+      <Stack gap="md">
+        {!filteredBySize && (
+          <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} />}>
+            <Stack gap="xs" align="flex-start">
+              <div>
+                <strong>{t('catalog.noSize.title')}</strong>
+                <br />
+                {t('catalog.noSize.body')}
+              </div>
+              <Button
+                size="xs"
+                variant="light"
+                leftSection={<IconRuler size={14} />}
+                onClick={() => navigate(routes.fit())}
+              >
+                {t('catalog.noSize.cta')}
+              </Button>
+            </Stack>
+          </Alert>
+        )}
+
         <QueryBoundary
           isLoading={query.isPending}
           isError={query.isError}
@@ -65,7 +63,13 @@ export function CatalogPage() {
           onRetry={query.refetch}
         >
           {query.data &&
-            (query.data.meta.hasStock ? (
+            (query.data.meta.hasStock === false && filteredBySize ? (
+              <NoStockState
+                meta={query.data.meta}
+                line={line}
+                generationId={generationId}
+              />
+            ) : (
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
                 {query.data.items.map((product) => (
                   <ProductCard
@@ -76,15 +80,9 @@ export function CatalogPage() {
                   />
                 ))}
               </SimpleGrid>
-            ) : (
-              <NoStockState
-                meta={query.data.meta}
-                line={line}
-                generationId={generationId}
-              />
             ))}
         </QueryBoundary>
-      )}
+      </Stack>
     </Container>
   )
 }

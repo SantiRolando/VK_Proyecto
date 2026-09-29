@@ -125,9 +125,15 @@ export function saleLinesWithDetails(db, sale) {
 
 // Antigüedad de una venta en días, para que el admin vea las que llevan mucho
 // tiempo abiertas (Q-11: sin TTL, la decisión es suya).
+//
+// Redondeo y no `floor`: la seed fija las fechas a las 12:00, así que una venta
+// de "hace 4 días" lleva 3 días y 12 horas transcurridas. Con `floor` el número
+// dependía de la hora a la que corriera el proceso —a la mañana daba 3, a la
+// tarde 4— y el umbral de antigüedad quedaba a merced del reloj. `round` hace que
+// "hace 4 días" sea 4 sin importar la hora.
 export function saleAgeDays(sale, now = new Date()) {
   const created = new Date(sale.createdAt).getTime()
-  return Math.max(0, Math.floor((now.getTime() - created) / 86_400_000))
+  return Math.max(0, Math.round((now.getTime() - created) / 86_400_000))
 }
 
 // ¿La venta sigue reteniendo stock y pasó el umbral `stale_sale_days`?

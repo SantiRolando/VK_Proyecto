@@ -59,7 +59,7 @@ export function MovementsPage() {
       key: 'reason',
       header: t('admin.movements.column.reason'),
       render: (item) => (
-        <Badge variant="light" color="vikinga">
+        <Badge variant="light" color="green">
           {t(`enums.transactionReason.${item.reason}`)}
         </Badge>
       ),

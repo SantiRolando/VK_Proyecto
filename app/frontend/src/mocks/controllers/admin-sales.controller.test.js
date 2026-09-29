@@ -1,5 +1,7 @@
 import { getDb, resetDatabase } from '@mocks/db/database.js'
 import { findVariant } from '@mocks/db/seed/catalog.js'
+import { daysAgo } from '@mocks/db/seed/helpers.js'
+import { saleAgeDays } from '@mocks/domain/sales.js'
 import { availableQuantity } from '@mocks/domain/stock.js'
 import { configureMockRouter, handle } from '@mocks/router/mock-router.js'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -154,7 +156,9 @@ describe('admin sales — listado', () => {
 
     // La venta 2 (Contacted, 4 días) supera los 3 días por defecto.
     expect(byId[2].isStale).toBe(true)
-    expect(byId[2].ageDays).toBe(4)
+    // Se compara contra la fecha real de la venta y no contra un literal: la seed
+    // usa fechas relativas y un número fijo dependía de la hora de ejecución.
+    expect(byId[2].ageDays).toBe(saleAgeDays(byId[2]))
     expect(byId[1].isStale).toBe(false)
     // Confirmadas y canceladas ya no retienen stock: nunca son «antiguas».
     expect(byId[3].isStale).toBe(false)
@@ -164,6 +168,21 @@ describe('admin sales — listado', () => {
     getDb().settings.find((item) => item.key === 'stale_sale_days').value = '30'
     const relaxed = await call('GET', '/admin/sales', { auth: ADMIN })
     expect(relaxed.data.every((sale) => sale.isStale === false)).toBe(true)
+  })
+
+  // Regresión: `saleAgeDays` usaba `floor`, así que una venta de "hace 4 días"
+  // daba 3 si el proceso corría antes del mediodía (la seed fija las 12:00) y 4
+  // después. La antigüedad no debe depender de la hora.
+  it('la antigüedad no depende de la hora del día', () => {
+    const createdAt = daysAgo(4, 12) // 4 días atrás a las 12:00, como la seed
+
+    const morning = new Date()
+    morning.setHours(9, 0, 0, 0)
+    const afternoon = new Date()
+    afternoon.setHours(18, 0, 0, 0)
+
+    expect(saleAgeDays({ createdAt }, morning)).toBe(4)
+    expect(saleAgeDays({ createdAt }, afternoon)).toBe(4)
   })
 })
 

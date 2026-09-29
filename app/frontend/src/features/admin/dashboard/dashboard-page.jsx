@@ -33,6 +33,7 @@ import {
   IconPercentage,
   IconTrendingUp,
 } from '@tabler/icons-react'
+import { CHART_ACCENT } from '@theme/theme.js'
 import 'dayjs/locale/es'
 import { lazy, Suspense, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -87,7 +88,7 @@ function ConversionBlock({ query }) {
                 sections={[
                   {
                     value: Math.min(100, Math.round(query.data.ratio * 100)),
-                    color: 'vikinga',
+                    color: 'primary',
                   },
                 ]}
                 label={
@@ -123,7 +124,7 @@ function ConversionBlock({ query }) {
                   { metric: t('admin.dashboard.sales'), value: query.data.sales },
                 ]}
                 dataKey="metric"
-                series={[{ name: 'value', color: 'vikinga' }]}
+                series={[{ name: 'value', color: CHART_ACCENT }]}
               />
             </Suspense>
           </Stack>
@@ -158,7 +159,7 @@ function PrecisionBlock({ query }) {
                     {percentOf(group)}%
                   </Text>
                 </Group>
-                <Progress value={percentOf(group)} color="vikinga" mt={4} />
+                <Progress value={percentOf(group)} color="green" mt={4} />
                 <Text size="xs" c="dimmed" mt={4}>
                   {t('admin.dashboard.correct', {
                     correct: group.correct,

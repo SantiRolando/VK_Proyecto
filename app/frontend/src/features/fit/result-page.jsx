@@ -37,11 +37,11 @@ function SizeCard({ generation }) {
       <Text c="dimmed" size="sm">
         {t('fit.result.subtitle')}
       </Text>
-      <Text fw={900} className="text-8xl" c="vikinga">
+      <Text fw={900} className="text-8xl" c="primary">
         {generation.suggestedSize?.code}
       </Text>
       <Group justify="center" gap="xs" mt="md">
-        <Badge variant="light" color="vikinga">
+        <Badge variant="light" color="blue">
           {t(`enums.line.${generation.line}`)}
         </Badge>
         {generation.dominantMeasure && (
@@ -178,7 +178,7 @@ function FeedbackCard({ generation, onRated }) {
     return (
       <Card withBorder radius="md" padding="lg">
         <Group gap="sm" wrap="nowrap">
-          <Badge variant="light" color="vikinga">
+          <Badge variant="light" color="blue">
             {t(`enums.rating.${generation.rating}`)}
           </Badge>
           <Text size="sm" c="dimmed">

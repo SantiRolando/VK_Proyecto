@@ -220,7 +220,7 @@ export function RewardsPage() {
 
       <Card withBorder radius="md" padding="lg" mb="xl">
         <Group gap="md" wrap="nowrap">
-          <ThemeIcon size={48} radius="xl" variant="light" color="vikinga">
+          <ThemeIcon size={48} radius="xl" variant="light" color="yellow">
             <IconCoin size={26} />
           </ThemeIcon>
           <div>

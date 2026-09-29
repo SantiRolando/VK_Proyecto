@@ -32,9 +32,24 @@ function toFormValues(profile) {
   return { name: profile.name, ...measuresFormValues(profile) }
 }
 
-// Perfiles de medidas (US5/T074): crear, editar, elegir el predeterminado y dar
-// de baja. El perfil activo del selector global apunta a uno de estos.
+// `ProfilesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
+// exporta aparte para poder embeberlo en una pestaña de la información de cuenta
+// sin anidar contenedores ni repetir el encabezado (bug squash sesión #1).
 export function ProfilesPage() {
+  const { t } = useI18n()
+
+  return (
+    <Container size="md" py="xl">
+      <PageHeader
+        title={t('account.profiles.title')}
+        subtitle={t('account.profiles.subtitle')}
+      />
+      <ProfilesBody />
+    </Container>
+  )
+}
+
+export function ProfilesBody() {
   const { t } = useI18n()
   const query = useProfiles()
   const createProfile = useCreateProfile()
@@ -65,19 +80,15 @@ export function ProfilesPage() {
   }
 
   return (
-    <Container size="md" py="xl">
-      <PageHeader
-        title={t('account.profiles.title')}
-        subtitle={t('account.profiles.subtitle')}
-        actions={
-          <Button
-            leftSection={<IconPlus size={16} />}
-            onClick={() => setEditing(NEW_PROFILE)}
-          >
-            {t('account.profiles.new')}
-          </Button>
-        }
-      />
+    <>
+      <Group justify="flex-end" mb="md">
+        <Button
+          leftSection={<IconPlus size={16} />}
+          onClick={() => setEditing(NEW_PROFILE)}
+        >
+          {t('account.profiles.new')}
+        </Button>
+      </Group>
 
       <QueryBoundary
         isLoading={query.isPending}
@@ -100,7 +111,7 @@ export function ProfilesPage() {
                     <Group gap="xs" wrap="nowrap">
                       <Text fw={600}>{profile.name}</Text>
                       {profile.isDefault && (
-                        <Badge variant="light" color="vikinga">
+                        <Badge variant="light" color="blue">
                           {t('account.profiles.default')}
                         </Badge>
                       )}
@@ -201,6 +212,6 @@ export function ProfilesPage() {
           </Group>
         </Stack>
       </Modal>
-    </Container>
+    </>
   )
 }

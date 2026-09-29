@@ -71,7 +71,7 @@ export function ProductDetailPage() {
             <div>
               <Title order={1}>{product.model}</Title>
               <Group gap="xs" mt="xs">
-                <Badge variant="light" color="vikinga">
+                <Badge variant="light" color="primary">
                   {t(`enums.line.${product.line}`)}
                 </Badge>
                 {product.selectedSize && (
@@ -116,7 +116,7 @@ export function ProductDetailPage() {
                               size={28}
                               style={{
                                 outline: isSelected
-                                  ? '2px solid var(--mantine-color-vikinga-6)'
+                                  ? '2px solid var(--mantine-primary-color-filled)'
                                   : 'none',
                                 outlineOffset: 2,
                               }}
@@ -147,7 +147,7 @@ export function ProductDetailPage() {
                             size.id === product.selectedSize?.id ? 'filled' : 'outline'
                           }
                           color={
-                            size.id === product.selectedSize?.id ? 'vikinga' : 'gray'
+                            size.id === product.selectedSize?.id ? 'primary' : 'gray'
                           }
                           size="compact-md"
                           onClick={() =>

@@ -61,7 +61,7 @@ export function OtpPage() {
     try {
       const { user, token } = await authService.verifyOtp(parsed.data)
       adoptSession(token, user)
-      navigate(user.type === 'Admin' ? routes.admin : (returnTo ?? routes.home))
+      navigate(user.type === 'Admin' ? routes.admin : (returnTo ?? routes.account))
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     } finally {

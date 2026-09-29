@@ -76,7 +76,7 @@ export function OrdersPage() {
                       />
                     </Text>
                     {sale.coupon && (
-                      <Badge variant="outline" color="vikinga">
+                      <Badge variant="outline" color="primary">
                         {sale.coupon.code}
                       </Badge>
                     )}

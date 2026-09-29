@@ -301,7 +301,7 @@ export function CouponsPage() {
                             </Badge>
                           )}
                           {coupon.redeemable && (
-                            <Badge variant="light" color="vikinga">
+                            <Badge variant="light" color="green">
                               {t('admin.coupons.redeemable')}
                             </Badge>
                           )}

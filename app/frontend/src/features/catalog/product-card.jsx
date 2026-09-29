@@ -5,8 +5,12 @@ import { useI18n } from '@i18n/context.js'
 import { Button, Card, ColorSwatch, Group, Stack, Text } from '@mantine/core'
 import { useNavigate } from 'react-router'
 
-// Tarjeta de producto del catálogo filtrado (US3): solo colores con unidades
-// disponibles en el talle consultado.
+// Tarjeta de producto del catálogo (US3).
+//
+// Con `sizeId`, solo se listan los colores con unidades disponibles en el talle
+// consultado. Sin `sizeId` (catálogo exploratorio) el producto no trae variantes,
+// así que **no** se muestra "0 unidades disponibles": la disponibilidad es
+// desconocida, no cero, y decir cero sería mentir sobre el stock.
 export function ProductCard({ product, sizeId, generationId }) {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -30,21 +34,25 @@ export function ProductCard({ product, sizeId, generationId }) {
           <Money value={product.price} />
         </Text>
 
-        <Group gap="xs">
-          {product.variants.map((variant) => (
-            <ColorSwatch
-              key={variant.id}
-              color={colorHex(variant.color)}
-              size={20}
-              role="img"
-              aria-label={colorLabel(variant.color)}
-              title={colorLabel(variant.color)}
-            />
-          ))}
-        </Group>
+        {sizeId && product.variants.length > 0 && (
+          <Group gap="xs">
+            {product.variants.map((variant) => (
+              <ColorSwatch
+                key={variant.id}
+                color={colorHex(variant.color)}
+                size={20}
+                role="img"
+                aria-label={colorLabel(variant.color)}
+                title={colorLabel(variant.color)}
+              />
+            ))}
+          </Group>
+        )}
 
         <Text size="xs" c="dimmed">
-          {t('catalog.available', { count: totalAvailable })}
+          {sizeId
+            ? t('catalog.available', { count: totalAvailable })
+            : t('catalog.pickSizeHint')}
         </Text>
 
         <Button

@@ -9,20 +9,30 @@ export default {
   'nav.fit': 'Medir',
   'nav.catalog': 'Catálogo',
   'nav.history': 'Historial',
-  'nav.account': 'Cuenta',
   'nav.orders': 'Mis compras',
-  'nav.dashboard': 'Panel',
+  'nav.analytics': 'Analíticas',
   'nav.sales': 'Ventas',
   'nav.inventory': 'Inventario',
   'nav.movements': 'Movimientos',
   'nav.products': 'Productos',
   'nav.missingSizes': 'Talles faltantes',
   'nav.comments': 'Comentarios',
+  'nav.users': 'Usuarios',
   'nav.coupons': 'Cupones',
   'nav.settings': 'Reglas',
-  'nav.assistant': 'Para terceros',
+  'nav.admin': 'Panel de administración',
+  // Unificado (bug squash sesión #1): antes había tres rótulos para lo mismo
+  // ("Panel", "Panel de control", "Panel de administración"). Se usa el más claro
+  // en el encabezado de sección, en el enlace del avatar y en el título de la
+  // pantalla.
+  'nav.panelSection': 'Panel de administración',
   'nav.logout': 'Cerrar sesión',
   'nav.language': 'Idioma',
+
+  'theme.label': 'Tema',
+  'theme.light': 'Claro',
+  'theme.dark': 'Oscuro',
+  'theme.system': 'Sistema',
 
   'common.loading': 'Cargando…',
   'common.retry': 'Reintentar',
@@ -154,19 +164,6 @@ export default {
   'validation.password': 'Mínimo 6 caracteres.',
   'validation.phone': 'Ingresá un teléfono válido (ej. +59899000000).',
 
-  'home.title': 'Tu talle para natación, sin adivinar',
-  'home.subtitle': 'Cinco medidas y una línea: obtené tu talle al instante.',
-  'home.guest': 'Probar sin registrarme',
-  'home.guestHint': 'Sin email, sin contraseña. Tu talle en segundos.',
-  'home.register': 'Crear cuenta',
-  'home.registerHint':
-    'Guardá tus medidas y perfiles, mirá el stock real y ganá cupones.',
-  'home.login': 'Iniciar sesión',
-  'home.logged': 'Medir mi talle',
-  'home.history': 'Ver historial',
-  'home.account': 'Mi cuenta',
-  'home.about': '¿Qué es Scan VKFit?',
-
   'fit.title': 'Medí tu talle',
   'fit.subtitle':
     'Ingresá tus cinco medidas y elegí la línea de prenda. Te decimos tu talle al instante.',
@@ -221,6 +218,11 @@ export default {
   'catalog.view': 'Ver',
   'catalog.available.one': '{{count}} unidad disponible',
   'catalog.available.other': '{{count}} unidades disponibles',
+  'catalog.noSize.title': 'Mejor con tu talle',
+  'catalog.noSize.body':
+    'Estás viendo todo el catálogo. Si medís tu talle, te mostramos solo lo que hay disponible en tu medida.',
+  'catalog.noSize.cta': 'Medir mi talle',
+  'catalog.pickSizeHint': 'Elegí un talle para ver disponibilidad',
   'catalog.needSize.title': 'Primero necesitamos tu talle',
   'catalog.needSize.body':
     'Medí tus cinco medidas y te mostramos solo lo que hay disponible en tu talle.',
@@ -295,6 +297,16 @@ export default {
   'checkout.confirmation.noContact': 'Esta compra ya está fuera de coordinación.',
   'checkout.confirmation.continue': 'Seguir comprando',
   'checkout.confirmation.home': 'Volver al inicio',
+  'account.info.title': 'Mi cuenta',
+  'account.info.subtitle': 'Tus datos y la agenda de perfiles y direcciones.',
+  'account.info.tabAccount': 'Cuenta',
+  'account.info.tabAgenda': 'Perfiles y direcciones',
+  'account.info.email': 'Email',
+  'account.info.whatsapp': 'WhatsApp',
+  'account.info.whatsappHint':
+    'Por WhatsApp coordinamos la entrega de tus compras, por eso es obligatorio.',
+  'account.menu.label': 'Cuenta',
+  'account.menu.profile': 'Perfil en uso',
   'account.profiles.title': 'Perfiles de medidas',
   'account.profiles.subtitle':
     'Guardá distintas medidas y cambiá de perfil para medir o comprar para otra persona.',
@@ -369,7 +381,7 @@ export default {
   'feedback.toast.title': '¡Ganaste puntos!',
   'feedback.toast.body': 'Sumaste {{points}} puntos por tu feedback.',
 
-  'admin.dashboard.title': 'Panel de control',
+  'admin.dashboard.title': 'Panel de administración',
   'admin.dashboard.subtitle':
     'Conversión, precisión del talle, stock crítico y ventas en vuelo.',
   'admin.dashboard.range': 'Rango de fechas',
@@ -386,6 +398,45 @@ export default {
   'admin.dashboard.moreCritical': '+{{count}} más',
   'admin.dashboard.inFlight': 'Ventas en vuelo',
   'admin.dashboard.noInFlight': 'No hay ventas pendientes de coordinación.',
+
+  'admin.users.title': 'Usuarios',
+  'admin.users.subtitle':
+    'Todas las cuentas de la plataforma. Podés otorgar o revocar el acceso al panel.',
+  'admin.users.kpi.total': 'Cuentas totales',
+  'admin.users.kpi.totalHint': '{{admins}} admin · {{customers}} clientes',
+  'admin.users.kpi.active': 'Activos (30 días)',
+  'admin.users.kpi.activeHint': '{{rate}}% del total midió o compró',
+  'admin.users.kpi.new': 'Altas (30 días)',
+  'admin.users.kpi.newGrowth': '{{growth}}% vs. los 30 días anteriores',
+  'admin.users.kpi.admins': 'Con acceso al panel',
+  'admin.users.kpi.adminsHint': 'Pueden ver y administrar todo',
+  'admin.users.chart.title': 'Cuentas nuevas por mes',
+  'admin.users.chart.series': 'Altas',
+  'admin.users.chart.hint': 'Últimos 12 meses.',
+  // "Padrón" era demasiado administrativo y no se entendía. Se nombra lo que la
+  // tabla muestra: todas las cuentas.
+  'admin.users.list.title': 'Todas las cuentas',
+  'admin.users.filter.all': 'Todos',
+  'admin.users.filter.customers': 'Clientes',
+  'admin.users.filter.admins': 'Admins',
+  'admin.users.filter.anyActivity': 'Con o sin actividad',
+  'admin.users.filter.active': 'Con actividad',
+  'admin.users.column.user': 'Usuario',
+  'admin.users.column.role': 'Rol',
+  'admin.users.column.since': 'Alta',
+  'admin.users.column.activity': 'Última actividad',
+  'admin.users.column.actions': 'Acciones',
+  'admin.users.noActivity': 'Sin actividad',
+  'admin.users.grant': 'Dar admin',
+  'admin.users.revoke': 'Quitar admin',
+  'admin.users.cannotDemoteSelf': 'No podés quitarte tu propio acceso.',
+  'admin.users.empty': 'No hay usuarios con ese filtro',
+  'admin.users.emptyBody': 'Probá con otro rol o sin el filtro de actividad.',
+  'admin.users.showing': 'Mostrando {{count}} de {{total}} cuentas.',
+  'admin.users.error.LAST_ADMIN':
+    'No se puede quitar el último administrador: el panel quedaría sin acceso.',
+  'admin.users.error.CANNOT_DEMOTE_SELF': 'No podés quitarte tu propio acceso.',
+  'admin.users.error.SERVER_ERROR': 'No se pudo cambiar el rol. Probá de nuevo.',
   'admin.sales.title': 'Ventas',
   'admin.sales.subtitle':
     'Coordiná las ventas en curso: contactá al cliente, confirmá o cancelá.',
@@ -556,9 +607,6 @@ export default {
   'admin.settings.form.staleSaleDaysHint':
     'A partir de estos días, el panel resalta la venta como vieja (Q-11).',
   'admin.settings.saved': 'Reglas guardadas. El cliente ya ve los cambios.',
-  'admin.assistant.title': 'Modo para terceros',
-  'admin.assistant.subtitle':
-    'Medí a alguien que tenés enfrente. La medición queda marcada como del personal.',
   'admin.assistant.forThirdParties': 'Para terceros',
   'admin.assistant.linkCustomer': 'Vincular a un cliente',
   'admin.assistant.linkCustomerHint':
@@ -569,6 +617,7 @@ export default {
 
   'notFound.title': 'Página no encontrada',
   'notFound.body': 'La página que buscás no existe o fue movida.',
+  'notFound.backHome': 'Volver al inicio',
 
   'enums.userType.Admin': 'Administrador',
   'enums.userType.Customer': 'Cliente',

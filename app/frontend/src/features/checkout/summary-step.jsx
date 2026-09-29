@@ -38,7 +38,7 @@ export function SummaryStep({
             <div>
               <Text fw={600}>{line.product?.model}</Text>
               <Group gap="xs" mt={4}>
-                <Badge variant="light" color="vikinga">
+                <Badge variant="light" color="green">
                   {t(`enums.line.${line.product?.line}`)}
                 </Badge>
                 {line.size?.code && (

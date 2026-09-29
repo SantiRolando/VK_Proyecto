@@ -97,7 +97,7 @@ export function HistoryPage() {
                     </div>
 
                     {generation.rating ? (
-                      <Badge variant="light" color="vikinga">
+                      <Badge variant="light" color="blue">
                         {t(`enums.rating.${generation.rating}`)}
                       </Badge>
                     ) : (

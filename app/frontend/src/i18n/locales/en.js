@@ -9,20 +9,27 @@ export default {
   'nav.fit': 'Measure',
   'nav.catalog': 'Catalog',
   'nav.history': 'History',
-  'nav.account': 'Account',
   'nav.orders': 'My purchases',
-  'nav.dashboard': 'Dashboard',
+  'nav.analytics': 'Analytics',
   'nav.sales': 'Sales',
   'nav.inventory': 'Inventory',
   'nav.movements': 'Movements',
   'nav.products': 'Products',
   'nav.missingSizes': 'Missing sizes',
   'nav.comments': 'Comments',
+  'nav.users': 'Users',
   'nav.coupons': 'Coupons',
   'nav.settings': 'Rules',
-  'nav.assistant': 'For others',
+  'nav.admin': 'Management panel',
+  // Unified (bug squash session #1): three labels used to mean the same thing.
+  'nav.panelSection': 'Management panel',
   'nav.logout': 'Sign out',
   'nav.language': 'Language',
+
+  'theme.label': 'Theme',
+  'theme.light': 'Light',
+  'theme.dark': 'Dark',
+  'theme.system': 'System',
 
   'common.loading': 'Loading…',
   'common.retry': 'Retry',
@@ -153,19 +160,6 @@ export default {
   'validation.password': 'At least 6 characters.',
   'validation.phone': 'Enter a valid phone number (e.g. +59899000000).',
 
-  'home.title': 'Your swimming size, no guessing',
-  'home.subtitle': 'Five measurements and one line: get your size instantly.',
-  'home.guest': 'Try without signing up',
-  'home.guestHint': 'No email, no password. Your size in seconds.',
-  'home.register': 'Create account',
-  'home.registerHint':
-    'Save your measurements and profiles, see real stock and earn coupons.',
-  'home.login': 'Sign in',
-  'home.logged': 'Measure my size',
-  'home.history': 'View history',
-  'home.account': 'My account',
-  'home.about': 'What is Scan VKFit?',
-
   'fit.title': 'Measure your size',
   'fit.subtitle':
     'Enter your five measurements and pick the garment line. We tell you your size instantly.',
@@ -221,6 +215,11 @@ export default {
   'catalog.view': 'View',
   'catalog.available.one': '{{count}} unit available',
   'catalog.available.other': '{{count}} units available',
+  'catalog.noSize.title': 'Better with your size',
+  'catalog.noSize.body':
+    'You are browsing the whole catalog. If you measure your size, we will show you only what is available in your measurement.',
+  'catalog.noSize.cta': 'Measure my size',
+  'catalog.pickSizeHint': 'Pick a size to see availability',
   'catalog.needSize.title': 'First we need your size',
   'catalog.needSize.body':
     'Measure your five measurements and we will show you only what is available in your size.',
@@ -295,6 +294,16 @@ export default {
   'checkout.confirmation.noContact': 'This purchase is no longer open for coordination.',
   'checkout.confirmation.continue': 'Keep shopping',
   'checkout.confirmation.home': 'Back to home',
+  'account.info.title': 'My account',
+  'account.info.subtitle': 'Your details and your profiles and addresses.',
+  'account.info.tabAccount': 'Account',
+  'account.info.tabAgenda': 'Profiles and addresses',
+  'account.info.email': 'Email',
+  'account.info.whatsapp': 'WhatsApp',
+  'account.info.whatsappHint':
+    'We coordinate delivery over WhatsApp, which is why it is required.',
+  'account.menu.label': 'Account',
+  'account.menu.profile': 'Profile in use',
   'account.profiles.title': 'Measurement profiles',
   'account.profiles.subtitle':
     'Save different measurements and switch profiles to measure or buy for someone else.',
@@ -369,7 +378,7 @@ export default {
   'feedback.toast.title': 'You earned points!',
   'feedback.toast.body': 'You earned {{points}} points for your feedback.',
 
-  'admin.dashboard.title': 'Dashboard',
+  'admin.dashboard.title': 'Management panel',
   'admin.dashboard.subtitle':
     'Conversion, size accuracy, critical stock and sales in flight.',
   'admin.dashboard.range': 'Date range',
@@ -386,6 +395,43 @@ export default {
   'admin.dashboard.moreCritical': '+{{count}} more',
   'admin.dashboard.inFlight': 'Sales in flight',
   'admin.dashboard.noInFlight': 'No sales pending coordination.',
+
+  'admin.users.title': 'Users',
+  'admin.users.subtitle':
+    'Every account on the platform. You can grant or revoke panel access.',
+  'admin.users.kpi.total': 'Total accounts',
+  'admin.users.kpi.totalHint': '{{admins}} admin · {{customers}} customers',
+  'admin.users.kpi.active': 'Active (30 days)',
+  'admin.users.kpi.activeHint': '{{rate}}% of the total measured or bought',
+  'admin.users.kpi.new': 'Signups (30 days)',
+  'admin.users.kpi.newGrowth': '{{growth}}% vs. the previous 30 days',
+  'admin.users.kpi.admins': 'With panel access',
+  'admin.users.kpi.adminsHint': 'They can see and manage everything',
+  'admin.users.chart.title': 'New accounts per month',
+  'admin.users.chart.series': 'Signups',
+  'admin.users.chart.hint': 'Last 12 months.',
+  'admin.users.list.title': 'All accounts',
+  'admin.users.filter.all': 'All',
+  'admin.users.filter.customers': 'Customers',
+  'admin.users.filter.admins': 'Admins',
+  'admin.users.filter.anyActivity': 'Any activity',
+  'admin.users.filter.active': 'With activity',
+  'admin.users.column.user': 'User',
+  'admin.users.column.role': 'Role',
+  'admin.users.column.since': 'Signed up',
+  'admin.users.column.activity': 'Last activity',
+  'admin.users.column.actions': 'Actions',
+  'admin.users.noActivity': 'No activity',
+  'admin.users.grant': 'Make admin',
+  'admin.users.revoke': 'Remove admin',
+  'admin.users.cannotDemoteSelf': 'You cannot remove your own access.',
+  'admin.users.empty': 'No users match that filter',
+  'admin.users.emptyBody': 'Try another role or drop the activity filter.',
+  'admin.users.showing': 'Showing {{count}} of {{total}} accounts.',
+  'admin.users.error.LAST_ADMIN':
+    'The last administrator cannot be removed: the panel would be left without access.',
+  'admin.users.error.CANNOT_DEMOTE_SELF': 'You cannot remove your own access.',
+  'admin.users.error.SERVER_ERROR': 'The role could not be changed. Try again.',
   'admin.sales.title': 'Sales',
   'admin.sales.subtitle':
     'Coordinate in-flight sales: contact the customer, confirm or cancel.',
@@ -553,9 +599,6 @@ export default {
   'admin.settings.form.staleSaleDaysHint':
     'From these days on, the panel flags the sale as stale (Q-11).',
   'admin.settings.saved': 'Rules saved. The customer already sees the changes.',
-  'admin.assistant.title': 'Third-party mode',
-  'admin.assistant.subtitle':
-    'Measure someone in front of you. The measurement is flagged as staff-created.',
   'admin.assistant.forThirdParties': 'For third parties',
   'admin.assistant.linkCustomer': 'Link to a customer',
   'admin.assistant.linkCustomerHint':
@@ -566,6 +609,7 @@ export default {
 
   'notFound.title': 'Page not found',
   'notFound.body': 'The page you are looking for does not exist or was moved.',
+  'notFound.backHome': 'Back to home',
 
   'enums.userType.Admin': 'Administrator',
   'enums.userType.Customer': 'Customer',

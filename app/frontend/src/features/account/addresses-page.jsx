@@ -19,8 +19,24 @@ import { useState } from 'react'
 const NEW_ADDRESS = 'new'
 
 // Agenda de direcciones (US5/T075): alta, edición, baja y predeterminada. El
-// checkout reutiliza el mismo formulario para dar de alta una dirección.
+// `AddressesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
+// exporta aparte para poder embeberlo en una pestaña de la información de cuenta
+// sin anidar contenedores ni repetir el encabezado (bug squash sesión #1).
 export function AddressesPage() {
+  const { t } = useI18n()
+
+  return (
+    <Container size="md" py="xl">
+      <PageHeader
+        title={t('account.addresses.title')}
+        subtitle={t('account.addresses.subtitle')}
+      />
+      <AddressesBody />
+    </Container>
+  )
+}
+
+export function AddressesBody() {
   const { t } = useI18n()
   const query = useAddresses()
   const createAddress = useCreateAddress()
@@ -51,19 +67,15 @@ export function AddressesPage() {
   }
 
   return (
-    <Container size="md" py="xl">
-      <PageHeader
-        title={t('account.addresses.title')}
-        subtitle={t('account.addresses.subtitle')}
-        actions={
-          <Button
-            leftSection={<IconPlus size={16} />}
-            onClick={() => setEditing(NEW_ADDRESS)}
-          >
-            {t('account.addresses.new')}
-          </Button>
-        }
-      />
+    <>
+      <Group justify="flex-end" mb="md">
+        <Button
+          leftSection={<IconPlus size={16} />}
+          onClick={() => setEditing(NEW_ADDRESS)}
+        >
+          {t('account.addresses.new')}
+        </Button>
+      </Group>
 
       <QueryBoundary
         isLoading={query.isPending}
@@ -85,7 +97,7 @@ export function AddressesPage() {
                   <div>
                     <Text fw={600}>{addressFullLine(address)}</Text>
                     {address.isDefault && (
-                      <Badge variant="light" color="vikinga" mt={4}>
+                      <Badge variant="light" color="blue" mt={4}>
                         {t('account.addresses.default')}
                       </Badge>
                     )}
@@ -177,6 +189,6 @@ export function AddressesPage() {
           </Group>
         </Stack>
       </Modal>
-    </Container>
+    </>
   )
 }

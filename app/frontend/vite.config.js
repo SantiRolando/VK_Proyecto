@@ -29,8 +29,11 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        theme_color: '#134379',
-        background_color: '#E8F0FA',
+        // Tema monocromo (bug squash sesión #1, F6). Los dos valores salen del
+        // propio ícono: fondo #1D1D1D–#2A2A2A y marca #D5D5D5. El splash queda
+        // claro para contrastar con el ícono, que es oscuro.
+        theme_color: '#1B1B1B',
+        background_color: '#D5D5D5',
         categories: ['shopping', 'sports'],
         icons: [
           {

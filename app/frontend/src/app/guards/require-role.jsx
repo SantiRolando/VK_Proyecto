@@ -12,7 +12,7 @@ export function RequireRole({ requiredRole, children }) {
   if (status === 'hydrating') return null
 
   if (!user || user.type !== requiredRole) {
-    return <Navigate to={routes.home} replace />
+    return <Navigate to={routes.account} replace />
   }
 
   return children

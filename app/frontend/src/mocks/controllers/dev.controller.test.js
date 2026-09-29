@@ -21,11 +21,19 @@ function call(method, url, { body } = {}) {
 
 describe('dev controller', () => {
   it('reset re-siembra la base de datos', async () => {
-    const before = getDb().users.length
-    expect(before).toBe(3)
+    // El padrón sembrado es amplio a propósito (la pantalla de usuarios necesita
+    // volumen para sus indicadores y su gráfico), así que se afirma la identidad
+    // de la semilla y no un número fijo de filas.
+    const seeded = getDb().users.length
+    expect(seeded).toBeGreaterThan(3)
+
+    // Se ensucia la base y se comprueba que el reset la devuelve al estado inicial.
+    getDb().users.push({ id: 9999, type: 'Customer', name: 'Temporal' })
+    expect(getDb().users.length).toBe(seeded + 1)
 
     await call('POST', '/dev/reset')
-    expect(getDb().users.length).toBe(3)
+
+    expect(getDb().users.length).toBe(seeded)
     expect(getDb().users).toEqual(
       expect.arrayContaining([expect.objectContaining({ email: 'admin@vikinga.test' })]),
     )

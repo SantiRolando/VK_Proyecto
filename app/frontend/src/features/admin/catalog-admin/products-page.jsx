@@ -469,7 +469,7 @@ export function ProductsPage() {
                   <div>
                     <Group gap="xs" wrap="nowrap">
                       <Text fw={600}>{product.model}</Text>
-                      <Badge variant="light" color="vikinga">
+                      <Badge variant="light" color="blue">
                         {t(`enums.line.${product.line}`)}
                       </Badge>
                       {!product.active && (

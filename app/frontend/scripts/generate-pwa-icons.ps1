@@ -11,8 +11,10 @@
 Add-Type -AssemblyName System.Drawing
 
 $out = Join-Path $PSScriptRoot '..\public'
-$background = [System.Drawing.ColorTranslator]::FromHtml('#134379') # vikinga-7
-$foreground = [System.Drawing.Color]::White
+# Tema monocromo (bug squash sesión #1, F6): se retiró el azul `vikinga-7`.
+# Valores tomados del ícono real actual.
+$background = [System.Drawing.ColorTranslator]::FromHtml('#1B1B1B')
+$foreground = [System.Drawing.ColorTranslator]::FromHtml('#D5D5D5')
 
 function New-Icon {
   param(

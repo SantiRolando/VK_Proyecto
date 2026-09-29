@@ -38,7 +38,7 @@ export function DeliveryStep({
       />
 
       {method === 'StorePickup' ? (
-        <Alert variant="light" color="vikinga" icon={<IconShoppingBag size={18} />}>
+        <Alert variant="light" color="blue" icon={<IconShoppingBag size={18} />}>
           <Text size="sm">{t('checkout.delivery.pickupHint')}</Text>
         </Alert>
       ) : (

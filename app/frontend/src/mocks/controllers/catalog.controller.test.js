@@ -71,11 +71,26 @@ describe('catalog controller', () => {
     expect(enduranceL.data.length).toBeGreaterThan(0)
   })
 
-  it('exige sizeId', async () => {
-    await expect(call('GET', '/catalog')).rejects.toMatchObject({
-      status: 422,
-      code: 'VALIDATION_ERROR',
-    })
+  // Bug squash sesión #1: sin talle ya no se bloquea la pantalla. Se listan los
+  // productos activos y el meta marca `hasStock: null` para señalar que no hubo
+  // filtro por talle (antes esta rama devolvía 422).
+  it('sin sizeId lista el catálogo completo y marca hasStock como null', async () => {
+    const result = await call('GET', '/catalog')
+
+    expect(result.data.length).toBeGreaterThan(0)
+    expect(result.meta.size).toBeNull()
+    expect(result.meta.hasStock).toBeNull()
+    // Todos los productos listados están activos.
+    expect(result.data.every((item) => item.variants.length === 0)).toBe(true)
+  })
+
+  it('sin sizeId respeta el filtro de línea', async () => {
+    const all = await call('GET', '/catalog')
+    const endurance = await call('GET', '/catalog', { query: { line: 'Endurance' } })
+
+    expect(endurance.data.length).toBeGreaterThan(0)
+    expect(endurance.data.length).toBeLessThan(all.data.length)
+    expect(endurance.data.every((item) => item.line === 'Endurance')).toBe(true)
   })
 
   it('deriva la línea del talle cuando no se pasa line', async () => {
