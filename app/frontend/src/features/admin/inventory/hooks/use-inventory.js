@@ -1,7 +1,8 @@
 import { adminInventoryService } from '@api/services/admin-inventory-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Inventario y movimientos del panel (US9).
+// Inventario y movimientos del panel (US9). Las variantes se administran en
+// `catalog-admin/hooks/use-products.js`.
 
 export function useInventory(filters) {
   return useQuery({
@@ -40,28 +41,4 @@ export function useAdjustStock() {
       queryClient.invalidateQueries({ queryKey: ['catalog-product'] })
     },
   })
-}
-
-function useVariantMutation(mutationFn) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'variants'] })
-      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
-      queryClient.invalidateQueries({ queryKey: ['catalog'] })
-      queryClient.invalidateQueries({ queryKey: ['catalog-product'] })
-    },
-  })
-}
-
-export function useCreateVariant() {
-  return useVariantMutation(adminInventoryService.createVariant)
-}
-
-export function useUpdateVariant() {
-  return useVariantMutation(({ variantId, ...payload }) =>
-    adminInventoryService.updateVariant(variantId, payload),
-  )
 }

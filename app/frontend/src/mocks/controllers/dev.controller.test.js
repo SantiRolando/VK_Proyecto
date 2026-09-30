@@ -58,7 +58,7 @@ describe('dev controller', () => {
     await call('POST', '/dev/router', { body: { failRate: 1 } })
 
     // Una ruta cualquiera falla…
-    await expect(call('GET', '/sizes')).rejects.toMatchObject({
+    await expect(call('GET', '/public/sizes')).rejects.toMatchObject({
       status: 500,
       code: 'SERVER_ERROR',
     })
@@ -66,6 +66,6 @@ describe('dev controller', () => {
     // …y las herramientas de /dev siguen disponibles para apagarla.
     const off = await call('POST', '/dev/router', { body: { failRate: 0 } })
     expect(off.data).toMatchObject({ failRate: 0 })
-    await expect(call('GET', '/sizes')).resolves.toBeTruthy()
+    await expect(call('GET', '/public/sizes')).resolves.toBeTruthy()
   })
 })

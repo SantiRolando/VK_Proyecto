@@ -1,14 +1,18 @@
-// Líneas de prenda: slug de URL (inglés, minúsculas) ↔ valor del ERD.
-// `/fit?line=endurance` (y su alias `linea=`) se resuelve con `slugToLine`.
+// Líneas y públicos: slug de URL (inglés, minúsculas) ↔ valor del modelo.
+// `/fit?line=jammer&audience=kids` (alias `linea=`) se resuelve acá.
 
-import { Line } from '@constants/enums.js'
+import { Audience, Line } from '@constants/enums.js'
 
 export const LINE_SLUGS = {
   endurance: Line.Endurance,
   soft: Line.Soft,
   jammer: Line.Jammer,
   sunga: Line.Sunga,
-  kids: Line.Kids,
+}
+
+export const AUDIENCE_SLUGS = {
+  adult: Audience.Adult,
+  kids: Audience.Kids,
 }
 
 export function slugToLine(slug) {
@@ -17,5 +21,14 @@ export function slugToLine(slug) {
 
 export function lineToSlug(line) {
   const entry = Object.entries(LINE_SLUGS).find(([, value]) => value === line)
+  return entry?.[0] ?? null
+}
+
+export function slugToAudience(slug) {
+  return AUDIENCE_SLUGS[String(slug ?? '').toLowerCase()] ?? null
+}
+
+export function audienceToSlug(audience) {
+  const entry = Object.entries(AUDIENCE_SLUGS).find(([, value]) => value === audience)
   return entry?.[0] ?? null
 }

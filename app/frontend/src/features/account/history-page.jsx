@@ -4,6 +4,8 @@ import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { PageHeader } from '@components/page-header.jsx'
 import { SizeBadge } from '@components/size-badge.jsx'
+import { env } from '@config/env.js'
+import { Audience } from '@constants/enums.js'
 import { useHistory } from '@features/account/hooks/use-history.js'
 import { useResolvedProfile } from '@features/account/hooks/use-profiles.js'
 import { FeedbackDrawer } from '@features/feedback/feedback-drawer.jsx'
@@ -20,12 +22,12 @@ const ALL = 'all'
 export function HistoryPage() {
   const { t } = useI18n()
   const navigate = useNavigate()
-  const { profile, profiles } = useResolvedProfile()
+  const { profiles } = useResolvedProfile()
 
-  // Sin elección explícita el historial sigue al perfil activo del selector.
-  const [chosen, setChosen] = useState(null)
+  // Arranca con todos los perfiles: las mediciones hechas como invitado o sin
+  // perfil no pertenecen a ninguno y quedarían ocultas.
+  const [selected, setSelected] = useState(ALL)
   const [rating, setRating] = useState(null)
-  const selected = chosen ?? (profile ? String(profile.id) : ALL)
 
   const query = useHistory(selected === ALL ? null : Number(selected))
 
@@ -46,7 +48,7 @@ export function HistoryPage() {
           <Select
             data={options}
             value={selected}
-            onChange={(value) => setChosen(value ?? ALL)}
+            onChange={(value) => setSelected(value ?? ALL)}
             allowDeselect={false}
             w={200}
             aria-label={t('account.history.filter')}
@@ -80,8 +82,17 @@ export function HistoryPage() {
                     <div>
                       <Group gap="xs" wrap="nowrap">
                         <Text fw={600}>{t(`enums.line.${generation.line}`)}</Text>
-                        {generation.suggestedSize && (
+                        {generation.audience === Audience.Kids && (
+                          <Badge variant="light" color="gray">
+                            {t('enums.audience.Kids')}
+                          </Badge>
+                        )}
+                        {generation.suggestedSize ? (
                           <SizeBadge code={generation.suggestedSize.code} />
+                        ) : (
+                          <Badge variant="light" color="orange">
+                            {t('fit.result.referredBadge')}
+                          </Badge>
                         )}
                       </Group>
                       <Text size="xs" c="dimmed" mt={4}>
@@ -89,7 +100,8 @@ export function HistoryPage() {
                           value={generation.createdAt}
                           options={{ dateStyle: 'medium', timeStyle: 'short' }}
                         />
-                        {` · ${t(`enums.source.${generation.source}`)}`}
+                        {generation.source &&
+                          ` · ${t(`enums.source.${generation.source}`)}`}
                         {selected === ALL &&
                           profileName(generation.profileId) &&
                           ` · ${profileName(generation.profileId)}`}
@@ -100,7 +112,7 @@ export function HistoryPage() {
                       <Badge variant="light" color="blue">
                         {t(`enums.rating.${generation.rating}`)}
                       </Badge>
-                    ) : (
+                    ) : env.isHybrid ? null : (
                       <Button
                         variant="light"
                         size="compact-md"

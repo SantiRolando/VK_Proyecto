@@ -57,7 +57,7 @@ describe('PATCH /admin/settings', () => {
     })
 
     // Generación 100 de Ana, sin calificar.
-    const feedback = await call('PATCH', '/size-generations/100/feedback', {
+    const feedback = await call('PATCH', '/fit/generations/100/feedback', {
       auth: { token: 'vkfit.2.test' },
       body: { rating: 'Correct' },
     })

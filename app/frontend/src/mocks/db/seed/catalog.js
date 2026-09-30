@@ -1,5 +1,5 @@
 // Seed: catálogo (PRODUCT, PRODUCT_VARIANT) — §4.8 del plan.
-// ~12 productos (2–3 por línea) con variantes producto × talle × color y
+// ~12 productos (2–3 por línea y público) con variantes producto × talle × color y
 // casos sembrados a propósito:
 //   - Endurance talle M sin stock en ningún color (flujo "sin stock").
 //   - Una variante con disponible = 1 (prueba de carrera/conflicto).
@@ -100,7 +100,8 @@ const PRODUCTS = [
   },
   {
     id: 10,
-    line: 'Kids',
+    line: 'Jammer',
+    audience: 'Kids',
     model: 'kids-jammer',
     description: 'Jammer infantil.',
     price: 1190,
@@ -109,7 +110,8 @@ const PRODUCTS = [
   },
   {
     id: 11,
-    line: 'Kids',
+    line: 'Sunga',
+    audience: 'Kids',
     model: 'kids-sunga',
     description: 'Sunga infantil.',
     price: 890,
@@ -118,7 +120,8 @@ const PRODUCTS = [
   },
   {
     id: 12,
-    line: 'Kids',
+    line: 'Endurance',
+    audience: 'Kids',
     model: 'kids-girls-endurance',
     description: 'Malla Endurance niña.',
     price: 1090,
@@ -136,6 +139,7 @@ export function buildCatalog(sizes) {
   const products = PRODUCTS.map((spec) => ({
     id: spec.id,
     line: spec.line,
+    audience: spec.audience ?? 'Adult',
     model: spec.model,
     description: spec.description,
     price: spec.price,
@@ -146,7 +150,10 @@ export function buildCatalog(sizes) {
   let variantId = 1
 
   for (const spec of PRODUCTS) {
-    const lineSizes = sizes.filter((size) => size.line === spec.line)
+    const audience = spec.audience ?? 'Adult'
+    const lineSizes = sizes.filter(
+      (size) => size.line === spec.line && size.audience === audience,
+    )
     for (const sizeCode of spec.sizes) {
       const size = lineSizes.find((item) => item.code === sizeCode)
       if (!size) continue
@@ -183,7 +190,12 @@ export function buildCatalog(sizes) {
 export function findVariant(sizes, products, productVariants, model, sizeCode, color) {
   const product = products.find((item) => item.model === model)
   if (!product) throw new Error(`Producto de seed no encontrado: ${model}`)
-  const size = sizes.find((item) => item.line === product.line && item.code === sizeCode)
+  const size = sizes.find(
+    (item) =>
+      item.line === product.line &&
+      item.audience === product.audience &&
+      item.code === sizeCode,
+  )
   if (!size) throw new Error(`Talle de seed no encontrado: ${product.line} ${sizeCode}`)
   return productVariants.find(
     (variant) =>

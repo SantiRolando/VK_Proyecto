@@ -36,7 +36,7 @@ describe('información de cuenta', () => {
       </Providers>,
     )
 
-  // El contenido vive en <main>; el header tiene sus propios controles, as� que se
+  // El contenido vive en <main>; el header tiene sus propios controles, así que se
   // acotan las consultas para no chocar con ellos.
   const main = async () => within(await screen.findByRole('main'))
 
@@ -82,7 +82,7 @@ describe('información de cuenta', () => {
     await signInAs(ANA)
     // El controlador de perfiles debe responder: si la redirección no ocurre, la
     // pantalla muestra el 404 y no hay perfiles.
-    const profiles = await apiClient.get('/me/profiles')
+    const profiles = await apiClient.get('/profiles')
     expect(profiles.length).toBeGreaterThan(0)
 
     renderAt(routes.accountProfiles)

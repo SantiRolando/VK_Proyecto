@@ -12,8 +12,9 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
-// Ingreso por código de un solo uso (FR-010): pedir código al email y
-// verificarlo. En modo mock el código es siempre 123456 (plan §7.2).
+// Ingreso por código de un solo uso (FR-010): pedir código al email y canjearlo
+// por una sesión. En modo mock el código es siempre 123456; contra el backend
+// (fuera de producción) el código queda en el log del servidor.
 export function OtpPage() {
   const { t } = useI18n()
   const { adoptSession } = useAuth()
@@ -59,9 +60,9 @@ export function OtpPage() {
     setBusy(true)
     setServerError(null)
     try {
-      const { user, token } = await authService.verifyOtp(parsed.data)
-      adoptSession(token, user)
-      navigate(user.type === 'Admin' ? routes.admin : (returnTo ?? routes.account))
+      const auth = await authService.loginWithOtp(parsed.data)
+      adoptSession(auth)
+      navigate(auth.user.type === 'Admin' ? routes.admin : (returnTo ?? routes.account))
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     } finally {
@@ -109,9 +110,9 @@ export function OtpPage() {
               error={errors.code ? t(`validation.${errors.code}`) : null}
               required
             />
-            {env.isMock && (
+            {env.showDevHints && (
               <Text size="xs" c="dimmed">
-                {t('auth.otp.mockHint')}
+                {t(env.isMock ? 'auth.otp.mockHint' : 'auth.otp.devHint')}
               </Text>
             )}
             {serverError && (

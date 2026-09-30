@@ -151,15 +151,25 @@ export function ProfilesBody() {
                     </Group>
                   </Group>
 
-                  <SimpleGrid cols={{ base: 2, sm: 5 }} spacing="xs">
+                  <SimpleGrid cols={{ base: 3, sm: 6 }} spacing="xs">
                     {MEASURE_FIELDS.map((field) => (
                       <div key={field}>
                         <Text size="xs" c="dimmed">
                           {t(`fit.measure.${field}`)}
                         </Text>
-                        <Text size="sm">{t('common.cm', { value: profile[field] })}</Text>
+                        <Text size="sm">
+                          {profile[field] == null
+                            ? t('common.notSet')
+                            : t('common.cm', { value: profile[field] })}
+                        </Text>
                       </div>
                     ))}
+                    <div>
+                      <Text size="xs" c="dimmed">
+                        {t('fit.measure.age')}
+                      </Text>
+                      <Text size="sm">{profile.age ?? t('common.notSet')}</Text>
+                    </div>
                   </SimpleGrid>
                 </Stack>
               </Card>

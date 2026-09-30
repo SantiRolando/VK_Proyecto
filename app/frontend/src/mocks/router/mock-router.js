@@ -68,12 +68,42 @@ async function applyLatency() {
   await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// Tokens mock: `vkfit.<userId>.<nonce>` (prototipo: sin firma ni expiración).
+// Tokens mock (prototipo: sin firma ni expiración): access `vkfit.<userId>.<nonce>`
+// y refresh `vkfit-refresh.<userId>.<nonce>`. Un refresh nunca autentica.
+//
+// En modo híbrido llega el JWT del backend: se lee su payload (sin verificar la
+// firma, es un mock) y se usa el usuario mock con el mismo id y rol, o uno
+// sintético con los datos del token, para que las rutas que siguen en el mock
+// no rechacen una sesión real.
 function resolveUser(auth) {
   if (!auth?.token) return null
   const match = /^vkfit\.(\d+)\./.exec(auth.token)
-  if (!match) return null
-  return getDb().users.find((user) => user.id === Number(match[1])) ?? null
+  if (match) return getDb().users.find((user) => user.id === Number(match[1])) ?? null
+  return userFromJwt(auth.token)
+}
+
+function userFromJwt(token) {
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+  try {
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    const id = Number(payload.sub)
+    const type = payload.role === 'ADMIN' ? 'Admin' : 'Customer'
+    const local = getDb().users.find((user) => user.id === id && user.type === type)
+    return (
+      local ?? {
+        id,
+        type,
+        name: payload.email ?? `user-${id}`,
+        email: payload.email ?? '',
+        whatsappPhone: '',
+        pointsBalance: 0,
+        createdAt: new Date().toISOString(),
+      }
+    )
+  } catch {
+    return null
+  }
 }
 
 function checkAuth(user, required) {

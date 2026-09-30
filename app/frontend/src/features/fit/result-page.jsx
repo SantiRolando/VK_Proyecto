@@ -1,9 +1,12 @@
 import { routes } from '@app/routes.js'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
-import { lineToSlug } from '@constants/lines.js'
+import { env } from '@config/env.js'
+import { Audience, GenerationOutcome } from '@constants/enums.js'
+import { audienceToSlug, lineToSlug } from '@constants/lines.js'
 import { useAuth } from '@features/auth/auth-context.js'
 import { FeedbackDrawer } from '@features/feedback/feedback-drawer.jsx'
 import { useGeneration } from '@features/fit/hooks/use-generation.js'
+import { OutOfRange } from '@features/fit/out-of-range.jsx'
 import { SaveProfileModal } from '@features/fit/save-profile-modal.jsx'
 import { useI18n } from '@i18n/context.js'
 import {
@@ -20,6 +23,7 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
+  IconAlertTriangle,
   IconArrowLeft,
   IconCircleCheck,
   IconCircleOff,
@@ -27,7 +31,7 @@ import {
   IconUserCheck,
   IconUserPlus,
 } from '@tabler/icons-react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 
 function SizeCard({ generation }) {
   const { t } = useI18n()
@@ -41,16 +45,36 @@ function SizeCard({ generation }) {
         {generation.suggestedSize?.code}
       </Text>
       <Group justify="center" gap="xs" mt="md">
-        <Badge variant="light" color="blue">
-          {t(`enums.line.${generation.line}`)}
-        </Badge>
-        {generation.dominantMeasure && (
+        {generation.line && (
+          <Badge variant="light" color="blue">
+            {t(`enums.line.${generation.line}`)}
+          </Badge>
+        )}
+        {generation.audience === Audience.Kids && (
           <Badge variant="light" color="gray">
-            {t('fit.result.dominant')}: {t(`fit.measure.${generation.dominantMeasure}`)}
+            {t('enums.audience.Kids')}
           </Badge>
         )}
       </Group>
     </Paper>
+  )
+}
+
+// Avisos del motor (`outcome = WithWarning`): el talle vale, con una salvedad.
+function Warnings({ generation }) {
+  const { t } = useI18n()
+  if (!generation.warnings?.length) return null
+
+  return (
+    <Alert variant="light" color="yellow" icon={<IconAlertTriangle size={18} />}>
+      <Stack gap={4}>
+        {generation.warnings.map((warning) => (
+          <Text key={warning} size="sm">
+            {t(`enums.fitWarning.${warning}`)}
+          </Text>
+        ))}
+      </Stack>
+    </Alert>
   )
 }
 
@@ -72,6 +96,7 @@ function StockState({ generation }) {
             navigate(
               routes.catalog({
                 line: lineToSlug(generation.line),
+                audience: audienceToSlug(generation.audience),
                 sizeId: generation.suggestedSize?.id,
                 generationId: generation.id,
               }),
@@ -219,13 +244,18 @@ function FeedbackCard({ generation, onRated }) {
   )
 }
 
-// Resultado de la generación (US1): talle, línea, stock, CTA de registro para
-// invitados y feedback (US6).
+// Resultado de la generación (US1): talle, línea, avisos, stock, CTA de
+// registro para invitados y feedback (US6). Una generación derivada
+// (`Referred`) muestra el contacto de VK en lugar del talle.
 export function ResultPage() {
   const { t } = useI18n()
   const { generationId } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const query = useGeneration(Number(generationId))
+  // En modo asistente la generación es de un tercero: el personal no guarda
+  // perfiles ni califica. El formulario lo marca en la URL.
+  const onBehalf = searchParams.get('onBehalf') === '1'
 
   return (
     <Container size="sm" py="xl">
@@ -235,19 +265,26 @@ export function ResultPage() {
         error={query.error}
         onRetry={query.refetch}
       >
-        {query.data && (
+        {query.data?.outcome === GenerationOutcome.Referred && (
+          <Stack gap="lg">
+            <Title order={1}>{t('fit.result.referredTitle')}</Title>
+            <OutOfRange
+              reason={query.data.referralReason}
+              onReset={() => navigate(routes.fit())}
+            />
+          </Stack>
+        )}
+        {query.data && query.data.outcome !== GenerationOutcome.Referred && (
           <Stack gap="lg">
             <Title order={1}>{t('fit.result.title')}</Title>
             <SizeCard generation={query.data} />
+            <Warnings generation={query.data} />
             <StockState generation={query.data} />
             <RegisterCard />
-            {/* En modo asistente la generación es de un tercero: el personal no
-                guarda perfiles ni califica. */}
-            {!query.data.onBehalf && (
-              <>
-                <SaveProfileCard generation={query.data} />
-                <FeedbackCard generation={query.data} onRated={query.refetch} />
-              </>
+            {!onBehalf && <SaveProfileCard generation={query.data} />}
+            {/* El feedback sigue en el mock: en híbrido no conoce esta generación. */}
+            {!onBehalf && !env.isHybrid && (
+              <FeedbackCard generation={query.data} onRated={query.refetch} />
             )}
             <Button
               variant="subtle"

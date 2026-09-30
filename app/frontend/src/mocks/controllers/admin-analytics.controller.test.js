@@ -80,7 +80,7 @@ describe('GET /admin/analytics/missing-sizes', () => {
     }
 
     // La grilla completa la usa el mapa de calor para dibujar los ceros.
-    expect(result.meta.lines).toEqual(['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids'])
+    expect(result.meta.lines).toEqual(['Endurance', 'Soft', 'Jammer', 'Sunga'])
     expect(result.meta.sizes.length).toBe(getDb().sizes.length)
     expect(result.meta.total).toBe(result.data.reduce((sum, cell) => sum + cell.count, 0))
 

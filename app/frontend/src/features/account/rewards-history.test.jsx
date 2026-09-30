@@ -45,12 +45,12 @@ beforeEach(async () => {
 })
 
 describe('historial y feedback (US6)', () => {
-  it('arranca en el perfil activo y permite calificar una medición pendiente', async () => {
+  it('arranca con todos los perfiles y permite calificar una medición pendiente', async () => {
     const user = userEvent.setup()
     await signInAs(ANA)
 
-    // La primera medición sin calificar del perfil activo (Training, id 1).
-    const pending = (await sizeService.listGenerations({ profileId: 1 })).find(
+    // Hay al menos una medición sin calificar.
+    const pending = (await sizeService.listGenerations()).find(
       (generation) => generation.rating === null,
     )
     expect(pending).toBeTruthy()
@@ -58,10 +58,9 @@ describe('historial y feedback (US6)', () => {
     renderAt(routes.accountHistory)
     const view = await mainView()
 
-    // El historial sigue al perfil activo del selector global (los perfiles
-    // cargan async, así que el valor se estabiliza después del primer render).
+    // Arranca sin filtrar: las mediciones sin perfil también se ven.
     await waitFor(() =>
-      expect(view.getByLabelText('Filtrar por perfil')).toHaveValue('Training'),
+      expect(view.getByLabelText('Filtrar por perfil')).toHaveValue('Todos los perfiles'),
     )
 
     // Califica la primera pendiente de la lista.

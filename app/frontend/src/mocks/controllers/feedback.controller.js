@@ -6,10 +6,22 @@
 // exige usuario. El cálculo de puntos vive en `domain/points.js`.
 
 import { ApiError } from '@api/client/api-error.js'
-import { serializeGeneration } from '@mocks/controllers/size-generations.controller.js'
 import { mutate } from '@mocks/db/database.js'
 import { FEEDBACK_RATINGS, grantFeedbackReward } from '@mocks/domain/points.js'
 import { register } from '@mocks/router/mock-router.js'
+
+// Forma provisoria (modelo del FE) hasta que el backend defina el contrato.
+function serializeRated(db, generation) {
+  const size = db.sizes.find((item) => item.id === generation.suggestedSizeId) ?? null
+  return {
+    id: generation.id,
+    line: generation.line,
+    suggestedSize: size ? { id: size.id, code: size.code } : null,
+    rating: generation.rating,
+    comment: generation.comment,
+    ratedAt: generation.ratedAt,
+  }
+}
 
 // Dueño de la generación: el cliente dueño o el invitado con su sesión.
 function findOwnedGeneration(db, req, id) {
@@ -24,7 +36,8 @@ function findOwnedGeneration(db, req, id) {
   return generation
 }
 
-register('PATCH', '/size-generations/:id/feedback', (req) => {
+// Pendiente en el backend: la ruta sigue la forma de `/fit/generations` del contrato.
+register('PATCH', '/fit/generations/:id/feedback', (req) => {
   const { rating, comment = null } = req.body
   if (!FEEDBACK_RATINGS.includes(rating)) {
     throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['rating'] })
@@ -49,7 +62,7 @@ register('PATCH', '/size-generations/:id/feedback', (req) => {
 
     return {
       status: 200,
-      data: { generation: serializeGeneration(db, generation), reward },
+      data: { generation: serializeRated(db, generation), reward },
     }
   })
 })

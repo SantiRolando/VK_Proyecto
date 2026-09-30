@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 
 const profileSchema = z.object({
-  name: z.string().trim().min(1, { message: 'required' }),
+  name: z.string().trim().min(1, { message: 'required' }).max(60, { message: 'invalid' }),
   ...measuresShape,
 })
 
@@ -18,10 +18,12 @@ const EMPTY_PROFILE = {
   waist: '',
   hip: '',
   torso: '',
+  age: '',
 }
 
 // Formulario de perfil de medidas (US5/T074), compartido por la pantalla de
-// perfiles y el modal "guardar como perfil" del resultado.
+// perfiles y el modal "guardar como perfil" del resultado. Las medidas son
+// opcionales: qué necesita cada tabla lo pide el formulario de medición.
 export function ProfileForm({
   initialValues,
   onSubmit,
@@ -86,9 +88,16 @@ export function ProfileForm({
               onChange={setField(field)}
               error={errorText(field)}
               min={0}
-              required
             />
           ))}
+          <NumberInput
+            label={t('fit.form.age')}
+            value={values.age}
+            onChange={setField('age')}
+            error={errorText('age')}
+            min={1}
+            max={120}
+          />
         </SimpleGrid>
 
         {serverError && <ErrorState error={serverError} />}

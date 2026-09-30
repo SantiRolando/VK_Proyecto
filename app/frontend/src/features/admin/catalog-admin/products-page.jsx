@@ -1,23 +1,25 @@
+import { ApiError } from '@api/client/api-error.js'
 import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { ErrorState } from '@components/feedback/error-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { Money } from '@components/money.jsx'
 import { PageHeader } from '@components/page-header.jsx'
 import { COLOR_OPTIONS, colorHex, colorLabel } from '@constants/colors.js'
+import { Audience, KIDS_LINES, Line } from '@constants/enums.js'
 import {
   useCreateProduct,
-  useProducts,
-  useRemoveProduct,
-  useSizes,
-  useUpdateProduct,
-} from '@features/admin/catalog-admin/hooks/use-products.js'
-import {
   useCreateVariant,
-  useInventory,
+  useProductDetail,
+  useProducts,
+  useSetProductActive,
+  useSetVariantActive,
+  useUpdateProduct,
   useUpdateVariant,
-} from '@features/admin/inventory/hooks/use-inventory.js'
+} from '@features/admin/catalog-admin/hooks/use-products.js'
+import { useSizes } from '@hooks/use-sizes.js'
 import { useI18n } from '@i18n/context.js'
 import {
+  Autocomplete,
   Badge,
   Button,
   Card,
@@ -37,9 +39,17 @@ import {
 import { IconPackage, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 
-const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
+const LINES = Object.values(Line)
+const AUDIENCES = Object.values(Audience)
 
-const EMPTY_PRODUCT = { line: null, model: '', description: '', price: 0, active: true }
+const EMPTY_PRODUCT = {
+  line: null,
+  audience: Audience.Adult,
+  model: '',
+  description: '',
+  price: 0,
+  active: true,
+}
 
 function ColorSwatch({ color }) {
   return (
@@ -72,27 +82,37 @@ function ProductFormModal({ product, opened, onClose }) {
   const setField = (field) => (value) =>
     setValues((current) => ({ ...current, [field]: value }))
 
-  const saving = create.isPending || update.isPending
+  const setActive = useSetProductActive()
 
+  const saving = create.isPending || update.isPending || setActive.isPending
+  const noTable =
+    values.audience === Audience.Kids && values.line && !KIDS_LINES.includes(values.line)
+
+  // La edición es un PUT completo; el estado activo va por su propio endpoint.
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError(null)
+    const price =
+      values.price === '' || values.price === null ? null : Number(values.price)
+    if (!values.line || !values.model.trim() || price === null || price < 0) {
+      setError(new ApiError(400, 'VALIDATION_ERROR'))
+      return
+    }
     try {
+      const payload = {
+        line: values.line,
+        audience: values.audience,
+        model: values.model,
+        description: values.description,
+        price: Number(values.price),
+      }
       if (product) {
-        await update.mutateAsync({
-          productId: product.id,
-          model: values.model,
-          description: values.description,
-          price: Number(values.price),
-          active: values.active,
-        })
+        await update.mutateAsync({ productId: product.id, ...payload })
+        if (values.active !== product.active) {
+          await setActive.mutateAsync({ productId: product.id, active: values.active })
+        }
       } else {
-        await create.mutateAsync({
-          line: values.line,
-          model: values.model,
-          description: values.description,
-          price: Number(values.price),
-        })
+        await create.mutateAsync(payload)
       }
       onClose()
     } catch (saveError) {
@@ -111,18 +131,48 @@ function ProductFormModal({ product, opened, onClose }) {
       <form onSubmit={handleSubmit} noValidate>
         <Stack gap="sm">
           {!product && (
-            <Radio.Group
-              label={t('admin.products.form.line')}
-              value={values.line}
-              onChange={setField('line')}
-              withAsterisk
-            >
-              <Group gap="lg" mt="xs">
-                {LINES.map((value) => (
-                  <Radio key={value} value={value} label={t(`enums.line.${value}`)} />
-                ))}
-              </Group>
-            </Radio.Group>
+            <>
+              <Radio.Group
+                label={t('admin.products.form.audience')}
+                value={values.audience}
+                onChange={setField('audience')}
+                withAsterisk
+              >
+                <Group gap="lg" mt="xs">
+                  {AUDIENCES.map((value) => (
+                    <Radio
+                      key={value}
+                      value={value}
+                      label={t(`enums.audience.${value}`)}
+                    />
+                  ))}
+                </Group>
+              </Radio.Group>
+              <Radio.Group
+                label={t('admin.products.form.line')}
+                value={values.line}
+                onChange={setField('line')}
+                withAsterisk
+              >
+                <Group gap="lg" mt="xs">
+                  {LINES.map((value) => (
+                    <Radio
+                      key={value}
+                      value={value}
+                      label={t(`enums.line.${value}`)}
+                      disabled={
+                        values.audience === Audience.Kids && !KIDS_LINES.includes(value)
+                      }
+                    />
+                  ))}
+                </Group>
+              </Radio.Group>
+              {noTable && (
+                <Text size="sm" c="orange">
+                  {t('fit.form.noTable')}
+                </Text>
+              )}
+            </>
           )}
 
           <TextInput
@@ -160,7 +210,7 @@ function ProductFormModal({ product, opened, onClose }) {
             <Button variant="default" type="button" onClick={onClose}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" loading={saving}>
+            <Button type="submit" loading={saving} disabled={Boolean(noTable)}>
               {t('common.save')}
             </Button>
           </Group>
@@ -172,15 +222,15 @@ function ProductFormModal({ product, opened, onClose }) {
 
 function VariantFormModal({ product, variant, opened, onClose }) {
   const { t } = useI18n()
-  const sizes = useSizes(product?.line)
+  const sizes = useSizes(product?.line, product?.audience)
   const create = useCreateVariant()
   const update = useUpdateVariant()
+  const setActive = useSetVariantActive()
 
   const [values, setValues] = useState(() => ({
     sizeId: null,
-    color: COLOR_OPTIONS[0],
+    color: '',
     sku: '',
-    quantity: 0,
     minStock: 0,
     active: true,
     ...(variant ?? {}),
@@ -190,29 +240,36 @@ function VariantFormModal({ product, variant, opened, onClose }) {
   const setField = (field) => (value) =>
     setValues((current) => ({ ...current, [field]: value }))
 
-  const saving = create.isPending || update.isPending
+  const saving = create.isPending || update.isPending || setActive.isPending
 
+  // El talle no se cambia (se crea otra variante) y el físico nace en 0: solo
+  // lo mueven los movimientos de stock.
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError(null)
+    if ((!variant && !values.sizeId) || !values.color.trim() || !values.sku.trim()) {
+      setError(new ApiError(400, 'VALIDATION_ERROR'))
+      return
+    }
     try {
+      const payload = {
+        productId: product.id,
+        sizeId: Number(variant ? variant.sizeId : values.sizeId),
+        color: values.color,
+        sku: values.sku,
+        minStock: Number(values.minStock),
+      }
       if (variant) {
-        await update.mutateAsync({
-          variantId: variant.id,
-          color: values.color,
-          sku: values.sku,
-          minStock: Number(values.minStock),
-          active: values.active,
-        })
+        await update.mutateAsync({ variantId: variant.id, ...payload })
+        if (values.active !== variant.active) {
+          await setActive.mutateAsync({
+            productId: product.id,
+            variantId: variant.id,
+            active: values.active,
+          })
+        }
       } else {
-        await create.mutateAsync({
-          productId: product.id,
-          sizeId: Number(values.sizeId),
-          color: values.color,
-          sku: values.sku,
-          quantity: Number(values.quantity),
-          minStock: Number(values.minStock),
-        })
+        await create.mutateAsync(payload)
       }
       onClose()
     } catch (saveError) {
@@ -233,7 +290,7 @@ function VariantFormModal({ product, variant, opened, onClose }) {
           {variant ? (
             <Text size="sm" c="dimmed">
               {t('admin.products.variant.size')}: {variant.size?.code} ·{' '}
-              {t('admin.inventory.available')}: {variant.available}
+              {t('admin.inventory.physical')}: {variant.quantity}
             </Text>
           ) : (
             <Select
@@ -250,15 +307,12 @@ function VariantFormModal({ product, variant, opened, onClose }) {
             />
           )}
 
-          <Select
+          <Autocomplete
             label={t('admin.products.variant.color')}
-            data={COLOR_OPTIONS.map((value) => ({
-              value,
-              label: colorLabel(value),
-            }))}
+            description={t('admin.products.variant.colorHint')}
+            data={COLOR_OPTIONS.map(colorLabel)}
             value={values.color}
             onChange={setField('color')}
-            allowDeselect={false}
             required
           />
           <TextInput
@@ -269,13 +323,9 @@ function VariantFormModal({ product, variant, opened, onClose }) {
           />
 
           {!variant && (
-            <NumberInput
-              label={t('admin.inventory.physical')}
-              description={t('admin.products.variant.quantityHint')}
-              value={values.quantity}
-              onChange={setField('quantity')}
-              min={0}
-            />
+            <Text size="xs" c="dimmed">
+              {t('admin.products.variant.quantityHint')}
+            </Text>
           )}
 
           <NumberInput
@@ -311,10 +361,10 @@ function VariantFormModal({ product, variant, opened, onClose }) {
 
 function VariantsModal({ product, opened, onClose }) {
   const { t } = useI18n()
-  const variants = useInventory({ productId: product?.id, pageSize: 200 })
+  const detail = useProductDetail(product?.id)
   const [formTarget, setFormTarget] = useState(undefined)
 
-  const items = variants.data?.items ?? []
+  const items = detail.data?.variants ?? []
 
   return (
     <Modal
@@ -337,12 +387,12 @@ function VariantsModal({ product, opened, onClose }) {
         </Group>
 
         <QueryBoundary
-          isLoading={variants.isPending}
-          isError={variants.isError}
-          error={variants.error}
-          onRetry={variants.refetch}
+          isLoading={detail.isPending}
+          isError={detail.isError}
+          error={detail.error}
+          onRetry={detail.refetch}
         >
-          {variants.data &&
+          {detail.data &&
             (items.length === 0 ? (
               <Text size="sm" c="dimmed">
                 {t('admin.products.variant.empty')}
@@ -355,7 +405,7 @@ function VariantsModal({ product, opened, onClose }) {
                       <Table.Th>{t('admin.products.variant.size')}</Table.Th>
                       <Table.Th>{t('admin.products.variant.color')}</Table.Th>
                       <Table.Th>{t('admin.products.variant.sku')}</Table.Th>
-                      <Table.Th ta="right">{t('admin.inventory.available')}</Table.Th>
+                      <Table.Th ta="right">{t('admin.inventory.physical')}</Table.Th>
                       <Table.Th ta="right">{t('admin.inventory.min')}</Table.Th>
                       <Table.Th>{t('common.actions')}</Table.Th>
                     </Table.Tr>
@@ -373,13 +423,16 @@ function VariantsModal({ product, opened, onClose }) {
                           <Text size="sm">{variant.sku}</Text>
                         </Table.Td>
                         <Table.Td ta="right">
-                          <Text
-                            size="sm"
-                            fw={600}
-                            c={variant.isCritical ? 'red' : undefined}
-                          >
-                            {variant.available}
-                          </Text>
+                          <Group gap={6} justify="flex-end" wrap="nowrap">
+                            <Text size="sm" fw={600}>
+                              {variant.quantity}
+                            </Text>
+                            {!variant.active && (
+                              <Badge variant="light" color="gray" size="xs">
+                                {t('admin.inventory.inactive')}
+                              </Badge>
+                            )}
+                          </Group>
                         </Table.Td>
                         <Table.Td ta="right">
                           <Text size="sm">{variant.minStock}</Text>
@@ -420,8 +473,7 @@ function VariantsModal({ product, opened, onClose }) {
 export function ProductsPage() {
   const { t } = useI18n()
   const query = useProducts()
-  const removeProduct = useRemoveProduct()
-  const updateProduct = useUpdateProduct()
+  const setActive = useSetProductActive()
 
   const [editing, setEditing] = useState(null)
   const [creating, setCreating] = useState(false)
@@ -431,10 +483,12 @@ export function ProductsPage() {
 
   const products = query.data?.items ?? []
 
+  // "Dar de baja" es desactivar: el catálogo del cliente deja de ofrecerlo y
+  // sus variantes no cuentan como stock.
   const handleRemove = async () => {
     setRemoveError(null)
     try {
-      await removeProduct.mutateAsync(removing.id)
+      await setActive.mutateAsync({ productId: removing.id, active: false })
       setRemoving(null)
     } catch (error) {
       setRemoveError(error)
@@ -472,6 +526,11 @@ export function ProductsPage() {
                       <Badge variant="light" color="blue">
                         {t(`enums.line.${product.line}`)}
                       </Badge>
+                      {product.audience === Audience.Kids && (
+                        <Badge variant="light" color="gray">
+                          {t('enums.audience.Kids')}
+                        </Badge>
+                      )}
                       {!product.active && (
                         <Badge variant="light" color="gray">
                           {t('admin.products.inactive')}
@@ -484,11 +543,6 @@ export function ProductsPage() {
                     <Group gap="xs" mt={6}>
                       <Text size="sm" fw={600}>
                         <Money value={product.price} />
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {t('admin.products.variantCount', {
-                          count: product.activeVariantCount,
-                        })}
                       </Text>
                     </Group>
                   </div>
@@ -525,9 +579,9 @@ export function ProductsPage() {
                       <Button
                         variant="subtle"
                         size="compact-sm"
-                        loading={updateProduct.isPending}
+                        loading={setActive.isPending}
                         onClick={() =>
-                          updateProduct.mutate({ productId: product.id, active: true })
+                          setActive.mutate({ productId: product.id, active: true })
                         }
                       >
                         {t('admin.products.reactivate')}
@@ -579,7 +633,7 @@ export function ProductsPage() {
             <Button variant="default" onClick={() => setRemoving(null)}>
               {t('common.cancel')}
             </Button>
-            <Button color="red" loading={removeProduct.isPending} onClick={handleRemove}>
+            <Button color="red" loading={setActive.isPending} onClick={handleRemove}>
               {t('common.delete')}
             </Button>
           </Group>

@@ -1,6 +1,7 @@
 import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { PageHeader } from '@components/page-header.jsx'
+import { Line } from '@constants/enums.js'
 import { useMissingSizes } from '@features/admin/analytics/hooks/use-analytics.js'
 import { useExport } from '@hooks/use-export.js'
 import { useI18n } from '@i18n/context.js'
@@ -21,7 +22,7 @@ import { IconChartBar, IconFileSpreadsheet } from '@tabler/icons-react'
 import { useState } from 'react'
 
 const ALL = 'all'
-const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
+const LINES = Object.values(Line)
 
 function cellStyle(theme, count, maxCount) {
   if (!count) return { textAlign: 'center' }

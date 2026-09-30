@@ -36,7 +36,7 @@ describe('feedback controller', () => {
   it('registra la calificación y otorga puntos cuando el sorteo acierta', async () => {
     setSetting('success_probability', 100)
 
-    const result = await call('PATCH', '/size-generations/100/feedback', {
+    const result = await call('PATCH', '/fit/generations/100/feedback', {
       body: { rating: 'Correct', comment: '  Me quedó perfecto  ' },
       auth: ANA,
     })
@@ -68,7 +68,7 @@ describe('feedback controller', () => {
   it('guarda el feedback sin puntos cuando el sorteo falla', async () => {
     setSetting('success_probability', 0)
 
-    const result = await call('PATCH', '/size-generations/100/feedback', {
+    const result = await call('PATCH', '/fit/generations/100/feedback', {
       body: { rating: 'Large' },
       auth: ANA,
     })
@@ -98,7 +98,7 @@ describe('feedback controller', () => {
       })
     })
 
-    const result = await call('PATCH', '/size-generations/100/feedback', {
+    const result = await call('PATCH', '/fit/generations/100/feedback', {
       body: { rating: 'Small' },
       auth: ANA,
     })
@@ -115,7 +115,7 @@ describe('feedback controller', () => {
   it('rechaza calificar dos veces la misma generación', async () => {
     // La generación 101 ya está calificada en el seed.
     await expect(
-      call('PATCH', '/size-generations/101/feedback', {
+      call('PATCH', '/fit/generations/101/feedback', {
         body: { rating: 'Correct' },
         auth: ANA,
       }),
@@ -125,7 +125,7 @@ describe('feedback controller', () => {
   it('permite calificar al invitado, sin puntos (Q-15)', async () => {
     const guest = generationByGuest('guest-demo-1')
 
-    const result = await call('PATCH', `/size-generations/${guest.id}/feedback`, {
+    const result = await call('PATCH', `/fit/generations/${guest.id}/feedback`, {
       body: { rating: 'Correct' },
       guestSessionId: 'guest-demo-1',
     })
@@ -141,7 +141,7 @@ describe('feedback controller', () => {
 
   it('valida la calificación y el dueño', async () => {
     await expect(
-      call('PATCH', '/size-generations/100/feedback', {
+      call('PATCH', '/fit/generations/100/feedback', {
         body: { rating: 'Huge' },
         auth: ANA,
       }),
@@ -149,7 +149,7 @@ describe('feedback controller', () => {
 
     // La generación 104 es de otro cliente.
     await expect(
-      call('PATCH', '/size-generations/104/feedback', {
+      call('PATCH', '/fit/generations/104/feedback', {
         body: { rating: 'Correct' },
         auth: ANA,
       }),

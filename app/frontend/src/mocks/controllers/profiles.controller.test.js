@@ -33,18 +33,18 @@ const VALID_PROFILE = {
 
 describe('profiles controller — listado y alta', () => {
   it('exige sesión', async () => {
-    await expect(call('GET', '/me/profiles')).rejects.toMatchObject({
+    await expect(call('GET', '/profiles')).rejects.toMatchObject({
       status: 401,
       code: 'UNAUTHENTICATED',
     })
   })
 
   it('lista solo los perfiles propios, con el predeterminado primero', async () => {
-    const result = await call('GET', '/me/profiles', { auth: ANA })
+    const result = await call('GET', '/profiles', { auth: ANA })
 
     expect(result.status).toBe(200)
     expect(result.data).toHaveLength(2)
-    expect(result.data[0]).toMatchObject({ name: 'Training', isDefault: true })
+    expect(result.data[0]).toMatchObject({ name: 'Training', isDefault: true, age: null })
     expect(result.data[1]).toMatchObject({ name: 'Son', isDefault: false })
     // No expone internos del ER.
     expect(result.data[0]).not.toHaveProperty('userId')
@@ -52,7 +52,7 @@ describe('profiles controller — listado y alta', () => {
   })
 
   it('el primer perfil de un cliente queda como predeterminado', async () => {
-    const result = await call('POST', '/me/profiles', {
+    const result = await call('POST', '/profiles', {
       auth: OTHER,
       body: VALID_PROFILE,
     })
@@ -60,82 +60,56 @@ describe('profiles controller — listado y alta', () => {
     expect(result.status).toBe(201)
     expect(result.data).toMatchObject({ name: 'Verano', isDefault: true })
 
-    const list = await call('GET', '/me/profiles', { auth: OTHER })
+    const list = await call('GET', '/profiles', { auth: OTHER })
     expect(list.data).toHaveLength(1)
   })
 
-  it('marcar un perfil nuevo como predeterminado mueve la marca', async () => {
-    const created = await call('POST', '/me/profiles', {
+  it('las medidas son opcionales pero deben estar en rango', async () => {
+    const onlyName = await call('POST', '/profiles', {
       auth: ANA,
-      body: { ...VALID_PROFILE, isDefault: true },
+      body: { name: 'Solo nombre' },
     })
+    expect(onlyName.data).toMatchObject({ name: 'Solo nombre', bust: null, age: null })
 
-    const list = await call('GET', '/me/profiles', { auth: ANA })
-    const defaults = list.data.filter((profile) => profile.isDefault)
-    expect(defaults).toHaveLength(1)
-    expect(defaults[0].id).toBe(created.data.id)
-  })
-
-  it('valida nombre y medidas', async () => {
     await expect(
-      call('POST', '/me/profiles', { auth: ANA, body: { name: 'Solo nombre' } }),
+      call('POST', '/profiles', { auth: ANA, body: { ...VALID_PROFILE, name: '   ' } }),
     ).rejects.toMatchObject({
-      status: 422,
+      status: 400,
       code: 'VALIDATION_ERROR',
-      details: { fields: ['height', 'bust', 'waist', 'hip', 'torso'] },
+      details: { fields: { name: expect.any(String) } },
     })
 
     await expect(
-      call('POST', '/me/profiles', {
-        auth: ANA,
-        body: { ...VALID_PROFILE, name: '   ' },
-      }),
-    ).rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
-
-    // Las medidas deben ser números positivos.
-    await expect(
-      call('POST', '/me/profiles', {
-        auth: ANA,
-        body: { ...VALID_PROFILE, waist: 0 },
-      }),
+      call('POST', '/profiles', { auth: ANA, body: { ...VALID_PROFILE, waist: 0 } }),
     ).rejects.toMatchObject({
-      status: 422,
+      status: 400,
       code: 'VALIDATION_ERROR',
-      details: { fields: ['waist'] },
+      details: { fields: { waist: expect.any(String) } },
     })
   })
 })
 
 describe('profiles controller — edición, predeterminado y baja', () => {
-  it('edita el nombre sin tocar las medidas', async () => {
-    const result = await call('PATCH', '/me/profiles/2', {
+  it('reemplaza nombre y medidas con PUT; una medida omitida queda en null', async () => {
+    const result = await call('PUT', '/profiles/2', {
       auth: ANA,
-      body: { name: 'Hijo' },
+      body: { name: 'Hijo', waist: 74, hip: 100, age: 9 },
     })
 
-    expect(result.data).toMatchObject({ id: 2, name: 'Hijo', height: 145 })
+    expect(result.data).toMatchObject({
+      id: 2,
+      name: 'Hijo',
+      waist: 74,
+      hip: 100,
+      age: 9,
+      height: null,
+      bust: null,
+    })
   })
 
-  it('edita las medidas completas', async () => {
-    const result = await call('PATCH', '/me/profiles/2', {
-      auth: ANA,
-      body: { ...VALID_PROFILE, name: 'Hijo' },
-    })
-
-    expect(result.data).toMatchObject({ name: 'Hijo', waist: 74, hip: 100 })
-  })
-
-  it('rechaza medidas incompletas y perfiles ajenos', async () => {
+  it('rechaza perfiles ajenos', async () => {
     await expect(
-      call('PATCH', '/me/profiles/2', { auth: ANA, body: { waist: 74 } }),
-    ).rejects.toMatchObject({
-      status: 422,
-      code: 'VALIDATION_ERROR',
-      details: { fields: ['height', 'bust', 'hip', 'torso'] },
-    })
-
-    await expect(
-      call('PATCH', '/me/profiles/1', { auth: OTHER, body: { name: 'Ajeno' } }),
+      call('PUT', '/profiles/1', { auth: OTHER, body: { name: 'Ajeno' } }),
     ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
 
     expect(getDb().measurementProfiles.find((item) => item.id === 1).name).toBe(
@@ -144,20 +118,21 @@ describe('profiles controller — edición, predeterminado y baja', () => {
   })
 
   it('cambia el perfil predeterminado', async () => {
-    const result = await call('PUT', '/me/profiles/2/default', { auth: ANA })
+    const result = await call('PUT', '/profiles/2/default', { auth: ANA })
 
     expect(result.data).toMatchObject({ id: 2, isDefault: true })
-    const list = await call('GET', '/me/profiles', { auth: ANA })
+    const list = await call('GET', '/profiles', { auth: ANA })
     expect(list.data.filter((profile) => profile.isDefault)).toHaveLength(1)
     expect(list.data[0].id).toBe(2)
   })
 
-  it('da de baja el predeterminado y promueve el más antiguo que queda', async () => {
-    await call('DELETE', '/me/profiles/1', { auth: ANA })
+  it('borrar el predeterminado deja al usuario sin default', async () => {
+    const removed = await call('DELETE', '/profiles/1', { auth: ANA })
+    expect(removed.status).toBe(204)
 
-    const list = await call('GET', '/me/profiles', { auth: ANA })
+    const list = await call('GET', '/profiles', { auth: ANA })
     expect(list.data).toHaveLength(1)
-    expect(list.data[0]).toMatchObject({ id: 2, name: 'Son', isDefault: true })
+    expect(list.data[0]).toMatchObject({ id: 2, name: 'Son', isDefault: false })
 
     // La baja es lógica: el historial que apunta al perfil sigue intacto.
     const profile = getDb().measurementProfiles.find((item) => item.id === 1)
@@ -166,14 +141,15 @@ describe('profiles controller — edición, predeterminado y baja', () => {
   })
 
   it('permite quedarse sin perfiles y rechaza bajas ajenas', async () => {
-    await call('DELETE', '/me/profiles/1', { auth: ANA })
-    await call('DELETE', '/me/profiles/2', { auth: ANA })
+    await call('DELETE', '/profiles/1', { auth: ANA })
+    await call('DELETE', '/profiles/2', { auth: ANA })
 
-    const list = await call('GET', '/me/profiles', { auth: ANA })
+    const list = await call('GET', '/profiles', { auth: ANA })
     expect(list.data).toHaveLength(0)
 
-    await expect(call('DELETE', '/me/profiles/1', { auth: OTHER })).rejects.toMatchObject(
-      { status: 404, code: 'NOT_FOUND' },
-    )
+    await expect(call('DELETE', '/profiles/1', { auth: OTHER })).rejects.toMatchObject({
+      status: 404,
+      code: 'NOT_FOUND',
+    })
   })
 })

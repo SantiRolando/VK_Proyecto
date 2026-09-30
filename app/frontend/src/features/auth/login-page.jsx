@@ -21,12 +21,18 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
-// Credenciales demo visibles solo en modo mock (plan §7.2).
-const DEMO_CREDENTIALS = [
-  { email: 'admin@vikinga.test', password: 'admin123' },
-  { email: 'ana@example.test', password: 'cliente123' },
-  { email: 'nuevo@example.test', password: 'cliente123' },
-]
+// Credenciales demo: las de la base mock, o las del perfil `demo` del backend
+// en modo híbrido. En modo `http` no se muestran.
+const DEMO_CREDENTIALS = env.isMock
+  ? [
+      { email: 'admin@vikinga.test', password: 'admin123' },
+      { email: 'ana@example.test', password: 'cliente123' },
+      { email: 'nuevo@example.test', password: 'cliente123' },
+    ]
+  : [
+      { email: 'admin@vkfit.demo', password: 'Demo12345' },
+      { email: 'ana.perez@vkfit.demo', password: 'Demo12345' },
+    ]
 
 // Login unificado de clientes y admins (FR-010): según el rol se redirige a
 // `/admin` o al `returnTo`/home.
@@ -128,7 +134,7 @@ export function LoginPage() {
         </Text>
       </Stack>
 
-      {env.isMock && (
+      {env.showDevHints && (
         <>
           <Divider mt="lg" />
           <Stack gap="xs" mt="md">

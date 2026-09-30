@@ -32,20 +32,21 @@ const VALID_ADDRESS = {
 
 describe('addresses controller', () => {
   it('exige sesión', async () => {
-    await expect(call('GET', '/me/addresses')).rejects.toMatchObject({
+    await expect(call('GET', '/addresses')).rejects.toMatchObject({
       status: 401,
       code: 'UNAUTHENTICATED',
     })
   })
 
   it('lista solo las direcciones propias, con la predeterminada primero', async () => {
-    const result = await call('GET', '/me/addresses', { auth: ANA })
+    const result = await call('GET', '/addresses', { auth: ANA })
 
     expect(result.status).toBe(200)
     expect(result.data).toHaveLength(2)
     expect(result.data[0]).toMatchObject({ street: 'Av. Italia', isDefault: true })
     expect(result.data[1]).toMatchObject({
       street: 'Rambla de los Argentinos',
+      reference: null,
       isDefault: false,
     })
     // No expone internos del ER.
@@ -54,7 +55,7 @@ describe('addresses controller', () => {
   })
 
   it('la primera dirección de un cliente queda como predeterminada', async () => {
-    const result = await call('POST', '/me/addresses', {
+    const result = await call('POST', '/addresses', {
       auth: OTHER,
       body: VALID_ADDRESS,
     })
@@ -66,30 +67,17 @@ describe('addresses controller', () => {
       isDefault: true,
     })
 
-    const list = await call('GET', '/me/addresses', { auth: OTHER })
+    const list = await call('GET', '/addresses', { auth: OTHER })
     expect(list.data).toHaveLength(1)
   })
 
-  it('marcar una nueva como predeterminada mueve la marca', async () => {
-    const created = await call('POST', '/me/addresses', {
-      auth: ANA,
-      body: { ...VALID_ADDRESS, isDefault: true },
-    })
-    expect(created.data.isDefault).toBe(true)
-
-    const list = await call('GET', '/me/addresses', { auth: ANA })
-    const defaults = list.data.filter((address) => address.isDefault)
-    expect(defaults).toHaveLength(1)
-    expect(defaults[0].id).toBe(created.data.id)
-  })
-
-  it('valida los campos obligatorios', async () => {
+  it('valida calle, ciudad y departamento', async () => {
     await expect(
-      call('POST', '/me/addresses', { auth: ANA, body: { street: 'Rivera' } }),
+      call('POST', '/addresses', { auth: ANA, body: { street: 'Rivera' } }),
     ).rejects.toMatchObject({
-      status: 422,
+      status: 400,
       code: 'VALIDATION_ERROR',
-      details: { fields: ['number', 'city', 'department'] },
+      details: { fields: { city: expect.any(String), department: expect.any(String) } },
     })
 
     expect(getDb().addresses).toHaveLength(2)
@@ -97,33 +85,33 @@ describe('addresses controller', () => {
 })
 
 describe('addresses controller — edición, predeterminada y baja', () => {
-  it('edita solo los campos que llegan', async () => {
-    const result = await call('PATCH', '/me/addresses/2', {
+  it('reemplaza la dirección completa con PUT', async () => {
+    const result = await call('PUT', '/addresses/2', {
       auth: ANA,
-      body: { city: 'Punta del Este', reference: '' },
+      body: { ...VALID_ADDRESS, city: 'Punta del Este', reference: '' },
     })
 
     expect(result.data).toMatchObject({
       id: 2,
-      street: 'Rambla de los Argentinos',
+      street: 'Rivera',
       city: 'Punta del Este',
-      reference: '',
+      reference: null,
     })
   })
 
   it('rechaza dejar vacío un campo obligatorio y las direcciones ajenas', async () => {
     await expect(
-      call('PATCH', '/me/addresses/2', { auth: ANA, body: { city: '   ' } }),
+      call('PUT', '/addresses/2', { auth: ANA, body: { ...VALID_ADDRESS, city: '   ' } }),
     ).rejects.toMatchObject({
-      status: 422,
+      status: 400,
       code: 'VALIDATION_ERROR',
-      details: { fields: ['city'] },
+      details: { fields: { city: expect.any(String) } },
     })
 
     await expect(
-      call('PATCH', '/me/addresses/1', {
+      call('PUT', '/addresses/1', {
         auth: OTHER,
-        body: { city: 'Robada' },
+        body: { ...VALID_ADDRESS, city: 'Robada' },
       }),
     ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
 
@@ -131,33 +119,34 @@ describe('addresses controller — edición, predeterminada y baja', () => {
   })
 
   it('cambia la dirección predeterminada', async () => {
-    const result = await call('PUT', '/me/addresses/2/default', { auth: ANA })
+    const result = await call('PUT', '/addresses/2/default', { auth: ANA })
 
     expect(result.data).toMatchObject({ id: 2, isDefault: true })
-    const list = await call('GET', '/me/addresses', { auth: ANA })
+    const list = await call('GET', '/addresses', { auth: ANA })
     expect(list.data.filter((address) => address.isDefault)).toHaveLength(1)
     expect(list.data[0].id).toBe(2)
   })
 
-  it('da de baja la predeterminada y promueve la más antigua que queda', async () => {
-    const result = await call('DELETE', '/me/addresses/1', { auth: ANA })
+  it('borrar la predeterminada deja al usuario sin default (baja lógica)', async () => {
+    const result = await call('DELETE', '/addresses/1', { auth: ANA })
     expect(result.status).toBe(204)
 
-    const list = await call('GET', '/me/addresses', { auth: ANA })
+    const list = await call('GET', '/addresses', { auth: ANA })
     expect(list.data).toHaveLength(1)
-    expect(list.data[0]).toMatchObject({ id: 2, isDefault: true })
+    expect(list.data[0]).toMatchObject({ id: 2, isDefault: false })
 
     // Baja lógica: el registro sigue para las ventas que lo referencian.
     expect(getDb().addresses.find((item) => item.id === 1).active).toBe(false)
   })
 
   it('rechaza bajas y cambios de predeterminada ajenos', async () => {
-    await expect(
-      call('DELETE', '/me/addresses/1', { auth: OTHER }),
-    ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
+    await expect(call('DELETE', '/addresses/1', { auth: OTHER })).rejects.toMatchObject({
+      status: 404,
+      code: 'NOT_FOUND',
+    })
 
     await expect(
-      call('PUT', '/me/addresses/1/default', { auth: OTHER }),
+      call('PUT', '/addresses/1/default', { auth: OTHER }),
     ).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' })
   })
 })

@@ -1,11 +1,14 @@
-// Estado de sesión a nivel transporte: token de acceso, snapshot del usuario
-// y `guestSessionId` del dispositivo. Vive fuera de React para que `api-client`
-// pueda adjuntar las cabeceras sin depender del árbol de componentes.
+// Estado de sesión a nivel transporte: access token (con su vencimiento),
+// refresh token, snapshot del usuario y `guestSessionId` del dispositivo. Vive
+// fuera de React para que `api-client` pueda adjuntar las cabeceras sin
+// depender del árbol de componentes.
 //
-// Solo prototipo: el token se guarda en localStorage (R-15 del plan).
+// Los tokens se guardan en localStorage (R-15 del plan). El refresh token es de
+// un solo uso: se reemplaza en cada renovación (`api-client`).
 
 const SESSION_KEY = 'vkfit.session'
 const GUEST_KEY = 'vkfit.guest'
+const API_CACHE = 'vkfit-api-get'
 
 let onUnauthorized = null
 
@@ -26,17 +29,49 @@ export function getSession() {
   }
 }
 
-export function setSession(token, user) {
+// `expiresInSeconds` viene del backend; sin dato el token se toma por vigente.
+export function setSession(token, user, refreshToken = null, expiresInSeconds = null) {
   try {
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify({ token, user }))
+    window.localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        token,
+        refreshToken: refreshToken ?? null,
+        expiresAt: expiresInSeconds ? Date.now() + expiresInSeconds * 1000 : null,
+        user,
+      }),
+    )
   } catch {
     // localStorage lleno o no disponible: la sesión vive solo en memoria.
   }
 }
 
+// Actualiza el usuario sin tocar tokens ni vencimiento (hidratación de /auth/me).
+export function setSessionUser(user) {
+  const session = getSession()
+  if (!session) return
+  try {
+    window.localStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, user }))
+  } catch {
+    // localStorage lleno o no disponible: la sesión vive solo en memoria.
+  }
+}
+
+// Vencido, o a punto de vencer: conviene renovar antes de pedir.
+export function isAccessTokenExpired(session, marginMs = 30_000) {
+  return Boolean(session?.expiresAt) && session.expiresAt - marginMs <= Date.now()
+}
+
 export function clearSession() {
   try {
     window.localStorage.removeItem(SESSION_KEY)
+  } catch {
+    // ignorar
+  }
+  // El service worker cachea GETs públicos; lo privado nunca se cachea, pero
+  // se limpia igual para que otro usuario del dispositivo no herede nada.
+  try {
+    if (typeof caches !== 'undefined') caches.delete(API_CACHE)
   } catch {
     // ignorar
   }
@@ -53,8 +88,8 @@ function createUuid() {
   })
 }
 
-// Identificador persistente del invitado en el dispositivo (FR-008).
-// Si el navegador lo pierde se crea uno nuevo (caso borde aceptado).
+// Identificador persistente del invitado en el dispositivo (FR-008), un UUID
+// como exige el backend. Si el navegador lo pierde se crea uno nuevo.
 export function getGuestSessionId() {
   let id
   try {
@@ -73,6 +108,9 @@ export function getGuestSessionId() {
   return id
 }
 
+// Se rota al entrar y al salir: las mediciones de invitado ya pasaron a la
+// cuenta, y las que haga el próximo invitado del dispositivo no deben ir a
+// parar a la cuenta de quien se logueó antes.
 export function resetGuestSessionId() {
   try {
     window.localStorage.removeItem(GUEST_KEY)

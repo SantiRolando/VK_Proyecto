@@ -1,26 +1,67 @@
-// Controller de perfiles de medidas (US5/T071): listado, alta, edición, baja
-// lógica y marca de predeterminado. Un solo perfil predeterminado por usuario
-// (§5.2).
+// Controller de perfiles de medidas (US5/T071) con el contrato del backend
+// (`/profiles`): listado, alta, edición completa (PUT), baja y default.
+// Un solo perfil predeterminado por usuario; borrar el default deja al usuario
+// sin default (igual que el backend).
 //
 // La baja es lógica (`active`) para no romper el historial, que referencia
-// `profileId`; `active` es una extensión del mock, igual que en ADDRESS.
+// `profileId`; el backend en cambio pone `profileId` en null.
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
-import { hasMeasures, readMeasures } from '@mocks/domain/measures.js'
 import { register } from '@mocks/router/mock-router.js'
+
+const MEASURES = ['height', 'bust', 'waist', 'hip', 'torso', 'age']
+const RANGES = {
+  height: [50, 250],
+  bust: [30, 200],
+  waist: [30, 200],
+  hip: [30, 200],
+  torso: [50, 300],
+  age: [1, 120],
+}
 
 export function serializeProfile(profile) {
   return {
     id: profile.id,
     name: profile.name,
-    height: profile.height,
-    bust: profile.bust,
-    waist: profile.waist,
-    hip: profile.hip,
-    torso: profile.torso,
+    height: profile.height ?? null,
+    bust: profile.bust ?? null,
+    waist: profile.waist ?? null,
+    hip: profile.hip ?? null,
+    torso: profile.torso ?? null,
+    age: profile.age ?? null,
     isDefault: Boolean(profile.isDefault),
+    createdAt: profile.createdAt ?? null,
+    updatedAt: profile.updatedAt ?? null,
   }
+}
+
+// `MeasurementProfileRequestDTO`: nombre obligatorio, medidas opcionales en rango.
+function readProfile(body) {
+  const fields = {}
+  const name = String(body.name ?? '').trim()
+  if (!name) fields.name = 'must not be blank'
+  if (name.length > 60) fields.name = 'size must be between 0 and 60'
+
+  const measures = {}
+  for (const field of MEASURES) {
+    const raw = body[field]
+    if (raw === undefined || raw === null || raw === '') {
+      measures[field] = null
+      continue
+    }
+    const value = Number(raw)
+    const [min, max] = RANGES[field]
+    if (!Number.isFinite(value) || value < min || value > max) {
+      fields[field] = `must be between ${min} and ${max}`
+    }
+    measures[field] = value
+  }
+
+  if (Object.keys(fields).length > 0) {
+    throw new ApiError(400, 'VALIDATION_ERROR', { fields, message: 'Validation failed' })
+  }
+  return { name, ...measures }
 }
 
 function mineProfiles(db, userId) {
@@ -33,59 +74,53 @@ function findMine(db, userId, profileId) {
   return mineProfiles(db, userId).find((profile) => profile.id === profileId) ?? null
 }
 
-// Si no quedó ningún predeterminado (p. ej. borraron el que lo era), el más
-// antiguo que queda pasa a serlo.
-function ensureDefault(profiles) {
-  if (profiles.length === 0) return
-  if (profiles.some((profile) => profile.isDefault)) return
-
-  const oldest = profiles.reduce((best, profile) =>
-    profile.id < best.id ? profile : best,
-  )
-  oldest.isDefault = true
+function requireMine(db, userId, profileId) {
+  const profile = findMine(db, userId, profileId)
+  if (!profile) throw new ApiError(404, 'NOT_FOUND')
+  return profile
 }
 
 register(
   'GET',
-  '/me/profiles',
+  '/profiles',
   (req) => {
     const profiles = mineProfiles(getDb(), req.auth.user.id).sort(
       (a, b) => Number(b.isDefault) - Number(a.isDefault) || a.id - b.id,
     )
-
     return { status: 200, data: profiles.map(serializeProfile) }
   },
   { auth: 'user' },
 )
 
 register(
-  'POST',
-  '/me/profiles',
+  'GET',
+  '/profiles/:id',
   (req) => {
-    const { isDefault = false } = req.body
-    const name = String(req.body.name ?? '').trim()
-    if (!name) throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['name'] })
-    const measures = readMeasures(req.body)
+    const profile = requireMine(getDb(), req.auth.user.id, Number(req.params.id))
+    return { status: 200, data: serializeProfile(profile) }
+  },
+  { auth: 'user' },
+)
 
+register(
+  'POST',
+  '/profiles',
+  (req) => {
+    const values = readProfile(req.body)
     return mutate((db) => {
       const userId = req.auth.user.id
-      const mine = mineProfiles(db, userId)
-      // El primer perfil (o el que se pide) es el predeterminado.
-      const makeDefault = Boolean(isDefault) || mine.length === 0
-      if (makeDefault) {
-        for (const other of mine) other.isDefault = false
-      }
-
+      const now = new Date().toISOString()
       const profile = {
         id: nextId(db.measurementProfiles),
         userId,
-        name,
-        ...measures,
-        isDefault: makeDefault,
+        ...values,
+        // El primer perfil del usuario queda como default.
+        isDefault: mineProfiles(db, userId).length === 0,
         active: true,
+        createdAt: now,
+        updatedAt: now,
       }
       db.measurementProfiles.push(profile)
-
       return { status: 201, data: serializeProfile(profile) }
     })
   },
@@ -93,26 +128,13 @@ register(
 )
 
 register(
-  'PATCH',
-  '/me/profiles/:id',
+  'PUT',
+  '/profiles/:id',
   (req) => {
-    const withName = req.body.name !== undefined
-    const name = withName ? String(req.body.name).trim() : null
-    if (withName && !name) {
-      throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['name'] })
-    }
-
-    // Las medidas viajan completas cuando se editan (el formulario manda las 5).
-    const measures = hasMeasures(req.body) ? readMeasures(req.body) : null
-
+    const values = readProfile(req.body)
     return mutate((db) => {
-      const userId = req.auth.user.id
-      const profile = findMine(db, userId, Number(req.params.id))
-      if (!profile) throw new ApiError(404, 'NOT_FOUND')
-
-      if (withName) profile.name = name
-      if (measures) Object.assign(profile, measures)
-
+      const profile = requireMine(db, req.auth.user.id, Number(req.params.id))
+      Object.assign(profile, values, { updatedAt: new Date().toISOString() })
       return { status: 200, data: serializeProfile(profile) }
     })
   },
@@ -121,17 +143,12 @@ register(
 
 register(
   'DELETE',
-  '/me/profiles/:id',
+  '/profiles/:id',
   (req) => {
     return mutate((db) => {
-      const userId = req.auth.user.id
-      const profile = findMine(db, userId, Number(req.params.id))
-      if (!profile) throw new ApiError(404, 'NOT_FOUND')
-
+      const profile = requireMine(db, req.auth.user.id, Number(req.params.id))
       profile.active = false
       profile.isDefault = false
-      ensureDefault(mineProfiles(db, userId))
-
       return { status: 204, data: null }
     })
   },
@@ -140,16 +157,13 @@ register(
 
 register(
   'PUT',
-  '/me/profiles/:id/default',
+  '/profiles/:id/default',
   (req) => {
     return mutate((db) => {
       const userId = req.auth.user.id
-      const profile = findMine(db, userId, Number(req.params.id))
-      if (!profile) throw new ApiError(404, 'NOT_FOUND')
-
+      const profile = requireMine(db, userId, Number(req.params.id))
       for (const other of mineProfiles(db, userId)) other.isDefault = false
       profile.isDefault = true
-
       return { status: 200, data: serializeProfile(profile) }
     })
   },

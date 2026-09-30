@@ -186,7 +186,8 @@ describe('perfiles de medidas (US5)', () => {
       expect(list.find((profile) => profile.name === 'Hijo 2026').isDefault).toBe(true)
     })
 
-    // Baja: se elimina el predeterminado y el más antiguo que queda lo reemplaza.
+    // Baja: se elimina el predeterminado y el usuario queda sin default (como en
+    // la API: no se promueve otro).
     await user.click(view.getAllByRole('button', { name: 'Eliminar' })[0])
     dialog = await screen.findByRole('dialog', { name: 'Eliminar perfil' })
     await user.click(within(dialog).getByRole('button', { name: 'Eliminar' }))
@@ -194,7 +195,7 @@ describe('perfiles de medidas (US5)', () => {
     await waitFor(async () => {
       const list = await profilesService.listMine()
       expect(list).toHaveLength(1)
-      expect(list[0]).toMatchObject({ name: 'Entrenamiento', isDefault: true })
+      expect(list[0]).toMatchObject({ name: 'Entrenamiento', isDefault: false })
     })
   })
 
@@ -312,7 +313,7 @@ describe('agenda de direcciones (US5)', () => {
       await view.findByText('Rivera 3000, Las Piedras, Montevideo, Apto 2'),
     ).toBeInTheDocument()
 
-    // Baja de la predeterminada: la más antigua que queda pasa a serlo.
+    // Baja de la predeterminada: el usuario queda sin default (como en la API).
     await user.click(view.getAllByRole('button', { name: 'Eliminar' })[0])
     dialog = await screen.findByRole('dialog', { name: 'Eliminar dirección' })
     await user.click(within(dialog).getByRole('button', { name: 'Eliminar' }))
@@ -320,7 +321,7 @@ describe('agenda de direcciones (US5)', () => {
     await waitFor(async () => {
       const list = await addressesService.listMine()
       expect(list).toHaveLength(1)
-      expect(list[0]).toMatchObject({ city: 'Las Piedras', isDefault: true })
+      expect(list[0]).toMatchObject({ city: 'Las Piedras', isDefault: false })
     })
   })
 })

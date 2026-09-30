@@ -9,12 +9,18 @@ import { useI18n } from '@i18n/context.js'
 import { Alert, Button, PasswordInput, Stack, TextInput } from '@mantine/core'
 import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 
-// Nueva contraseña (FR-010). En modo mock cualquier token es válido.
+// Nueva contraseña (FR-010): email, código recibido por mail y clave nueva.
+// En modo mock el código es siempre 123456.
 export function ResetPasswordPage() {
   const { t } = useI18n()
-  const [values, setValues] = useState({ email: '', token: '', password: '' })
+  const [searchParams] = useSearchParams()
+  const [values, setValues] = useState({
+    email: searchParams.get('email') ?? '',
+    code: '',
+    newPassword: '',
+  })
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState(null)
   const [done, setDone] = useState(false)
@@ -76,18 +82,19 @@ export function ResetPasswordPage() {
               required
             />
             <TextInput
-              label={t('auth.reset.token')}
-              description={env.isMock ? t('auth.reset.tokenHint') : undefined}
-              value={values.token}
-              onChange={setField('token')}
-              error={errorText('token')}
+              label={t('auth.reset.code')}
+              description={env.isMock ? t('auth.otp.mockHint') : t('auth.reset.codeHint')}
+              value={values.code}
+              onChange={setField('code')}
+              error={errorText('code')}
+              inputMode="numeric"
               required
             />
             <PasswordInput
               label={t('auth.reset.password')}
-              value={values.password}
-              onChange={setField('password')}
-              error={errorText('password')}
+              value={values.newPassword}
+              onChange={setField('newPassword')}
+              error={errorText('newPassword')}
               required
             />
             {serverError && (

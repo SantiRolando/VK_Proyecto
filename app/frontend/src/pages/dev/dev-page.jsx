@@ -38,8 +38,8 @@ export function DevPage() {
   const handleLoginAs = async (userId) => {
     setError(null)
     try {
-      const { user, token } = await devService.loginAs(userId)
-      setSession(token, user)
+      const { user, token, refreshToken } = await devService.loginAs(userId)
+      setSession(token, user, refreshToken)
       window.location.assign(routes.home)
     } catch {
       setError(t('dev.loginError'))

@@ -22,7 +22,16 @@ import {
 } from '@mocks/db/seed/helpers.js'
 import { availableQuantity } from '@mocks/domain/stock.js'
 
-const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
+// Combinaciones línea + público con tabla de talles (Soft no tiene infantil).
+const TABLES = [
+  ['Endurance', 'Adult'],
+  ['Soft', 'Adult'],
+  ['Jammer', 'Adult'],
+  ['Sunga', 'Adult'],
+  ['Jammer', 'Kids'],
+  ['Sunga', 'Kids'],
+  ['Endurance', 'Kids'],
+]
 
 const COMMENT_POOL = [
   'Me quedó perfecto, ya lo usé en pileta.',
@@ -33,7 +42,9 @@ const COMMENT_POOL = [
 ]
 
 function sizeByCode(sizes, line, code) {
-  return sizes.find((size) => size.line === line && size.code === code)
+  return sizes.find(
+    (size) => size.line === line && size.audience === 'Adult' && size.code === code,
+  )
 }
 
 function jitter(random, value, spread = 1.5) {
@@ -42,32 +53,49 @@ function jitter(random, value, spread = 1.5) {
 }
 
 function measuresFor(random, line, size) {
-  const height =
-    line === 'Kids'
-      ? between(random, 115, 160)
-      : line === 'Jammer' || line === 'Sunga'
-        ? between(random, 165, 190)
-        : between(random, 155, 178)
+  const kids = size.audience === 'Kids'
+  const height = kids
+    ? between(random, 115, 160)
+    : line === 'Jammer' || line === 'Sunga'
+      ? between(random, 165, 190)
+      : between(random, 155, 178)
 
-  const torso = line === 'Kids' ? between(random, 100, 130) : between(random, 135, 152)
+  const torso = kids ? between(random, 100, 130) : between(random, 135, 152)
+
+  if (kids) {
+    return {
+      height,
+      bust: null,
+      waist: size.waistMin != null ? jitter(random, size.waistMin, 1) : null,
+      hip: size.hipMin != null ? jitter(random, size.hipMin, 1) : null,
+      torso,
+      age: size.ageMin ?? null,
+    }
+  }
 
   if (line === 'Endurance' || line === 'Soft') {
-    const bust = jitter(random, midpoint(size.bust))
+    const bust = jitter(random, midpoint([size.bustMin, size.bustMax]))
     return {
       height,
       bust,
-      waist: jitter(random, midpoint(size.waist)),
+      waist: jitter(random, midpoint([size.waistMin, size.waistMax])),
       hip: Math.round((bust + between(random, 6, 10)) * 10) / 10,
       torso,
+      age: null,
     }
   }
 
   return {
     height,
     bust: null,
-    waist: size.waist ? jitter(random, midpoint(size.waist)) : null,
-    hip: size.hip ? jitter(random, midpoint(size.hip)) : null,
+    waist:
+      size.waistMin != null
+        ? jitter(random, midpoint([size.waistMin, size.waistMax]))
+        : null,
+    hip:
+      size.hipMin != null ? jitter(random, midpoint([size.hipMin, size.hipMax])) : null,
     torso,
+    age: null,
   }
 }
 
@@ -91,6 +119,7 @@ function buildGenerations(sizes, random) {
     profileId: 1,
     adminId: null,
     line: 'Endurance',
+    audience: 'Adult',
     createdAt: daysAgo(1),
     height: 168,
     bust: 90,
@@ -98,6 +127,9 @@ function buildGenerations(sizes, random) {
     hip: 98,
     torso: 142,
     suggestedSizeId: enduranceL.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: true,
     rating: null,
     comment: null,
@@ -111,6 +143,7 @@ function buildGenerations(sizes, random) {
     profileId: 1,
     adminId: null,
     line: 'Soft',
+    audience: 'Adult',
     createdAt: daysAgo(4),
     height: 165,
     bust: 85,
@@ -118,6 +151,9 @@ function buildGenerations(sizes, random) {
     hip: 92,
     torso: 140,
     suggestedSizeId: softS.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: true,
     rating: 'Correct',
     comment: 'Perfecto en la cadera',
@@ -131,6 +167,7 @@ function buildGenerations(sizes, random) {
     profileId: 2,
     adminId: null,
     line: 'Jammer',
+    audience: 'Adult',
     createdAt: daysAgo(6),
     height: 178,
     bust: null,
@@ -138,6 +175,9 @@ function buildGenerations(sizes, random) {
     hip: 93,
     torso: 148,
     suggestedSizeId: jammerM.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: true,
     rating: 'Correct',
     comment: null,
@@ -151,6 +191,7 @@ function buildGenerations(sizes, random) {
     profileId: 1,
     adminId: null,
     line: 'Endurance',
+    audience: 'Adult',
     createdAt: daysAgo(9),
     height: 168,
     bust: 96,
@@ -158,6 +199,9 @@ function buildGenerations(sizes, random) {
     hip: 104,
     torso: 142,
     suggestedSizeId: enduranceXL.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: true,
     rating: 'Large',
     comment: 'Me quedó grande, pediría un talle menos',
@@ -171,6 +215,7 @@ function buildGenerations(sizes, random) {
     profileId: null,
     adminId: null,
     line: 'Sunga',
+    audience: 'Adult',
     createdAt: daysAgo(0, 10),
     height: 172,
     bust: null,
@@ -178,6 +223,9 @@ function buildGenerations(sizes, random) {
     hip: 88,
     torso: 145,
     suggestedSizeId: sungaS.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: true,
     rating: null,
     comment: null,
@@ -192,6 +240,7 @@ function buildGenerations(sizes, random) {
     profileId: null,
     adminId: null,
     line: 'Endurance',
+    audience: 'Adult',
     createdAt: daysAgo(2),
     height: 167,
     bust: 85,
@@ -199,6 +248,9 @@ function buildGenerations(sizes, random) {
     hip: 94,
     torso: 141,
     suggestedSizeId: enduranceM.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: false,
     rating: null,
     comment: null,
@@ -212,6 +264,7 @@ function buildGenerations(sizes, random) {
     profileId: null,
     adminId: null,
     line: 'Soft',
+    audience: 'Adult',
     createdAt: daysAgo(1),
     height: 167,
     bust: 90,
@@ -219,6 +272,9 @@ function buildGenerations(sizes, random) {
     hip: 96,
     torso: 141,
     suggestedSizeId: softM.id,
+    outcome: 'Direct',
+    warnings: [],
+    referralReason: null,
     stockAvailableAtQuery: true,
     rating: null,
     comment: null,
@@ -230,14 +286,18 @@ function buildGenerations(sizes, random) {
   // Relleno determinista hasta ~40 generaciones.
   const fillCount = 33
   for (let i = 0; i < fillCount; i++) {
-    const line = pick(random, LINES)
-    const lineSizes = sizes.filter((size) => size.line === line)
-    const size = pick(random, lineSizes)
+    const [line, audience] = pick(random, TABLES)
+    const tableSizes = sizes.filter(
+      (size) => size.line === line && size.audience === audience,
+    )
+    const size = pick(random, tableSizes)
 
     const isGuest = random() < 0.12
     const customerId = isGuest ? null : random() < 0.12 ? 3 : 2
     const createdAt = daysAgo(between(random, 1, 60), between(random, 9, 19))
-    const noStock = (line === 'Endurance' && size.code === 'M') || random() < 0.08
+    const noStock =
+      (line === 'Endurance' && audience === 'Adult' && size.code === 'M') ||
+      random() < 0.08
 
     const rated = !isGuest && random() < 0.55
     const ratingRoll = random()
@@ -255,9 +315,13 @@ function buildGenerations(sizes, random) {
       profileId: customerId === 2 ? (random() < 0.2 ? 2 : 1) : null,
       adminId: null,
       line,
+      audience,
       createdAt,
       ...measuresFor(random, line, size),
       suggestedSizeId: size.id,
+      outcome: 'Direct',
+      warnings: [],
+      referralReason: null,
       stockAvailableAtQuery: !noStock,
       rating,
       comment: rated && random() < 0.25 ? pick(random, COMMENT_POOL) : null,

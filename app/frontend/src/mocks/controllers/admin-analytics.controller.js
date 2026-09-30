@@ -75,7 +75,7 @@ register(
   { auth: 'admin' },
 )
 
-const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
+const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga']
 
 register(
   'GET',

@@ -73,7 +73,7 @@ describe('estados de error (T107)', () => {
     // Primero carga bien.
     const view = within(await screen.findByRole('main'))
     await waitFor(() =>
-      expect(view.getByLabelText('Filtrar por perfil')).toHaveValue('Training'),
+      expect(view.getByLabelText('Filtrar por perfil')).toHaveValue('Todos los perfiles'),
     )
 
     // Se cae el backend simulado y se fuerza un refetch.

@@ -1,5 +1,8 @@
-// Service de inventario del panel (US9/T089): variantes y movimientos de stock
-// (§6.2).
+// Service de inventario del panel (US9/T089): existencias por variante y
+// movimientos de stock (§6.2). Las variantes se dan de alta y editan por
+// `admin-catalog-service`.
+//
+// Pendiente en el backend (módulo de stock): hoy responde el mock.
 
 import { apiClient } from '@api/client/api-client.js'
 
@@ -9,9 +12,6 @@ export const adminInventoryService = {
     apiClient
       .request({ method: 'GET', url: '/admin/variants', params })
       .then((response) => ({ items: response.data, meta: response.meta })),
-  createVariant: (payload) => apiClient.post('/admin/variants', payload),
-  updateVariant: (variantId, payload) =>
-    apiClient.patch(`/admin/variants/${variantId}`, payload),
   createTransaction: (payload) => apiClient.post('/admin/stock-transactions', payload),
   listReasons: () => apiClient.get('/admin/stock-transactions/reasons'),
   listTransactions: (params) =>

@@ -1,45 +1,53 @@
 import { routes } from '@app/routes.js'
 import { ErrorState } from '@components/feedback/error-state.jsx'
+import { Audience, GenerationOutcome, KIDS_LINES, Line } from '@constants/enums.js'
 import { fitSchema } from '@features/fit/fit-schema.js'
 import { useCreateGeneration } from '@features/fit/hooks/use-create-generation.js'
 import { MeasureHelp } from '@features/fit/measure-help.jsx'
 import { OutOfRange } from '@features/fit/out-of-range.jsx'
+import { requiredMeasuresOf, useSizes } from '@hooks/use-sizes.js'
 import { useI18n } from '@i18n/context.js'
 import {
+  Alert,
   Button,
   Group,
   NumberInput,
+  Radio,
   Select,
   SimpleGrid,
   Stack,
   Text,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconHelp } from '@tabler/icons-react'
+import { IconHelp, IconInfoCircle } from '@tabler/icons-react'
+import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
-const LINE_OPTIONS = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
-
+const LINE_OPTIONS = Object.values(Line)
+const AUDIENCE_OPTIONS = Object.values(Audience)
 const MEASURE_FIELDS = ['height', 'bust', 'waist', 'hip', 'torso']
 
 const INITIAL_VALUES = {
   line: '',
+  audience: Audience.Adult,
   height: '',
   bust: '',
   waist: '',
   hip: '',
   torso: '',
+  age: '',
 }
 
-// Formulario de medición (T039): línea + cinco medidas con validación de
-// formato. La precarga de línea (QR) y el origen (`source`) llegan por props
-// desde `fit-page`; el cálculo de talle lo hace la capa de datos.
+// Formulario de medición (T039): línea + público, las cinco medidas y la edad
+// (para niños). Qué medidas son obligatorias lo dice la tabla de talles de la
+// API; el cálculo lo hace la API y devuelve talle, avisos o una derivación.
 //
 // En modo asistente (US12) se agrega `onBehalf` (+ `customerId` opcional): el
 // personal genera la medición para un tercero.
 export function FitForm({
   initialLine,
+  initialAudience,
   source,
   profileId = null,
   initialMeasures = null,
@@ -54,38 +62,33 @@ export function FitForm({
   const [values, setValues] = useState({
     ...INITIAL_VALUES,
     line: initialLine ?? '',
+    audience: initialAudience ?? Audience.Adult,
     // Con perfil activo, el formulario arranca precargado (US5/T073).
     ...(initialMeasures ?? {}),
   })
   const [errors, setErrors] = useState({})
-  const [outOfRange, setOutOfRange] = useState(false)
+  const [referral, setReferral] = useState(null)
   const [submitError, setSubmitError] = useState(null)
+
+  const sizes = useSizes(values.line || null, values.audience)
+  const required = requiredMeasuresOf(sizes.data)
+  const isKids = values.audience === Audience.Kids
+  const noTable = isKids && values.line && !KIDS_LINES.includes(values.line)
 
   const setField = (field) => (value) => {
     setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
-  const errorText = (field) => {
-    if (!errors[field]) return null
-    return errors[field] === 'required'
-      ? t('validation.required')
-      : t('validation.invalid')
-  }
+  const errorText = (field) => (errors[field] ? t(`validation.${errors[field]}`) : null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    const parsed = fitSchema.safeParse(values)
+    // Fuera de niños la edad no se pide: no debe bloquear el envío.
+    const parsed = fitSchema(required).safeParse(isKids ? values : { ...values, age: '' })
     if (!parsed.success) {
-      const next = {}
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0]
-        if (field && next[field] === undefined) {
-          next[field] = issue.message === 'required' ? 'required' : 'invalid'
-        }
-      }
-      setErrors(next)
+      setErrors(collectFieldErrors(parsed.error))
       return
     }
 
@@ -96,21 +99,21 @@ export function FitForm({
         source,
         profileId,
         onBehalf: Boolean(onBehalf),
-        // Sin vínculo, el controller deja la generación sin cliente.
+        // Sin vínculo, la generación queda sin cliente.
         ...(onBehalf && customerId ? { customerId } : {}),
       })
-      navigate(routes.fitResult(generation.id))
-    } catch (error) {
-      if (error?.code === 'OUT_OF_RANGE') {
-        setOutOfRange(true)
-      } else {
-        setSubmitError(error)
+      if (generation.outcome === GenerationOutcome.Referred) {
+        setReferral(generation.referralReason)
+        return
       }
+      navigate(routes.fitResult(generation.id, onBehalf ? { onBehalf: 1 } : undefined))
+    } catch (error) {
+      setSubmitError(error)
     }
   }
 
-  if (outOfRange) {
-    return <OutOfRange onReset={() => setOutOfRange(false)} />
+  if (referral) {
+    return <OutOfRange reason={referral} onReset={() => setReferral(null)} />
   }
 
   return (
@@ -131,18 +134,38 @@ export function FitForm({
           </Button>
         </Group>
 
+        <Radio.Group
+          label={t('fit.form.audience')}
+          value={values.audience}
+          onChange={setField('audience')}
+        >
+          <Group gap="lg" mt="xs">
+            {AUDIENCE_OPTIONS.map((value) => (
+              <Radio key={value} value={value} label={t(`enums.audience.${value}`)} />
+            ))}
+          </Group>
+        </Radio.Group>
+
         <Select
           label={t('fit.form.line')}
           placeholder={t('fit.form.line.placeholder')}
           data={LINE_OPTIONS.map((line) => ({
             value: line,
             label: t(`enums.line.${line}`),
+            disabled: isKids && !KIDS_LINES.includes(line),
           }))}
           value={values.line || null}
           onChange={setField('line')}
           error={errorText('line')}
           required
         />
+
+        {noTable && (
+          <Alert variant="light" color="orange" icon={<IconInfoCircle size={18} />}>
+            {t('fit.form.noTable')}
+          </Alert>
+        )}
+        {sizes.isError && <ErrorState error={sizes.error} onRetry={sizes.refetch} />}
 
         <SimpleGrid cols={{ base: 2, sm: 3 }}>
           {MEASURE_FIELDS.map((field) => (
@@ -154,16 +177,34 @@ export function FitForm({
               onChange={setField(field)}
               error={errorText(field)}
               min={0}
-              required
+              required={required.includes(field)}
             />
           ))}
+          {isKids && (
+            <NumberInput
+              label={t('fit.form.age')}
+              value={values.age}
+              onChange={setField('age')}
+              error={errorText('age')}
+              min={1}
+              max={120}
+              required={required.includes('age')}
+            />
+          )}
         </SimpleGrid>
 
         {submitError && (
           <ErrorState error={submitError} onRetry={() => setSubmitError(null)} />
         )}
 
-        <Button type="submit" size="lg" loading={createGeneration.isPending}>
+        <Button
+          type="submit"
+          size="lg"
+          loading={
+            createGeneration.isPending || (Boolean(values.line) && sizes.isPending)
+          }
+          disabled={Boolean(noTable) || sizes.isError}
+        >
           {t('fit.form.submit')}
         </Button>
       </Stack>

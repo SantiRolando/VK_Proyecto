@@ -12,8 +12,10 @@ const COLOR_SWATCHES = {
   purple: '#7c3aed',
 }
 
+// El color es texto libre del catálogo (`Negro`, `navy`): el swatch sale del
+// mapa cuando el nombre coincide y gris en el resto.
 export function colorHex(color) {
-  return COLOR_SWATCHES[color] ?? '#9ca3af'
+  return COLOR_SWATCHES[String(color ?? '').toLowerCase()] ?? '#9ca3af'
 }
 
 // Opciones del alta/edición de variantes en el panel (US9).

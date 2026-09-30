@@ -2,6 +2,7 @@ import { DateTime } from '@components/date-time.jsx'
 import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { PageHeader } from '@components/page-header.jsx'
+import { Line } from '@constants/enums.js'
 import { useComments } from '@features/admin/analytics/hooks/use-analytics.js'
 import { useExport } from '@hooks/use-export.js'
 import { useI18n } from '@i18n/context.js'
@@ -10,7 +11,7 @@ import { IconFileSpreadsheet, IconMessage } from '@tabler/icons-react'
 import { useState } from 'react'
 
 const ALL = 'all'
-const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
+const LINES = Object.values(Line)
 const RATINGS = ['Small', 'Correct', 'Large']
 
 const RATING_COLORS = { Small: 'orange', Correct: 'teal', Large: 'red' }

@@ -48,7 +48,7 @@ export const routes = {
   register: '/register',
 
   fit: (query) => withQuery('/fit', query),
-  fitResult: (generationId) => `/fit/result/${generationId}`,
+  fitResult: (generationId, query) => withQuery(`/fit/result/${generationId}`, query),
 
   catalog: (query) => withQuery('/catalog', query),
   product: (productId, query) => withQuery(`/catalog/${productId}`, query),

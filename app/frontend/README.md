@@ -19,11 +19,44 @@ npm run dev        # http://localhost:5173
 
 | Script | Qué hace |
 |---|---|
-| `npm run dev` | Servidor de desarrollo (modo mock por defecto). |
+| `npm run dev` | Servidor de desarrollo (modo mock por defecto; ver "Contra el backend"). |
 | `npm run build` / `npm run preview` | Build de producción y servidor local del bundle. |
 | `npm test` / `npm run test:watch` | Vitest + jsdom + Testing Library. |
 | `npm run lint` / `npm run format` | Biome (lint + formato + imports restringidos). Es el único tool. |
 | `npm run i18n:check` | Verifica paridad de claves entre `es` y `en`. |
+
+### Contra el backend (modo `hybrid`)
+
+El backend (`vk-scan-fit-be`, Spring Boot en `http://localhost:8080`) ya implementa
+autenticación, motor de talle, historial, perfiles, direcciones y catálogo del
+panel. Para usarlo:
+
+```bash
+cp .env.example .env
+# en .env: VITE_API_MODE=hybrid
+npm run dev
+```
+
+En `hybrid` las rutas que el backend implementa (`src/api/client/backend-coverage.js`)
+salen por HTTP y el resto (stock, ventas, cupones, puntos, alertas, analítica,
+usuarios) sigue en el mock, así la app se recorre completa mientras el backend
+crece. El dev server reenvía `/api` al backend sin el prefijo (proxy en
+`vite.config.js`), por eso no hay CORS. Con el perfil `dev,demo` del backend las
+cuentas son `admin@vkfit.demo` y `ana.perez@vkfit.demo` (clave `Demo12345`).
+
+Límites conocidos del modo híbrido, hasta que el backend sume esos módulos:
+
+- El feedback de una generación sigue en el mock y no conoce las generaciones del
+  backend: en híbrido la app oculta el botón de calificar.
+- El catálogo del cliente, el checkout y el inventario siguen en el mock: no ven
+  los productos creados en el backend, y una venta referencia direcciones del
+  backend por id. La tabla de talles del mock copia la del backend (mismos ids),
+  así que un `sizeId` vale en los dos lados.
+- "Vincular a un cliente" en el modo asistente se oculta (el padrón es del mock).
+- Las rutas del mock que piden sesión aceptan el JWT del backend (leen su payload
+  sin verificar la firma) y usan el usuario mock con el mismo id y rol, o uno
+  sintético.
+- `/dev` (reset, entrar como usuario) solo afecta al mock.
 
 ### Cuentas demo (modo mock)
 
@@ -70,10 +103,24 @@ Contrato de la capa de datos (§6.1 del plan):
   `data`; `apiClient.request` devuelve la respuesta completa cuando la pantalla
   necesita `meta` (p. ej. `GET /catalog` con `meta.hasStock`).
 - **Error** `ApiError(status, code, details)` con códigos estables
-  (`VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`,
-  `STOCK_INSUFFICIENT`, `NETWORK_ERROR`, `SERVER_ERROR`). `ErrorState` los
-  traduce con `errors.<CODE>`; un 401 por sesión expirada dispara el logout
-  global desde `api-client`.
+  (`VALIDATION_ERROR`, `BAD_REQUEST`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`,
+  `CONFLICT`, `STOCK_INSUFFICIENT`, `NETWORK_ERROR`, `SERVER_ERROR`). `ErrorState`
+  los traduce con `errors.<CODE>`. El backend responde `{ code, message, fields? }`
+  y el transporte HTTP lo lleva a esa forma (`details.fields` trae el mensaje por
+  campo de una `VALIDATION_ERROR`).
+- **Sesión**: el backend entrega un access token (30 min) y un refresh token de un
+  solo uso (30 días). `api-client` guarda los dos con el vencimiento (`session.js`)
+  y renueva antes de un pedido si el access token venció (las rutas públicas
+  tratan un token vencido como invitado) o tras un 401 `UNAUTHENTICATED`; una sola
+  renovación en vuelo y un solo reintento. Solo un refresh token rechazado cierra
+  la sesión; un corte de red la deja como está. Al entrar y al salir se rota el
+  `guestSessionId` y se vacía la caché de TanStack Query. `logout` revoca el
+  refresh token.
+- **Vocabulario**: el backend escribe los enums en UPPER_SNAKE (`ENDURANCE`,
+  `WITH_WARNING`) y el FE en PascalCase (`constants/enums.js`). La conversión vive
+  en `src/api/wire.js` y la hacen los services (y los controllers mock, que hablan
+  el mismo contrato). Las líneas son `Endurance | Soft | Jammer | Sunga` y el
+  público `Adult | Kids`: "Kids" ya no es una línea.
 - **Sin lógica de negocio en el FE**: talles, puntos, reserva de stock y
   transiciones de venta viven en `src/mocks/domain/`.
 
@@ -107,7 +154,9 @@ register('GET', '/products/:productId/reviews', (req) => {
    Los handlers se pueden testear sin React (ver `*.controller.test.js`).
 3. **Registro**: agregar el import en `src/mocks/controllers/register-all.js`.
 4. **Service** (`src/api/services/reviews-service.js`): único lugar donde se
-   mapean DTOs (si la API real usa `snake_case`, se convierte acá).
+   mapean DTOs (enums con los codecs de `src/api/wire.js`, paginación con
+   `decodePage`). El controller mock debe responder con la misma forma que el
+   backend, así el modo `hybrid` no nota la diferencia.
 
 ```js
 import { apiClient } from '@api/client/api-client.js'
@@ -132,19 +181,22 @@ son estables (admin = 1, Ana = 2, cliente vacío = 3).
 
 ## Pasar a la API real
 
-1. Definir `VITE_API_MODE=http` (y `VITE_API_BASE_URL` si no es `/api/v1`).
-2. Ajustar los mapeos localizados en `src/api/services/*` si el contrato real
-   difiere (snake_case, envelopes, paginación).
-3. Nada más: `src/mocks/` **no entra al bundle** en modo http (SC-005). El
-   import del transporte mock es dinámico y se elimina en el build; conviene
-   repetir el chequeo barriendo `dist/` por marcadores (`mock-transport`).
+Los services ya hablan el contrato del backend. Cuando el backend sume un módulo:
+
+1. Agregar sus rutas a `src/api/client/backend-coverage.js` (modo `hybrid`).
+2. Ajustar el service si el contrato difiere del mock, y alinear el controller
+   mock (o borrarlo cuando ya no haga falta).
+3. Con todo cubierto, `VITE_API_MODE=http`: `src/mocks/` **no entra al bundle**
+   (SC-005). El import del transporte mock es dinámico y se elimina en el build;
+   conviene repetir el chequeo barriendo `dist/` por marcadores (`mock-transport`).
 
 Variables de entorno (ver `.env.example`, leídas en `src/config/env.js`):
 
 | Variable | Default | Uso |
 |---|---|---|
-| `VITE_API_MODE` | `mock` | `mock` \| `http`. |
-| `VITE_API_BASE_URL` | `/api/v1` | Base de la API real. |
+| `VITE_API_MODE` | `mock` | `mock` \| `hybrid` \| `http`. |
+| `VITE_API_BASE_URL` | `/api` | Prefijo que el dev server reenvía al backend. |
+| `VITE_BACKEND_URL` | `http://localhost:8080` | Destino del proxy (solo dev/preview). |
 | `VITE_MOCK_LATENCY_MS` | `250-600` | Latencia simulada (`0` la apaga). |
 | `VITE_MOCK_FAIL_RATE` | `0` | Probabilidad de error del mock (0–1). |
 
@@ -189,10 +241,12 @@ La app se instala como PWA y navega sin conexión, con `vite-plugin-pwa`
   chunks de cada ruta + imágenes + fuentes), así que cualquier pantalla visitada —y de
   hecho todas, porque están precacheadas— funciona sin conexión. La navegación SPA
   offline se resuelve con el fallback a `index.html`.
-- **API**: los `GET /api/` usan `NetworkFirst` (caché `vkfit-api-get`, 3 s de timeout,
-  24 h de expiración) para poder mostrar los últimos datos vistos sin conexión; las
-  escrituras **no** se cachean y las respuestas de `/api/` nunca se resuelven con el
-  shell de la app. En modo `mock` no hay red: la app funciona offline por completo.
+- **API**: solo los `GET /api/public/` usan `NetworkFirst` (caché `vkfit-api-get`, 3 s
+  de timeout, 24 h de expiración) para poder mostrar la tabla de talles y el contacto
+  sin conexión; lo que lleva sesión (perfiles, historial, panel) y las escrituras
+  **no** se cachean, y las respuestas de `/api/` nunca se resuelven con el shell de la
+  app. Cerrar sesión borra esa caché. En modo `mock` no hay red: la app funciona
+  offline por completo.
 - **Sin push** y sin prompt de actualización: el SW se auto-actualiza
   (`skipWaiting` + `clientsClaim`). Si se quiere avisar de la versión nueva con un
   mensaje traducido, alcanza con cambiar a `registerType: 'prompt'` y usar
@@ -216,8 +270,10 @@ debajo del notch; al habilitarlo hay que sumar `env(safe-area-inset-*)` al
 
 ## Estado del prototipo
 
-Historias US1–US12 implementadas (cliente y panel) sobre datos mock, más la PWA
-instalable (Fase 14). Queda el **motor de recomendación real**
-(`../../agents/context/recommendation-engine.txt`), que hoy devuelve un talle placeholder
-desde `src/mocks/domain/size-engine.js`, y las preguntas abiertas del plan §9 sin cerrar
-con el cliente/backend (Q-01 y Q-03 son las de mayor impacto).
+Historias US1–US12 implementadas (cliente y panel), más la PWA instalable (Fase
+14). Integrado con el backend (modo `hybrid`): autenticación con refresh token,
+OTP por mail, motor de recomendación real (talle directo, con aviso o derivación
+a atención personalizada), historial, perfiles, direcciones y catálogo del panel.
+El mock sigue cubriendo stock, ventas, cupones, puntos, alertas, analítica y
+usuarios hasta que el backend los implemente; `src/mocks/domain/size-engine.js`
+replica el motor solo para la demo sin servidor.

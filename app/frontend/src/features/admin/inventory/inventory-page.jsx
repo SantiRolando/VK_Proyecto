@@ -4,6 +4,7 @@ import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { PageHeader } from '@components/page-header.jsx'
 import { ResponsiveList } from '@components/responsive-list.jsx'
 import { colorHex, colorLabel } from '@constants/colors.js'
+import { Line } from '@constants/enums.js'
 import {
   useAdjustStock,
   useInventory,
@@ -27,7 +28,7 @@ import { IconAlertTriangle, IconBox, IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
 
 const ALL = 'all'
-const LINES = ['Endurance', 'Soft', 'Jammer', 'Sunga', 'Kids']
+const LINES = Object.values(Line)
 
 function ColorDot({ color }) {
   return (

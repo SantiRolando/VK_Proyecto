@@ -1,26 +1,42 @@
-// Controller de direcciones (US4/T059 + US5/T075): agenda completa del cliente
-// — listado, alta, edición, baja lógica y dirección predeterminada.
-//
-// La baja es lógica (`active`) para no romper las ventas que la referencian.
+// Controller de direcciones (US4/T059 + US5/T075) con el contrato del backend
+// (`/addresses`): listado, alta, edición completa (PUT), baja lógica y default.
+// Borrar la default deja al usuario sin default (igual que el backend).
 
 import { ApiError } from '@api/client/api-error.js'
-import { requireFields } from '@mocks/controllers/controller-utils.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { register } from '@mocks/router/mock-router.js'
 
-const EDITABLE_FIELDS = ['street', 'number', 'city', 'department', 'reference']
-const REQUIRED_FIELDS = ['street', 'number', 'city', 'department']
+const LIMITS = { street: 160, number: 20, city: 80, department: 80, reference: 200 }
+const REQUIRED = ['street', 'city', 'department']
 
 export function serializeAddress(address) {
   return {
     id: address.id,
     street: address.street,
-    number: address.number,
+    number: address.number || null,
     city: address.city,
     department: address.department,
-    reference: address.reference ?? '',
+    reference: address.reference || null,
     isDefault: Boolean(address.isDefault),
+    createdAt: address.createdAt ?? null,
+    updatedAt: address.updatedAt ?? null,
   }
+}
+
+// `AddressRequestDTO`: calle, ciudad y departamento obligatorios.
+function readAddress(body) {
+  const fields = {}
+  const values = {}
+  for (const [field, max] of Object.entries(LIMITS)) {
+    const value = body[field] == null ? '' : String(body[field]).trim()
+    if (REQUIRED.includes(field) && !value) fields[field] = 'must not be blank'
+    if (value.length > max) fields[field] = `size must be between 0 and ${max}`
+    values[field] = value || null
+  }
+  if (Object.keys(fields).length > 0) {
+    throw new ApiError(400, 'VALIDATION_ERROR', { fields, message: 'Validation failed' })
+  }
+  return values
 }
 
 function mineAddresses(db, userId) {
@@ -29,68 +45,53 @@ function mineAddresses(db, userId) {
   )
 }
 
-function findMine(db, userId, addressId) {
-  return mineAddresses(db, userId).find((address) => address.id === addressId) ?? null
-}
-
-// Si no quedó ninguna predeterminada (p. ej. dieron de baja la que lo era), la
-// más antigua que queda pasa a serlo.
-function ensureDefault(addresses) {
-  if (addresses.length === 0) return
-  if (addresses.some((address) => address.isDefault)) return
-
-  const oldest = addresses.reduce((best, address) =>
-    address.id < best.id ? address : best,
-  )
-  oldest.isDefault = true
-}
-
-function sortDefaultFirst(addresses) {
-  return addresses.sort(
-    (a, b) => Number(b.isDefault) - Number(a.isDefault) || a.id - b.id,
-  )
+function requireMine(db, userId, addressId) {
+  const address = mineAddresses(db, userId).find((item) => item.id === addressId)
+  if (!address) throw new ApiError(404, 'NOT_FOUND')
+  return address
 }
 
 register(
   'GET',
-  '/me/addresses',
+  '/addresses',
   (req) => {
-    const addresses = sortDefaultFirst(mineAddresses(getDb(), req.auth.user.id))
-
+    const addresses = mineAddresses(getDb(), req.auth.user.id).sort(
+      (a, b) => Number(b.isDefault) - Number(a.isDefault) || a.id - b.id,
+    )
     return { status: 200, data: addresses.map(serializeAddress) }
   },
   { auth: 'user' },
 )
 
 register(
-  'POST',
-  '/me/addresses',
+  'GET',
+  '/addresses/:id',
   (req) => {
-    const { reference = '', isDefault = false } = req.body
-    requireFields(req.body, REQUIRED_FIELDS)
+    const address = requireMine(getDb(), req.auth.user.id, Number(req.params.id))
+    return { status: 200, data: serializeAddress(address) }
+  },
+  { auth: 'user' },
+)
 
+register(
+  'POST',
+  '/addresses',
+  (req) => {
+    const values = readAddress(req.body)
     return mutate((db) => {
       const userId = req.auth.user.id
-      const mine = mineAddresses(db, userId)
-      // La primera dirección es la predeterminada; marcar otra mueve la marca.
-      const makeDefault = Boolean(isDefault) || mine.length === 0
-      if (makeDefault) {
-        for (const other of mine) other.isDefault = false
-      }
-
+      const now = new Date().toISOString()
       const address = {
         id: nextId(db.addresses),
         userId,
-        street: req.body.street,
-        number: req.body.number,
-        city: req.body.city,
-        department: req.body.department,
-        reference: reference ?? '',
-        isDefault: makeDefault,
+        ...values,
+        // La primera dirección del usuario queda como default.
+        isDefault: mineAddresses(db, userId).length === 0,
         active: true,
+        createdAt: now,
+        updatedAt: now,
       }
       db.addresses.push(address)
-
       return { status: 201, data: serializeAddress(address) }
     })
   },
@@ -98,33 +99,13 @@ register(
 )
 
 register(
-  'PATCH',
-  '/me/addresses/:id',
+  'PUT',
+  '/addresses/:id',
   (req) => {
-    // El PATCH es parcial: solo se tocan los campos que llegan.
-    const patch = {}
-    const fields = []
-    for (const field of EDITABLE_FIELDS) {
-      if (req.body[field] === undefined) continue
-
-      const value = String(req.body[field]).trim()
-      if (value === '' && REQUIRED_FIELDS.includes(field)) {
-        fields.push(field)
-        continue
-      }
-      patch[field] = value
-    }
-
-    if (fields.length > 0) {
-      throw new ApiError(422, 'VALIDATION_ERROR', { fields })
-    }
-
+    const values = readAddress(req.body)
     return mutate((db) => {
-      const address = findMine(db, req.auth.user.id, Number(req.params.id))
-      if (!address) throw new ApiError(404, 'NOT_FOUND')
-
-      Object.assign(address, patch)
-
+      const address = requireMine(db, req.auth.user.id, Number(req.params.id))
+      Object.assign(address, values, { updatedAt: new Date().toISOString() })
       return { status: 200, data: serializeAddress(address) }
     })
   },
@@ -133,17 +114,12 @@ register(
 
 register(
   'DELETE',
-  '/me/addresses/:id',
+  '/addresses/:id',
   (req) => {
     return mutate((db) => {
-      const userId = req.auth.user.id
-      const address = findMine(db, userId, Number(req.params.id))
-      if (!address) throw new ApiError(404, 'NOT_FOUND')
-
+      const address = requireMine(db, req.auth.user.id, Number(req.params.id))
       address.active = false
       address.isDefault = false
-      ensureDefault(mineAddresses(db, userId))
-
       return { status: 204, data: null }
     })
   },
@@ -152,16 +128,13 @@ register(
 
 register(
   'PUT',
-  '/me/addresses/:id/default',
+  '/addresses/:id/default',
   (req) => {
     return mutate((db) => {
       const userId = req.auth.user.id
-      const address = findMine(db, userId, Number(req.params.id))
-      if (!address) throw new ApiError(404, 'NOT_FOUND')
-
+      const address = requireMine(db, userId, Number(req.params.id))
       for (const other of mineAddresses(db, userId)) other.isDefault = false
       address.isDefault = true
-
       return { status: 200, data: serializeAddress(address) }
     })
   },

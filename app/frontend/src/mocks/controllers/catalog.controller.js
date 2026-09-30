@@ -67,8 +67,14 @@ register('GET', '/catalog', (req) => {
 
   const lineValue = line || size.line
 
+  // La tabla del talle (línea + público) decide qué productos aplican.
   const items = db.products
-    .filter((product) => product.active && product.line === lineValue)
+    .filter(
+      (product) =>
+        product.active &&
+        product.line === lineValue &&
+        (product.audience ?? 'Adult') === size.audience,
+    )
     .map((product) => ({
       id: product.id,
       line: product.line,

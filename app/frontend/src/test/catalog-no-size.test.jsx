@@ -71,7 +71,7 @@ describe('catálogo sin talle', () => {
   })
 
   it('con un sizeId válido filtra y no muestra el aviso', async () => {
-    const size = await apiClient.get('/sizes').then((data) => data[0])
+    const size = await apiClient.get('/public/sizes').then((data) => data[0])
     renderAt(`${routes.catalog()}?sizeId=${size.id}`)
 
     const view = await main()

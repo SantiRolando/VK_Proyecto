@@ -1,7 +1,8 @@
 import { ListSkeleton } from '@components/feedback/skeletons.jsx'
 import { PageHeader } from '@components/page-header.jsx'
-import { GenerationSource } from '@constants/enums.js'
-import { slugToLine } from '@constants/lines.js'
+import { env } from '@config/env.js'
+import { Audience, GenerationSource } from '@constants/enums.js'
+import { slugToAudience, slugToLine } from '@constants/lines.js'
 import { useResolvedProfile } from '@features/account/hooks/use-profiles.js'
 import { useCustomers } from '@features/admin/assistant/hooks/use-customers.js'
 import { useAuth } from '@features/auth/auth-context.js'
@@ -23,9 +24,9 @@ function resolveSource(searchParams) {
   return GenerationSource.Direct
 }
 
-// Pantalla de medición (US1): acepta `/fit?line=endurance` (alias `linea=`,
-// Q-10), registra el origen de la consulta y, con sesión, precarga el perfil
-// activo (US5/T073).
+// Pantalla de medición (US1): acepta `/fit?line=endurance&audience=kids` (alias
+// `linea=`, Q-10), registra el origen de la consulta y, con sesión, precarga el
+// perfil activo (US5/T073).
 //
 // Modo asistente (US12, FR-027): para un admin, la misma pantalla suma el switch
 // "para terceros" y el vínculo opcional a un cliente. Antes vivía en una ruta
@@ -44,7 +45,12 @@ export function FitPage() {
   // Solo se piden clientes cuando el modo asistente está activo.
   const customers = useCustomers({ enabled: isAdmin && onBehalf })
 
-  const initialLine = slugToLine(searchParams.get('line') ?? searchParams.get('linea'))
+  // `?line=kids` es un enlace viejo (QR impresos): hoy es un público, no una línea.
+  const lineParam = searchParams.get('line') ?? searchParams.get('linea')
+  const initialLine = slugToLine(lineParam)
+  const initialAudience =
+    slugToAudience(searchParams.get('audience')) ??
+    (String(lineParam ?? '').toLowerCase() === 'kids' ? Audience.Kids : null)
   const source = resolveSource(searchParams)
   // Se espera a los perfiles para no mostrar el formulario vacío y precargarlo
   // un instante después. En modo asistente no aplica: son medidas de un tercero.
@@ -63,7 +69,8 @@ export function FitPage() {
               onChange={(event) => setOnBehalf(event.currentTarget.checked)}
             />
 
-            {onBehalf && (
+            {/* El padrón de clientes sigue en el mock: en híbrido no se vincula. */}
+            {onBehalf && !env.isHybrid && (
               <Stack gap="sm" mt="md">
                 <Select
                   label={t('admin.assistant.linkCustomer')}
@@ -94,6 +101,7 @@ export function FitPage() {
               // Cambiar de perfil o de modo remonta el formulario con valores nuevos.
               key={onBehalf ? `third-${customerId ?? 'none'}` : (profile?.id ?? 'guest')}
               initialLine={initialLine}
+              initialAudience={initialAudience}
               source={source}
               profileId={onBehalf ? null : (profile?.id ?? null)}
               initialMeasures={onBehalf || !profile ? null : measuresFormValues(profile)}

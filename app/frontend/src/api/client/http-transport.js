@@ -1,11 +1,15 @@
-// Transporte HTTP real (VITE_API_MODE=http): `fetch` contra la API REST,
-// con mapeo de errores al contrato `{ error: { code, details? } }` (§6.1).
+// Transporte HTTP real (`http` / `hybrid`): `fetch` contra la API REST.
+//
+// El backend responde el cuerpo "pelado" (sin envelope) y los errores con
+// `{ status, error, code, message, fields? }` (`error` es el nombre del código
+// HTTP, `code` el estable); acá se adaptan a la forma que consume el resto del
+// FE: `{ status, data, meta }` y `ApiError(status, code, details)`.
 
 import { ApiError } from '@api/client/api-error.js'
 import { env } from '@config/env.js'
 
 const FALLBACK_CODES = {
-  400: 'VALIDATION_ERROR',
+  400: 'BAD_REQUEST',
   401: 'UNAUTHENTICATED',
   403: 'FORBIDDEN',
   404: 'NOT_FOUND',
@@ -33,14 +37,28 @@ function buildUrl(url, params) {
   return target
 }
 
+export function toApiError(status, payload) {
+  const body = payload && typeof payload === 'object' ? payload : {}
+  const error = typeof body.code === 'string' ? body : (body.error ?? {})
+  return new ApiError(status, error.code ?? FALLBACK_CODES[status] ?? 'SERVER_ERROR', {
+    fields: error.fields,
+    message: error.message,
+  })
+}
+
 export const httpTransport = {
-  async send({ method, url, params, body, headers = {} }) {
+  async send({ method, url, params, body, headers = {}, guestSessionId }) {
     const requestHeaders = {
       Accept: 'application/json',
       ...headers,
     }
     if (body !== undefined) {
       requestHeaders['Content-Type'] = 'application/json'
+    }
+    // Identifica al invitado (lo lee `/public/fit/generations/{id}`); con
+    // sesión el backend lo ignora.
+    if (guestSessionId) {
+      requestHeaders['X-Guest-Session-Id'] = guestSessionId
     }
 
     let response
@@ -54,17 +72,12 @@ export const httpTransport = {
       throw new ApiError(0, 'NETWORK_ERROR')
     }
 
-    const payload = await parseJson(response)
+    const payload = response.status === 204 ? null : await parseJson(response)
 
     if (!response.ok) {
-      const error = payload?.error ?? {}
-      throw new ApiError(
-        response.status,
-        error.code ?? FALLBACK_CODES[response.status] ?? 'SERVER_ERROR',
-        error.details,
-      )
+      throw toApiError(response.status, payload)
     }
 
-    return { status: response.status, data: payload?.data, meta: payload?.meta }
+    return { status: response.status, data: payload, meta: undefined }
   },
 }

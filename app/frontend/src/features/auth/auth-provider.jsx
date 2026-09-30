@@ -1,14 +1,18 @@
-// Estado de sesión a nivel React (R-15 del plan): usuario, token y rol.
-// La persistencia vive en `api/client/session.js`; el `api-client` registra
-// acá el handler que limpia la sesión ante un 401 (código UNAUTHENTICATED).
+// Estado de sesión a nivel React (R-15 del plan): usuario, tokens y rol.
+// La persistencia vive en `api/client/session.js`; el `api-client` renueva el
+// access token con el refresh token y registra acá el handler que limpia la
+// sesión cuando la renovación ya no es posible (código UNAUTHENTICATED).
 
 import {
   clearSession,
   getSession,
+  resetGuestSessionId,
   setOnUnauthorized,
   setSession,
+  setSessionUser,
 } from '@api/client/session.js'
 import { authService } from '@api/services/auth-service.js'
+import { queryClient } from '@app/query-client.js'
 import { AuthContext } from '@features/auth/auth-context.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -22,16 +26,35 @@ export function AuthProvider({ children }) {
     }
   })
 
-  const applySession = useCallback((token, user) => {
-    if (token && user) setSession(token, user)
-    else clearSession()
-    setState({ user, token, status: 'ready' })
+  // Adopta una sesión `{ user, token, refreshToken, expiresInSeconds }` (login,
+  // registro, OTP) o la cierra con `null`. Al entrar o salir se rota el id de
+  // invitado y se vacía la caché de datos: lo que sigue es de otra persona.
+  const applySession = useCallback((auth) => {
+    if (auth?.token && auth?.user) {
+      const current = getSession()
+      setSession(
+        auth.token,
+        auth.user,
+        auth.refreshToken ?? current?.refreshToken,
+        auth.expiresInSeconds ?? null,
+      )
+      if (!current?.user || current.user.id !== auth.user.id) {
+        resetGuestSessionId()
+        queryClient.clear()
+      }
+      setState({ user: auth.user, token: auth.token, status: 'ready' })
+    } else {
+      clearSession()
+      resetGuestSessionId()
+      queryClient.clear()
+      setState({ user: null, token: null, status: 'ready' })
+    }
   }, [])
 
   useEffect(() => {
     let active = true
 
-    setOnUnauthorized(() => applySession(null, null))
+    setOnUnauthorized(() => applySession(null))
 
     async function hydrate() {
       const { token } = getSession() ?? {}
@@ -40,11 +63,15 @@ export function AuthProvider({ children }) {
         return
       }
       try {
-        // Valida el token contra la DB mock (si se reseteó, queda inválido).
+        // Valida el token contra la API (si venció, el api-client lo renueva).
         const user = await authService.me()
-        if (active) applySession(token, user)
+        const session = getSession()
+        if (active) {
+          setSessionUser(user)
+          setState({ user, token: session?.token ?? token, status: 'ready' })
+        }
       } catch {
-        if (active) applySession(null, null)
+        if (active) applySession(null)
       }
     }
 
@@ -56,29 +83,30 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (email, password) => {
-      const { user, token } = await authService.login({ email, password })
-      applySession(token, user)
-      return user
+      const auth = await authService.login({ email, password })
+      applySession(auth)
+      return auth.user
     },
     [applySession],
   )
 
   const register = useCallback(
     async (payload) => {
-      const { user, token } = await authService.register(payload)
-      applySession(token, user)
-      return user
+      const auth = await authService.register(payload)
+      applySession(auth)
+      return auth.user
     },
     [applySession],
   )
 
   const logout = useCallback(async () => {
+    const refreshToken = getSession()?.refreshToken
     try {
-      await authService.logout()
+      if (refreshToken) await authService.logout(refreshToken)
     } catch {
       // logout best-effort: se limpia la sesión local igual.
     }
-    applySession(null, null)
+    applySession(null)
   }, [applySession])
 
   const value = useMemo(
@@ -91,8 +119,6 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
-      // Adopta una sesión obtenida por otra vía (p. ej. OTP) sin pasar por
-      // login/register.
       adoptSession: applySession,
     }),
     [state, login, register, logout, applySession],

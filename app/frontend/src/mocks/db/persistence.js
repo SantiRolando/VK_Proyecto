@@ -2,8 +2,8 @@
 // Versionada: si cambia el esquema se sube `VERSION` y se re-siembra.
 // Nunca debe tirar: ante quota o storage no disponible se ignora.
 
-const KEY = 'vkfit.mockdb.v1'
-const VERSION = 1
+const KEY = 'vkfit.mockdb.v2'
+const VERSION = 2
 
 export function loadPersisted() {
   try {

@@ -10,8 +10,8 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-// Recuperación de contraseña (FR-010). En modo mock no se envía nada: el
-// reset se completa en `/reset-password` con cualquier token.
+// Recuperación de contraseña (FR-010): se pide un código por mail y se
+// completa en `/reset-password` con el código y la clave nueva.
 export function ForgotPasswordPage() {
   const { t } = useI18n()
   const [email, setEmail] = useState('')
@@ -31,7 +31,7 @@ export function ForgotPasswordPage() {
     setBusy(true)
     setServerError(null)
     try {
-      await authService.forgotPassword({ email: parsed.data.email })
+      await authService.requestOtp({ email: parsed.data.email })
       setSent(true)
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
@@ -47,6 +47,12 @@ export function ForgotPasswordPage() {
           <Alert variant="light" color="teal">
             {t('auth.forgot.sent')}
           </Alert>
+          <Button
+            component={Link}
+            to={`${routes.resetPassword}?email=${encodeURIComponent(email)}`}
+          >
+            {t('auth.forgot.continue')}
+          </Button>
           <Anchor component={Link} to={routes.login} size="sm">
             {t('auth.forgot.back')}
           </Anchor>
