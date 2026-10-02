@@ -6,6 +6,7 @@ import { slugToAudience, slugToLine } from '@constants/lines.js'
 import { useResolvedProfile } from '@features/account/hooks/use-profiles.js'
 import { useCustomers } from '@features/admin/assistant/hooks/use-customers.js'
 import { useAuth } from '@features/auth/auth-context.js'
+import { DemoCasesCard } from '@features/fit/demo-cases-card.jsx'
 import { FitForm } from '@features/fit/fit-form.jsx'
 import { useI18n } from '@i18n/context.js'
 import { Alert, Card, Container, Select, Stack, Switch } from '@mantine/core'
@@ -42,6 +43,9 @@ export function FitPage() {
   const isAdmin = user?.type === 'Admin'
   const [onBehalf, setOnBehalf] = useState(false)
   const [customerId, setCustomerId] = useState(null)
+  // Caso de demo elegido (VK-82): andamiaje solo para admin. Elegirlo cambia
+  // los valores iniciales del formulario, no dispara la generación.
+  const [demoCase, setDemoCase] = useState(null)
   // Solo se piden clientes cuando el modo asistente está activo.
   const customers = useCustomers({ enabled: isAdmin && onBehalf })
 
@@ -56,11 +60,27 @@ export function FitPage() {
   // un instante después. En modo asistente no aplica: son medidas de un tercero.
   const loadingProfile = isAuthenticated && isPending && !onBehalf
 
+  // El caso de demo manda sobre el perfil y sobre la URL: es el que fija línea,
+  // público y medidas. Sin caso, el formulario arranca como siempre.
+  const initialForm = demoCase
+    ? {
+        line: demoCase.line,
+        audience: demoCase.audience,
+        measures: measuresFormValues(demoCase.measures),
+      }
+    : {
+        line: initialLine,
+        audience: initialAudience,
+        measures: onBehalf || !profile ? null : measuresFormValues(profile),
+      }
+
   return (
     <Container size="md" py="xl">
       <PageHeader title={t('fit.title')} subtitle={t('fit.subtitle')} />
 
       <Stack gap="md">
+        {isAdmin && <DemoCasesCard onSelect={setDemoCase} />}
+
         {isAdmin && (
           <Card withBorder radius="md" padding="md">
             <Switch
@@ -98,13 +118,14 @@ export function FitPage() {
             <ListSkeleton rows={3} />
           ) : (
             <FitForm
-              // Cambiar de perfil o de modo remonta el formulario con valores nuevos.
-              key={onBehalf ? `third-${customerId ?? 'none'}` : (profile?.id ?? 'guest')}
-              initialLine={initialLine}
-              initialAudience={initialAudience}
+              // Cambiar de perfil, de modo o de caso de demo remonta el
+              // formulario con valores nuevos.
+              key={`${onBehalf ? `third-${customerId ?? 'none'}` : (profile?.id ?? 'guest')}-${demoCase?.id ?? 'none'}`}
+              initialLine={initialForm.line}
+              initialAudience={initialForm.audience}
               source={source}
               profileId={onBehalf ? null : (profile?.id ?? null)}
-              initialMeasures={onBehalf || !profile ? null : measuresFormValues(profile)}
+              initialMeasures={initialForm.measures}
               onBehalf={onBehalf}
               customerId={onBehalf && customerId ? Number(customerId) : null}
             />
