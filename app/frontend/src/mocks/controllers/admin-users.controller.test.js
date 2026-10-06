@@ -22,9 +22,9 @@ function call(method, url, { body, query, auth } = {}) {
 const ADMIN = { token: 'vkfit.1.test' }
 const ANA = { token: 'vkfit.2.test' }
 
-// Usuarios de la plataforma (panel): padrón, indicadores y rol de administrador.
+// Usuarios de la plataforma (panel): directorio, indicadores y rol de administrador.
 describe('admin users controller', () => {
-  it('lista el padrón con rol, alta y última actividad', async () => {
+  it('lista el directorio con rol, alta y última actividad', async () => {
     const result = await call('GET', '/admin/users', { auth: ADMIN })
 
     expect(result.status).toBe(200)
@@ -70,7 +70,7 @@ describe('admin users controller', () => {
     expect(active.data.every((user) => user.lastActivity !== null)).toBe(true)
   })
 
-  it('los indicadores cuadran con el padrón', async () => {
+  it('los indicadores cuadran con el directorio', async () => {
     const result = await call('GET', '/admin/users/analytics', { auth: ADMIN })
     const db = getDb()
 
@@ -134,7 +134,7 @@ describe('admin users controller', () => {
     ).rejects.toMatchObject({ status: 409, code: 'CANNOT_DEMOTE_SELF' })
   })
 
-  it('un cliente no puede ver el padrón ni cambiarse el rol', async () => {
+  it('un cliente no puede ver el directorio ni cambiarse el rol', async () => {
     await expect(call('GET', '/admin/users', { auth: ANA })).rejects.toMatchObject({
       status: 403,
       code: 'FORBIDDEN',

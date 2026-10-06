@@ -89,7 +89,7 @@ export function FitPage() {
               onChange={(event) => setOnBehalf(event.currentTarget.checked)}
             />
 
-            {/* El padrón de clientes sigue en el mock: en híbrido no se vincula. */}
+            {/* El directorio de clientes sigue en el mock: en híbrido no se vincula. */}
             {onBehalf && !env.isHybrid && (
               <Stack gap="sm" mt="md">
                 <Select

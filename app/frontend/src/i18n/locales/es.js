@@ -436,8 +436,7 @@ export default {
   'admin.users.chart.title': 'Cuentas nuevas por mes',
   'admin.users.chart.series': 'Altas',
   'admin.users.chart.hint': 'Últimos 12 meses.',
-  // "Padrón" era demasiado administrativo y no se entendía. Se nombra lo que la
-  // tabla muestra: todas las cuentas.
+  // El título evita la jerga administrativa y nombra lo que la tabla muestra.
   'admin.users.list.title': 'Todas las cuentas',
   'admin.users.filter.all': 'Todos',
   'admin.users.filter.customers': 'Clientes',

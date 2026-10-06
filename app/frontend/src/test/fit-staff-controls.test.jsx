@@ -9,10 +9,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Bug squash sesión #1: el modo asistente dejó de ser una ruta propia
-// (`/admin/assistant`) y pasó a ser un control dentro de `/fit`, visible solo
-// para un admin. `/fit` ahora es compartido, así que hay que garantizar que un
-// cliente NO vea los controles de personal.
+/*
+  El modo asistente no es una ruta propia: es un control dentro de `/fit`, visible
+  solo para un admin. Como `/fit` es compartido, el test garantiza que un cliente no
+  vea los controles de personal.
+*/
 describe('medición: controles de personal', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')

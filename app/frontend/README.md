@@ -51,7 +51,7 @@ Límites conocidos del modo híbrido, hasta que el backend sume esos módulos:
   los productos creados en el backend, y una venta referencia direcciones del
   backend por id. La tabla de talles del mock copia la del backend (mismos ids),
   así que un `sizeId` vale en los dos lados.
-- "Vincular a un cliente" en el modo asistente se oculta (el padrón es del mock).
+- "Vincular a un cliente" en el modo asistente se oculta (el directorio de usuarios es del mock).
 - Las rutas del mock que piden sesión aceptan el JWT del backend (leen su payload
   sin verificar la firma) y usan el usuario mock con el mismo id y rol, o uno
   sintético.

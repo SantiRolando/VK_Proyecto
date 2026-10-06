@@ -40,7 +40,7 @@ const fixedUsers = [
   },
 ]
 
-// Padrón de demostración: sin esto, la pantalla de usuarios y sus gráficos
+// Directorio de demostración: sin esto, la pantalla de usuarios y sus gráficos
 // quedarían con tres filas. Determinista (PRNG con semilla) para que la demo y
 // los tests sean estables.
 const FIRST_NAMES = [

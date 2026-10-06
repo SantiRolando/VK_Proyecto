@@ -9,10 +9,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Bug squash sesión #1: `/account` mostraba el 404. El layout autenticado no
-// tiene `path`, y el `index` de una ruta sin path matchea la ruta del padre (o
-// sea `/`), no `/account`; el catch-all se lo comía. `routes.account` apunta
-// ahora a una ruta con path real.
+/*
+  `/account` tiene que resolver, no caer en el 404: el layout autenticado no tiene
+  `path` y un `index` sin path matchea la ruta del padre. El porqué completo está en
+  `routes.js`.
+*/
 describe('destino post-login del cliente', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
@@ -40,8 +41,10 @@ describe('destino post-login del cliente', () => {
   })
 
   it('routes.account no es la raíz ni cae en el namespace sin ruta', () => {
-    // Guarda contra la regresión: si alguien vuelve `account` a `/account` (o a
-    // un `index`), este test sigue pasando solo si existe una ruta con path.
+    /*
+      Guarda contra la regresión: si `account` vuelve a `/account` o a un `index`,
+      este test solo pasa mientras la ruta tenga path propio.
+    */
     expect(routes.account.startsWith(routes.accountRoot)).toBe(true)
     expect(routes.account).not.toBe(routes.accountRoot)
   })

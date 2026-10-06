@@ -13,9 +13,9 @@ import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 /*
-    Estados de error (T107, FR-029): se encienden con la simulación de fallos del
-    mock (`POST /__test/transport { failRate }`), que no aplica a las propias
-    herramientas de la suite y por eso se puede apagar desde el test.
+  Los estados de error se encienden con la simulación de fallos del mock
+  (`POST /__test/transport { failRate }`), que no aplica a las propias herramientas
+  de la suite y por eso se puede apagar desde el test.
 */
 
 function renderAt(path) {
@@ -40,7 +40,7 @@ afterEach(async () => {
   await testTools.configureTransport({ failRate: 0 })
 })
 
-describe('estados de error (T107)', () => {
+describe('estados de error', () => {
   it('el detalle de producto (invitado) muestra el error y reintenta', async () => {
     const user = userEvent.setup()
     const size = (await sizeService.getSizes({ line: 'Endurance' })).find(

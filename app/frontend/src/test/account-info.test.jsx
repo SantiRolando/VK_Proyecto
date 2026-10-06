@@ -11,9 +11,10 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Bug squash sesión #1: la información de cuenta no existía como pantalla. Ahora
-// vive en `/account/info` con dos pestañas, y las rutas viejas de la agenda
-// redirigen ahí para no romper enlaces.
+/*
+  La información de cuenta vive en `/account/info` con dos pestañas; las rutas viejas
+  de la agenda redirigen ahí para no romper enlaces.
+*/
 describe('información de cuenta', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
@@ -30,8 +31,10 @@ describe('información de cuenta', () => {
       </Providers>,
     )
 
-  // El contenido vive en <main>; el header tiene sus propios controles, así que se
-  // acotan las consultas para no chocar con ellos.
+  /*
+    El contenido vive en <main>; el header tiene sus propios controles, así que se
+    acotan las consultas para no chocar con ellos.
+  */
   const main = async () => within(await screen.findByRole('main'))
 
   it('muestra los datos de la cuenta en la pestaña Cuenta', async () => {
@@ -74,8 +77,10 @@ describe('información de cuenta', () => {
 
   it('la ruta vieja /account/profiles redirige a la pestaña de agenda', async () => {
     await signInAs(SeedUser.Ana)
-    // El controlador de perfiles debe responder: si la redirección no ocurre, la
-    // pantalla muestra el 404 y no hay perfiles.
+    /*
+      El controlador de perfiles tiene que responder: si la redirección no ocurre, la
+      pantalla muestra el 404 y no hay perfiles.
+    */
     const profiles = await apiClient.get('/profiles')
     expect(profiles.length).toBeGreaterThan(0)
 

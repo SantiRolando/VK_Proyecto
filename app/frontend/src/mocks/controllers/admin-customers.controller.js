@@ -1,4 +1,4 @@
-// Usuarios de la plataforma (panel): padrón con rol, alta/revocación de admin y
+// Usuarios de la plataforma (panel): directorio con rol, alta/revocación de admin y
 // los indicadores de uso. Antes este controller solo listaba clientes para el
 // modo asistente (US12).
 
@@ -61,7 +61,7 @@ register(
   { auth: 'admin' },
 )
 
-// GET /admin/users — padrón completo, con filtro por rol y por actividad.
+// GET /admin/users — directorio completo, con filtro por rol y por actividad.
 register(
   'GET',
   '/admin/users',
@@ -95,7 +95,7 @@ register(
   { auth: 'admin' },
 )
 
-// GET /admin/users/analytics — indicadores del padrón y tendencia de altas.
+// GET /admin/users/analytics — indicadores del directorio y tendencia de altas.
 //
 // Alcance: "usuarios activos" se deriva de la última medición o compra, porque el
 // mock no registra inicios de sesión. Mide uso del producto, no logins.

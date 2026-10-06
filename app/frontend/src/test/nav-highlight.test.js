@@ -2,10 +2,11 @@ import { routes } from '@app/routes.js'
 import { matchNavItem } from '@config/navigation.js'
 import { describe, expect, it } from 'vitest'
 
-// Bug squash sesión #1: el resaltado del menú debe ser EXCLUSIVO. Antes cada ítem
-// se evaluaba por separado y estar en una ruta anidada encendía a la vez el ítem
-// padre y el hijo (`/admin/inventory/movements` resaltaba "Inventario" **y**
-// "Movimientos").
+/*
+  El resaltado del menú es exclusivo: en una ruta anidada gana el ítem más
+  específico. Evaluar cada ítem por separado encendía a la vez el padre y el hijo
+  (`/admin/inventory/movements` resaltaba "Inventario" y "Movimientos").
+*/
 const ITEMS = [
   { to: routes.admin, labelKey: 'nav.analytics' },
   { to: routes.adminSales, labelKey: 'nav.sales' },
@@ -17,7 +18,7 @@ const ITEMS = [
 
 describe('resaltado del menú', () => {
   it('en una ruta anidada gana el ítem más específico', () => {
-    // El caso reportado: movimientos vive dentro de /admin/inventory.
+    // Movimientos vive dentro de `/admin/inventory`.
     expect(matchNavItem(routes.adminMovements, ITEMS)).toBe(routes.adminMovements)
     expect(matchNavItem(routes.adminMovements, ITEMS)).not.toBe(routes.adminInventory)
   })

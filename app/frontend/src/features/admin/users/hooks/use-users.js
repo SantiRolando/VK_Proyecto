@@ -1,7 +1,7 @@
 import { adminUsersService } from '@api/services/admin-users-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Padrón de usuarios del panel. `params` acepta `{ role, active }`.
+// Directorio de usuarios del panel. `params` acepta `{ role, active }`.
 export function useUsers(params = {}) {
   return useQuery({
     queryKey: ['admin', 'users', params.role ?? 'all', params.active ?? 'all'],
@@ -16,7 +16,7 @@ export function useUsersAnalytics() {
   })
 }
 
-// Otorgar o revocar admin. Invalida el padrón y sus indicadores: los conteos de
+// Otorgar o revocar admin. Invalida el directorio y sus indicadores: los conteos de
 // admin y la actividad cambian con el rol.
 export function useSetUserRole() {
   const queryClient = useQueryClient()

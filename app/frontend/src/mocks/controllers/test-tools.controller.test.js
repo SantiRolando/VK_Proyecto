@@ -21,7 +21,7 @@ function call(method, url, { body } = {}) {
 
 describe('test tools controller', () => {
   it('reset re-siembra la base de datos', async () => {
-    // El padrón sembrado es amplio a propósito (la pantalla de usuarios necesita
+    // El directorio sembrado es amplio a propósito (la pantalla de usuarios necesita
     // volumen para sus indicadores y su gráfico), así que se afirma la identidad
     // de la semilla y no un número fijo de filas.
     const seeded = getDb().users.length

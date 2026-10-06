@@ -2,10 +2,11 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// Guarda de regresión de la PWA (Fase 14): nada de esto es lógica de la app,
-// pero un ícono renombrado o un meta borrado rompen la instalabilidad sin que
-// ningún test de UI se entere. Vitest corre con `root` = `app/frontend`, así
-// que las rutas del proyecto cuelgan de `process.cwd()`.
+/*
+  Guarda de regresión de la PWA: nada de esto es lógica de la app, pero un ícono
+  renombrado o un meta borrado rompen la instalabilidad sin que ningún test de UI se
+  entere.
+*/
 
 const root = process.cwd()
 const viteConfig = readFileSync(join(root, 'vite.config.js'), 'utf8')
@@ -18,7 +19,6 @@ describe('PWA', () => {
     )
     const appleIcon = indexHtml.match(/rel="apple-touch-icon"\s+href="([^"]+)"/)?.[1]
 
-    // Instalabilidad: 192 + 512 + una variante maskable (Lighthouse).
     expect(viteConfig).toContain("sizes: '192x192'")
     expect(viteConfig).toContain("sizes: '512x512'")
     expect(viteConfig).toContain("purpose: 'maskable'")
@@ -40,7 +40,6 @@ describe('PWA', () => {
   it('el service worker queda en autoUpdate y precachea el build', () => {
     expect(viteConfig).toContain("registerType: 'autoUpdate'")
     expect(viteConfig).toContain('globPatterns')
-    // La API nunca debe resolverse con el shell de la app.
     expect(viteConfig).toContain('navigateFallbackDenylist')
   })
 })

@@ -10,13 +10,13 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Bug squash sesión #1: el catálogo ya no se bloquea sin talle.
-//
-// El primer intento de test solo afirmaba que hubiera enlaces, y **pasaba** con el
-// catálogo vacío (los enlaces de la navegación alcanzaban). Ahora se afirma que
-// aparezcan las tarjetas de producto de verdad, que es lo que el bug rompía: el
-// hook tenía `enabled: Boolean(sizeId)`, así que sin talle la consulta quedaba
-// pendiente para siempre y la pantalla mostraba esqueletos.
+/*
+  El catálogo lista productos aunque el cliente todavía no tenga talle: el hook tenía
+  `enabled: Boolean(sizeId)`, así que sin talle la consulta quedaba pendiente para
+  siempre y la pantalla mostraba esqueletos. El test afirma las tarjetas de producto
+  y no la presencia de enlaces: con el catálogo vacío, los de la navegación
+  alcanzaban para pasarlo.
+*/
 describe('catálogo sin talle', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
@@ -76,8 +76,10 @@ describe('catálogo sin talle', () => {
 
     const view = await main()
 
-    // Se espera a que el encabezado refleje el talle: así el assert negativo
-    // ocurre después de que la pantalla resolvió.
+    /*
+      Se espera a que el encabezado refleje el talle: así el assert negativo ocurre
+      después de que la pantalla resolvió.
+    */
     await waitFor(() => {
       expect(view.getByText(`Talle: ${size.code}`)).toBeInTheDocument()
     })

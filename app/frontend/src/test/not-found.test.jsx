@@ -4,8 +4,10 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// F4 (bug squash sesión #1): el fallback de rutas muestra un 404 explícito.
-// Se usa `Providers` (i18n + Mantine) porque el componente usa Mantine.
+/*
+  El fallback de rutas muestra un 404 explícito. Se usa `Providers` (i18n + Mantine)
+  porque el componente usa Mantine.
+*/
 describe('not found page', () => {
   beforeEach(() => {
     window.localStorage.setItem('vkfit.language', 'es')

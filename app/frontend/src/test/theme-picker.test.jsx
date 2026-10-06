@@ -3,7 +3,7 @@ import { ThemePicker } from '@components/theme-picker.jsx'
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// F6 (bug squash sesión #1): el selector de tema ofrece claro / oscuro / sistema.
+// El selector de tema ofrece claro / oscuro / sistema.
 describe('theme picker', () => {
   beforeEach(() => {
     window.localStorage.setItem('vkfit.language', 'es')
