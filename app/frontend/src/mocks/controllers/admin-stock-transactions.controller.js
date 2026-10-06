@@ -1,6 +1,7 @@
-// Movimientos de stock del panel (US9/T088, FR-023): ajuste con motivo
-// obligatorio y auditoría. `SaleConfirmed` solo aparece por la confirmación de
-// venta (US7), no se registra a mano.
+/*
+  Movimientos de stock del panel: ajuste con motivo obligatorio y auditoría.
+  `SaleConfirmed` solo aparece por la confirmación de venta, no se registra a mano.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
@@ -15,8 +16,10 @@ import { register } from '@mocks/router/mock-router.js'
 
 const DEFAULT_PAGE_SIZE = 50
 
-// Catálogo de motivos del formulario de ajuste: el FE lo consume para saber qué
-// dirección elegir sin conocer las reglas (constitución VII).
+/*
+  Catálogo de motivos del formulario de ajuste: el FE lo consume para saber qué dirección
+  elegir sin conocer las reglas.
+*/
 register(
   'GET',
   '/admin/stock-transactions/reasons',
@@ -30,7 +33,7 @@ register(
   { auth: 'admin' },
 )
 
-export function serializeTransaction(db, transaction) {
+function serializeTransaction(db, transaction) {
   const user = db.users.find((item) => item.id === transaction.userId) ?? null
   const lines = db.transactionLines
     .filter((line) => line.transactionId === transaction.id)

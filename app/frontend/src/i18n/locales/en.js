@@ -21,7 +21,6 @@ export default {
   'nav.coupons': 'Coupons',
   'nav.settings': 'Rules',
   'nav.admin': 'Management panel',
-  // Unified (bug squash session #1): three labels used to mean the same thing.
   'nav.panelSection': 'Management panel',
   'nav.logout': 'Sign out',
   'nav.language': 'Language',

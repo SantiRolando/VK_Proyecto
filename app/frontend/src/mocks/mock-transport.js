@@ -1,6 +1,8 @@
-// Transporte mock: adapta la interfaz del transporte al `mock-router`.
-// Se registra la configuración desde el entorno y se importan los controllers
-// (side effect: `register(...)` de cada recurso).
+/*
+  Transporte mock: adapta la interfaz del transporte al `mock-router`. La configuración
+  sale del entorno y el import de los controllers es un side effect: cada recurso se
+  registra al cargarse.
+*/
 
 import { env } from '@config/env.js'
 import { configureMockRouter, handle } from '@mocks/router/mock-router.js'

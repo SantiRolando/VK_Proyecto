@@ -1,6 +1,8 @@
-// Rutas que ya implementa la API real. En modo `hybrid` estas van al backend y
-// el resto al mock; a medida que el backend suma módulos (stock, ventas,
-// cupones, puntos, analítica) se agregan acá y se borran del mock.
+/*
+  Rutas que ya implementa la API real: en modo `hybrid` estas van al backend y el resto al
+  mock. A medida que el backend suma módulos (stock, ventas, cupones, puntos, analítica) se
+  agregan acá y se borran del mock.
+*/
 
 const COVERED = [
   ['POST', /^\/auth\/(register|login|refresh|logout)$/],

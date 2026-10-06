@@ -1,12 +1,15 @@
-// Seed: identidad y contacto (USER, MEASUREMENT_PROFILE, ADDRESS).
-// Credenciales demo del plan §7.2 (solo modo mock).
+/*
+  Seed de USER, MEASUREMENT_PROFILE y ADDRESS. Las credenciales demo solo existen en modo
+  mock.
+*/
 
 import { createRandom, daysAgo, pick } from '@mocks/db/seed/helpers.js'
 
-// Los tres primeros usuarios son fijos: sus credenciales están documentadas y los
-// tests de otros módulos dependen de ellas (Ana y su historial, Nuevo Cliente).
-// Los ids de esas cuentas viven en `SeedUser` (`@constants/enums.js`): no se
-// escriben a mano en los tests.
+/*
+  Los tres primeros usuarios son fijos: sus credenciales están documentadas y los tests de
+  otros módulos dependen de ellas. Los ids viven en `SeedUser` (`@constants/enums.js`)
+  para no escribirlos a mano en los tests.
+*/
 const fixedUsers = [
   {
     id: 1,
@@ -40,9 +43,10 @@ const fixedUsers = [
   },
 ]
 
-// Directorio de demostración: sin esto, la pantalla de usuarios y sus gráficos
-// quedarían con tres filas. Determinista (PRNG con semilla) para que la demo y
-// los tests sean estables.
+/*
+  Directorio de demostración: sin esto, la pantalla de usuarios y sus gráficos quedarían
+  con tres filas. El PRNG con semilla fija mantiene estables la demo y los tests.
+*/
 const FIRST_NAMES = [
   'Lucía',
   'Martín',
@@ -100,8 +104,10 @@ function buildDemoUsers() {
   const generated = []
   let id = 4
 
-  // Altas repartidas en 12 meses, con más volumen en los últimos para que la
-  // tendencia tenga forma.
+  /*
+    Altas repartidas en 12 meses, con más volumen en los últimos, para que la tendencia
+    tenga forma.
+  */
   const months = [
     { from: 355, count: 1 },
     { from: 325, count: 1 },
@@ -137,8 +143,10 @@ function buildDemoUsers() {
     }
   }
 
-  // Dos cuentas de personal más, para que el filtro por rol y la acción de
-  // otorgar/revocar admin tengan con qué demostrarse.
+  /*
+    Dos cuentas de personal más, para que el filtro por rol y la acción de otorgar o
+    revocar admin tengan con qué demostrarse.
+  */
   for (const role of SALES_STAFF) {
     generated.push({
       id,

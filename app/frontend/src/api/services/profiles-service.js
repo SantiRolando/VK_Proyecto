@@ -1,5 +1,7 @@
-// Service de perfiles de medidas (US5/T072) contra `/profiles` del backend.
-// La edición es un PUT completo: nombre y las medidas, con null en las omitidas.
+/*
+  Perfiles de medidas contra `/profiles`. La edición es un PUT completo: nombre y medidas, con
+  null en las omitidas.
+*/
 
 import { apiClient } from '@api/client/api-client.js'
 import { optionalNumber } from '@api/wire.js'

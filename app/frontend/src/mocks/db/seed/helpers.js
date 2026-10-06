@@ -1,8 +1,9 @@
-// Helpers de seed: PRNG determinista y fechas relativas a "hoy"
-// (la seed se genera al inicializar; los rangos del dashboard siempre
-// tienen datos — §4.8 del plan).
+/*
+  Helpers del seed: PRNG con semilla fija para que los datos de demo se repitan, y fechas
+  relativas a hoy para que el dashboard siempre encuentre rangos con datos.
+*/
 
-// mulberry32: PRNG estable y barato para datos de demo reproducibles.
+// mulberry32: PRNG con semilla fija, para que el seed sea reproducible.
 export function createRandom(seedValue) {
   let state = seedValue >>> 0
   return function random() {
@@ -32,7 +33,7 @@ export function daysFromNow(days, hour = 12) {
   return daysAgo(-days, hour)
 }
 
-// Punto medio de un rango [min, max]; null-safe.
+// Punto medio de un rango [min, max], tolerante a `null`.
 export function midpoint(range) {
   if (!range) return null
   return Math.round(((range[0] + range[1]) / 2) * 10) / 10

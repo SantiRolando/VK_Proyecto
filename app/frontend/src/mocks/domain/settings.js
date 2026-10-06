@@ -1,5 +1,7 @@
-// Lectura de SETTING (configuración clave-valor del ER, §5.2). Los valores se
-// guardan como texto; estos helpers convierten y aplican el valor por defecto.
+/*
+  Lectura de SETTING (configuración clave-valor del ER). Los valores se guardan como
+  texto; estos helpers los convierten y aplican el valor por defecto.
+*/
 
 export function settingValue(settings, key, fallback = null) {
   const setting = settings.find((item) => item.key === key)

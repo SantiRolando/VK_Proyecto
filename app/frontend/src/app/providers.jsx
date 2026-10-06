@@ -1,5 +1,7 @@
-// Providers de la app (T014 del plan): tema Mantine, i18n, TanStack Query,
-// sesión y perfil activo. El router y Lenis viven en `main.jsx`.
+/*
+  Providers de la app: tema Mantine, i18n, TanStack Query, sesión y perfil activo. El router
+  y Lenis viven en `main.jsx`.
+*/
 
 import { queryClient } from '@app/query-client.js'
 import { ActiveProfileProvider } from '@features/account/active-profile-provider.jsx'

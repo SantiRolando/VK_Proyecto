@@ -1,5 +1,8 @@
-// Guard de ruta: requiere sesión activa (FR-004).
-// Redirige a login con `returnTo` para volver al punto donde estaba.
+/*
+  Guard de ruta: requiere sesión activa. Redirige a login con `returnTo` para volver al punto
+  donde estaba. Mientras se rehidrata la sesión no se decide nada: redirigir ahí expulsaría a
+  quien tiene sesión guardada.
+*/
 
 import { routes } from '@app/routes.js'
 import { useAuth } from '@features/auth/auth-context.js'

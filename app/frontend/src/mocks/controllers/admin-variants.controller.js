@@ -1,9 +1,10 @@
-// Inventario por variante (US9/T088, FR-023): existencias con físico,
-// reservado, disponible y crítico. La granularidad es Producto + Color + Talle.
-//
-// El alta y la edición de variantes viven en `admin-catalog.controller.js`
-// (contrato del backend). Este listado queda pendiente en el backend (módulo de
-// stock).
+/*
+  Inventario por variante: físico, reservado, disponible y crítico, con granularidad
+  Producto + Color + Talle.
+
+  El alta y la edición de variantes viven en `admin-catalog.controller.js` (contrato del
+  backend). Este listado queda pendiente en el backend (módulo de stock).
+*/
 
 import { getDb } from '@mocks/db/database.js'
 import { availableQuantity, reservedQuantity } from '@mocks/domain/stock.js'

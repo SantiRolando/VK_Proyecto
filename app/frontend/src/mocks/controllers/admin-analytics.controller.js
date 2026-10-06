@@ -1,6 +1,7 @@
-// Analítica del panel (US8/T084, FR-021). Los KPIs son reglas de negocio, así
-// que viven acá: conversión, precisión del talle (compró vs. solo consultó) y
-// stock crítico.
+/*
+  Analítica del panel. Los KPIs son reglas de negocio, así que viven acá: conversión,
+  precisión del talle (compró vs. solo consultó) y stock crítico.
+*/
 
 import { serializeInventoryVariant } from '@mocks/controllers/admin-variants.controller.js'
 import { getDb } from '@mocks/db/database.js'
@@ -8,8 +9,10 @@ import { inRange, rangeFromQuery } from '@mocks/domain/date-range.js'
 import { listCriticalVariants } from '@mocks/domain/stock.js'
 import { register } from '@mocks/router/mock-router.js'
 
-// Una generación "compró" si tiene una venta no cancelada asociada (las
-// pendientes de coordinación ya cuentan como compra coordinada).
+/*
+  Una generación cuenta como comprada si tiene una venta no cancelada asociada: las
+  pendientes de coordinación ya cuentan.
+*/
 function purchasedGenerationIds(db) {
   return new Set(
     db.sales
@@ -18,9 +21,11 @@ function purchasedGenerationIds(db) {
   )
 }
 
-// El serializador de inventario vive en `admin-variants` (US9): el bloque de
-// stock crítico del dashboard reusa el mismo DTO.
-export function serializeCriticalVariant(db, variant) {
+/*
+  El serializador de inventario vive en `admin-variants`: el bloque de stock crítico del
+  dashboard reusa el mismo DTO.
+*/
+function serializeCriticalVariant(db, variant) {
   return serializeInventoryVariant(db, variant)
 }
 
@@ -40,7 +45,6 @@ register(
       data: {
         generations,
         sales,
-        // Conversión = compras coordinadas / generaciones (0 si no hubo).
         ratio: generations > 0 ? sales / generations : 0,
       },
     }
@@ -62,7 +66,6 @@ register(
     }
 
     for (const generation of db.sizeGenerations) {
-      // Solo cuentan las mediciones calificadas y dentro del rango.
       if (!generation.rating || !inRange(generation.createdAt, range)) continue
 
       const group = purchased.has(generation.id) ? groups.purchased : groups.consultedOnly
@@ -91,8 +94,10 @@ register(
   { auth: 'admin' },
 )
 
-// Demanda no satisfecha (US10, FR-025): se deriva de las generaciones que
-// consultaron stock inexistente (§4.7), agregadas por línea × talle (Q-12).
+/*
+  Demanda no satisfecha: se deriva de las generaciones que consultaron stock inexistente,
+  agregadas por línea × talle.
+*/
 register(
   'GET',
   '/admin/analytics/missing-sizes',
@@ -139,8 +144,7 @@ register(
   { auth: 'admin' },
 )
 
-// Comentarios del feedback (US10, FR-025) con filtros por calificación, línea y
-// rango de fechas.
+// Comentarios del feedback, con filtros por calificación, línea y rango de fechas.
 register(
   'GET',
   '/admin/analytics/comments',

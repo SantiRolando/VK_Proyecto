@@ -1,8 +1,8 @@
-// Reglas derivadas de DISCOUNT_COUPON (§5.3 del plan, Q-07).
-//
-// El checkout ofrece un cupón opcional: al crear la venta se valida, se
-// guarda el descuento aplicado y se incrementa `usageCount` (se decrementa al
-// cancelar, US7).
+/*
+  Reglas derivadas de DISCOUNT_COUPON. El checkout ofrece un cupón opcional: al crear la
+  venta se valida, se guarda el descuento aplicado y se incrementa `usageCount`; al
+  cancelar la venta, se decrementa.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { round2 } from '@mocks/domain/money.js'
@@ -28,8 +28,10 @@ export function couponProblem(coupon, { userId, now = new Date() } = {}) {
   return null
 }
 
-// `Percentage` sobre el subtotal con tope en `maxDiscount`; `Fixed` como monto
-// fijo. Nunca descuenta más que el subtotal.
+/*
+  `Percentage` sobre el subtotal con tope en `maxDiscount`; `Fixed` como monto fijo.
+  Nunca descuenta más que el subtotal.
+*/
 export function computeDiscount(coupon, subtotal) {
   if (!coupon || subtotal <= 0) return 0
 
@@ -50,8 +52,10 @@ export function assertCouponUsable(coupon, options) {
   return coupon
 }
 
-// Descuento de una venta: snapshot del momento de la compra y, si falta (las
-// ventas sembradas no lo guardan), derivado del cupón asociado.
+/*
+  Descuento de una venta: snapshot del momento de la compra y, si falta (las ventas
+  sembradas no lo guardan), derivado del cupón asociado.
+*/
 export function saleDiscount(db, sale, subtotal) {
   if (sale.discountAmount != null) return sale.discountAmount
   const coupon = db.discountCoupons.find((item) => item.id === sale.couponId)

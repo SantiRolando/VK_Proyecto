@@ -21,10 +21,6 @@ export default {
   'nav.coupons': 'Cupones',
   'nav.settings': 'Reglas',
   'nav.admin': 'Panel de administración',
-  // Unificado (bug squash sesión #1): antes había tres rótulos para lo mismo
-  // ("Panel", "Panel de control", "Panel de administración"). Se usa el más claro
-  // en el encabezado de sección, en el enlace del avatar y en el título de la
-  // pantalla.
   'nav.panelSection': 'Panel de administración',
   'nav.logout': 'Cerrar sesión',
   'nav.language': 'Idioma',
@@ -436,7 +432,6 @@ export default {
   'admin.users.chart.title': 'Cuentas nuevas por mes',
   'admin.users.chart.series': 'Altas',
   'admin.users.chart.hint': 'Últimos 12 meses.',
-  // El título evita la jerga administrativa y nombra lo que la tabla muestra.
   'admin.users.list.title': 'Todas las cuentas',
   'admin.users.filter.all': 'Todos',
   'admin.users.filter.customers': 'Clientes',

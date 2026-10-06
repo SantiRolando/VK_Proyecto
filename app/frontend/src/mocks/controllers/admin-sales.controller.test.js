@@ -64,7 +64,7 @@ describe('admin sales — listado', () => {
     expect(result.data[0].id).toBe(4) // díasAgo(9)
     expect(result.data.at(-1).id).toBe(5) // hoy
 
-    // Cada venta trae lo que necesita el admin para coordinar (T069).
+    // El listado trae lo que el panel necesita para coordinar la entrega.
     expect(result.data[0]).toMatchObject({
       status: 'Cancelled',
       channel: 'Whatsapp',
@@ -118,8 +118,10 @@ describe('admin sales — listado', () => {
     })
     expect(exact.data.map((sale) => sale.id)).toEqual([5])
 
-    // Una fecha sin hora cubre el día completo: si `to` se tomara como
-    // medianoche, la venta de ese día quedaría afuera.
+    /*
+      Una fecha sin hora cubre el día completo: si `to` se tomara como medianoche,
+      la venta de ese día quedaría afuera.
+    */
     const day = sale5.createdAt.slice(0, 10)
     const thatDay = await call('GET', '/admin/sales', {
       auth: ADMIN,
@@ -156,23 +158,27 @@ describe('admin sales — listado', () => {
 
     // La venta 2 (Contacted, 4 días) supera los 3 días por defecto.
     expect(byId[2].isStale).toBe(true)
-    // Se compara contra la fecha real de la venta y no contra un literal: la seed
-    // usa fechas relativas y un número fijo dependía de la hora de ejecución.
+    /*
+      Se compara contra la fecha real de la venta y no contra un literal: la seed usa
+      fechas relativas y un número fijo dependía de la hora de ejecución.
+    */
     expect(byId[2].ageDays).toBe(saleAgeDays(byId[2]))
     expect(byId[1].isStale).toBe(false)
     // Confirmadas y canceladas ya no retienen stock: nunca son «antiguas».
     expect(byId[3].isStale).toBe(false)
     expect(byId[4].isStale).toBe(false)
 
-    // El umbral es configurable (SETTING).
+    // El umbral de días es configurable desde los ajustes.
     getDb().settings.find((item) => item.key === 'stale_sale_days').value = '30'
     const relaxed = await call('GET', '/admin/sales', { auth: ADMIN })
     expect(relaxed.data.every((sale) => sale.isStale === false)).toBe(true)
   })
 
-  // Regresión: `saleAgeDays` usaba `floor`, así que una venta de "hace 4 días"
-  // daba 3 si el proceso corría antes del mediodía (la seed fija las 12:00) y 4
-  // después. La antigüedad no debe depender de la hora.
+  /*
+    Regresión: `saleAgeDays` usaba `floor`, así que una venta de "hace 4 días" daba 3
+    si el proceso corría antes del mediodía (la seed fija las 12:00) y 4 después. La
+    antigüedad no debe depender de la hora.
+  */
   it('la antigüedad no depende de la hora del día', () => {
     const createdAt = daysAgo(4, 12) // 4 días atrás a las 12:00, como la seed
 
@@ -302,7 +308,7 @@ describe('admin sales — transiciones', () => {
   })
 
   it('rechaza transiciones inválidas sin escribir nada', async () => {
-    // Pendiente → Confirmada no está permitido (Q-04: solo desde Contactado).
+    // Pendiente → Confirmada no está permitido: solo desde Contactado.
     await expect(
       call('PATCH', '/admin/sales/1/status', {
         auth: ADMIN,
@@ -334,7 +340,7 @@ describe('admin sales — transiciones', () => {
   })
 
   it('cancela una venta recién creada y da de baja el uso del cupón', async () => {
-    // Recorrido cruzado: la compra de US4 y su cancelación en US7.
+    // La venta se crea como cliente y se cancela desde el panel.
     const target = variant('endurance-classic', 'L', 'black')
     const coupon = getDb().discountCoupons.find((item) => item.couponCode === 'VIKI10')
     const usageBefore = coupon.usageCount

@@ -1,5 +1,7 @@
-// Controller de talles: `GET /public/sizes?line&audience`, tabla SIZE con sus
-// rangos, con el contrato del backend (`SizeResponseDTO`).
+/*
+  Talles: `GET /public/sizes?line&audience`, tabla SIZE con sus rangos, con el contrato del
+  backend (`SizeResponseDTO`).
+*/
 
 import { audienceCodec, lineCodec } from '@api/wire.js'
 import { getDb } from '@mocks/db/database.js'

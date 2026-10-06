@@ -1,16 +1,18 @@
-// Líneas y públicos: slug de URL (inglés, minúsculas) ↔ valor del modelo.
-// `/fit?line=jammer&audience=kids` (alias `linea=`) se resuelve acá.
+/*
+  Líneas y públicos: slug de URL (inglés, minúsculas) ↔ valor del modelo.
+  `/fit?line=jammer&audience=kids` (alias `linea=`) se resuelve acá.
+*/
 
 import { Audience, Line } from '@constants/enums.js'
 
-export const LINE_SLUGS = {
+const LINE_SLUGS = {
   endurance: Line.Endurance,
   soft: Line.Soft,
   jammer: Line.Jammer,
   sunga: Line.Sunga,
 }
 
-export const AUDIENCE_SLUGS = {
+const AUDIENCE_SLUGS = {
   adult: Audience.Adult,
   kids: Audience.Kids,
 }

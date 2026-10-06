@@ -1,8 +1,8 @@
-// Service de autenticación contra el contrato del backend (`/auth/**`).
-//
-// El backend devuelve `{ accessToken, refreshToken, user }` (ver
-// `decodeAuth`). El `guestSessionId` del dispositivo viaja en registro y login
-// para que las generaciones hechas como invitado pasen a la cuenta.
+/*
+  Autenticación contra `/auth/**`. El backend devuelve `{ accessToken, refreshToken, user }`
+  (ver `decodeAuth`), y el `guestSessionId` del dispositivo viaja en registro y login para que
+  las generaciones hechas como invitado pasen a la cuenta.
+*/
 
 import { apiClient } from '@api/client/api-client.js'
 import { getGuestSessionId } from '@api/client/session.js'

@@ -1,5 +1,7 @@
-// Reglas derivadas de stock (§5.3 del plan). El ER no tiene columna de
-// "reservado": la reserva se deriva de las ventas abiertas.
+/*
+  Reglas derivadas de stock. El ER no tiene columna de "reservado": la reserva se deriva
+  de las ventas abiertas.
+*/
 
 import { RESERVING_SALE_STATUSES } from '@mocks/domain/sale-state-machine.js'
 
@@ -23,12 +25,10 @@ export function availableQuantity(db, variantId) {
   return Math.max(0, variant.quantity - reservedQuantity(db, variantId))
 }
 
-export function hasAvailableStock(db, variantId) {
-  return availableQuantity(db, variantId) > 0
-}
-
-// ¿Hay alguna variante activa de ese talle con stock disponible?
-// Base de `SIZE_GENERATION.stockAvailableAtQuery`.
+/*
+  ¿Hay alguna variante activa de ese talle con stock disponible? Es la base de
+  `SIZE_GENERATION.stockAvailableAtQuery`.
+*/
 export function hasStockForSize(db, sizeId) {
   return db.productVariants.some(
     (variant) =>

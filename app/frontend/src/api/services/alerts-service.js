@@ -1,4 +1,4 @@
-// Service de avisos de reposición (US3).
+// Avisos de reposición del cliente.
 
 import { apiClient } from '@api/client/api-client.js'
 

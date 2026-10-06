@@ -1,3 +1,8 @@
+/*
+  Navegación compartida por la barra lateral (escritorio) y el drawer (móvil): un solo
+  origen para que las dos superficies no se desincronicen.
+*/
+
 import { routes } from '@app/routes.js'
 import {
   IconArrowsRightLeft,
@@ -13,25 +18,21 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 
-// Navegación compartida por la barra lateral (desktop) y el drawer (móvil).
-// Un solo origen para que las dos superficies no se desincronicen.
-
-// Ítems genéricos del sitio (bug squash sesión #1, F3): los mismos para cualquier
-// rol, en cualquier pantalla.
-//
-// "Cuenta" ya no está: se llega desde el avatar del header (`Mi cuenta`), así que
-// el ítem era un duplicado en la navegación.
+/*
+  Ítems del sitio: los mismos para cualquier rol y en cualquier pantalla. La cuenta no tiene
+  ítem propio porque se llega desde el avatar del header (`Mi cuenta`).
+*/
 export const CUSTOMER_NAV_ITEMS = [
   { to: routes.fit(), labelKey: 'nav.fit', icon: IconRuler },
   { to: routes.catalog(), labelKey: 'nav.catalog', icon: IconPackage },
   { to: routes.accountHistory, labelKey: 'nav.history', icon: IconClock },
 ]
 
-// Sub-ítems del panel: visibles para un admin en cuanto está autenticado.
-//
-// El modo asistente NO tiene ítem propio: es el mismo formulario de medición con
-// un switch "para terceros", así que vive dentro de `/fit` y aparece solo para
-// admins (bug squash sesión #1).
+/*
+  Sub-ítems del panel: visibles para un admin en cuanto está autenticado. El modo asistente
+  no tiene ítem propio porque es el mismo formulario de medición con un switch para
+  terceros: vive dentro de `/fit` y aparece solo para admins.
+*/
 export const PANEL_NAV_ITEMS = [
   { to: routes.admin, labelKey: 'nav.analytics', icon: IconChartHistogram },
   { to: routes.adminSales, labelKey: 'nav.sales', icon: IconReceipt },
@@ -45,21 +46,16 @@ export const PANEL_NAV_ITEMS = [
   { to: routes.adminSettings, labelKey: 'nav.settings', icon: IconSettings },
 ]
 
-// ¿Esta ruta corresponde a este ítem? Por prefijo, para que una ruta hija
-// (`/admin/sales/7`) siga marcando su ítem padre.
+// Por prefijo: una ruta hija (`/admin/sales/7`) sigue marcando su ítem padre.
 export function isNavItemActive(pathname, to) {
   return pathname === to || pathname.startsWith(`${to}/`)
 }
 
-// Devuelve la ruta del ítem que debe quedar resaltado, o `null`.
-//
-// El resaltado es **exclusivo**: entre todos los ítems que matchean por prefijo
-// gana el más específico (el prefijo más largo). Antes cada ítem se evaluaba por
-// separado, así que estar en `/admin/inventory/movements` resaltaba a la vez
-// "Inventario" y "Movimientos" — dos ítems encendidos a la vez, que no se lee.
-//
-// El empate por longitud se rompe por orden de declaración, por eso la lista de
-// rutas se pasa completa y no ítem por ítem.
+/*
+  Ruta del ítem que debe quedar resaltado, o `null`. El resaltado es exclusivo: entre los
+  ítems que coinciden por prefijo gana el más específico. Mirarlos por separado enciende el
+  padre y el hijo a la vez; el empate por longitud se rompe por orden de declaración.
+*/
 export function matchNavItem(pathname, items) {
   let best = null
   let bestLength = -1

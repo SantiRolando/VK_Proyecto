@@ -1,5 +1,7 @@
-// Controller de cupones (T058): valida el cupón que el cliente escribe en el
-// checkout contra las líneas elegidas. El canje por puntos llega en US6.
+/*
+  Cupones: valida el cupón que el cliente escribe en el checkout contra las líneas
+  elegidas.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'

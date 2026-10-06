@@ -122,7 +122,7 @@ describe('feedback controller', () => {
     ).rejects.toMatchObject({ status: 409, code: 'ALREADY_RATED' })
   })
 
-  it('permite calificar al invitado, sin puntos (Q-15)', async () => {
+  it('permite calificar al invitado, sin puntos', async () => {
     const guest = generationByGuest('guest-demo-1')
 
     const result = await call('PATCH', `/fit/generations/${guest.id}/feedback`, {

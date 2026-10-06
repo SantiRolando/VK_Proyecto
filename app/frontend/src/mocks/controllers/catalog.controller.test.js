@@ -71,16 +71,17 @@ describe('catalog controller', () => {
     expect(enduranceL.data.length).toBeGreaterThan(0)
   })
 
-  // Bug squash sesión #1: sin talle ya no se bloquea la pantalla. Se listan los
-  // productos activos y el meta marca `hasStock: null` para señalar que no hubo
-  // filtro por talle (antes esta rama devolvía 422).
+  /*
+    Sin talle no hay filtro de stock que aplicar: se listan los productos activos y el
+    meta marca `hasStock: null`, que lo distingue de un talle agotado. Devolver 422
+    bloqueaba la pantalla.
+  */
   it('sin sizeId lista el catálogo completo y marca hasStock como null', async () => {
     const result = await call('GET', '/catalog')
 
     expect(result.data.length).toBeGreaterThan(0)
     expect(result.meta.size).toBeNull()
     expect(result.meta.hasStock).toBeNull()
-    // Todos los productos listados están activos.
     expect(result.data.every((item) => item.variants.length === 0)).toBe(true)
   })
 

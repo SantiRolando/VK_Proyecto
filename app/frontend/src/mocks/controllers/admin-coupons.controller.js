@@ -1,6 +1,8 @@
-// Cupones del panel (US11/T097, FR-026): plantillas canjeables y cupones
-// asignados. Editar el `pointsCost` de una plantilla se refleja al instante en
-// el cliente (`GET /rewards` lee la misma colección).
+/*
+  Cupones del panel: plantillas canjeables y cupones asignados. Editar el `pointsCost` de
+  una plantilla se refleja al instante en el cliente (`GET /rewards` lee la misma
+  colección).
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
@@ -9,7 +11,7 @@ import { register } from '@mocks/router/mock-router.js'
 
 const DISCOUNT_TYPES = ['Fixed', 'Percentage']
 
-export function serializeAdminCoupon(db, coupon, now = new Date()) {
+function serializeAdminCoupon(db, coupon, now = new Date()) {
   const owner = db.users.find((item) => item.id === coupon.userId) ?? null
 
   return {

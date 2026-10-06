@@ -1,7 +1,7 @@
 /*
-    Endpoints de la suite (`/__test/*`): solo existen en modo mock. `reset` vuelve
-    al seed y `transport` ajusta latencia y tasa de fallos en caliente, para poder
-    ver y probar los estados de carga y error sin reiniciar la app.
+  Endpoints de la suite (`/__test/*`): solo existen en modo mock. `reset` vuelve al seed y
+  `transport` ajusta latencia y tasa de fallos en caliente, para poder ver y probar los
+  estados de carga y error sin reiniciar la app.
 */
 import { resetDatabase } from '@mocks/db/database.js'
 import { configureMockRouter, register } from '@mocks/router/mock-router.js'

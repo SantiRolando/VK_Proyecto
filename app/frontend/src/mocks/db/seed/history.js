@@ -1,15 +1,9 @@
-// Seed histórico: SIZE_GENERATION, SALE, SALE_LINE, DISCOUNT_COUPON,
-// POINTS_MOVEMENT, TRANSACTION, TRANSACTION_LINE, ALERT — §4.8 del plan.
-//
-// Fechas relativas a "hoy". Casos sembrados a propósito:
-//   - ventas en cada estado, ambos canales y ambos métodos de entrega,
-//     una con antigüedad > 3 días;
-//   - ~40 generaciones en 60 días con calificaciones/comentarios, algunas
-//     vinculadas a venta y varias con `stock_available_at_query = false`
-//     (Endurance M) para el mapa de talles faltantes;
-//   - cupones de porcentaje, monto fijo, vencido y plantillas canjeables;
-//   - una venta pendiente que reserva la variante de 1 unidad (conflicto);
-//   - alertas de stock crítico derivadas de la reserva/stock sembrado.
+/*
+  Seed histórico de generaciones, ventas, cupones, movimientos de puntos, transacciones y
+  alertas. Las fechas son relativas a hoy y se siembran los casos límite (ventas en cada
+  estado, cupones vencidos, la última unidad reservada, alertas de stock) para que la demo
+  y los tests encuentren datos en todos los rangos.
+*/
 
 import { findVariant } from '@mocks/db/seed/catalog.js'
 import {
@@ -641,7 +635,7 @@ function buildTransactions(sizes, products, productVariants) {
 function buildAlerts(db) {
   const alerts = []
 
-  // Stock crítico: derivado (disponible < mínimo) — dominio real, no hardcodeado.
+  // Stock crítico calculado con `availableQuantity`; no se hardcodea la lista.
   for (const variant of db.productVariants) {
     if (!variant.active) continue
     if (availableQuantity(db, variant.id) < variant.minStock) {
@@ -657,7 +651,7 @@ function buildAlerts(db) {
     }
   }
 
-  // Aviso de reposición: Ana suscripta al talle M de Endurance (sin stock).
+  // Aviso de reposición: Ana suscrita al talle M de Endurance, que no tiene stock.
   const enduranceMNavy = findVariant(
     db.sizes,
     db.products,
@@ -740,8 +734,10 @@ export function buildHistory({ sizes, products, productVariants }) {
       type: 'Feedback',
       createdAt: daysAgo(18),
     },
-    // Ajuste manual de saldo: deja a Ana con 120 puntos (40 de feedback + 80),
-    // suficiente para canjear una plantilla en la demo de US6.
+    /*
+      Ajuste manual de saldo: deja a Ana con 120 puntos (40 de feedback + 80), suficientes
+      para canjear una plantilla en la demo.
+    */
     {
       id: 5,
       userId: 2,

@@ -1,5 +1,7 @@
-// Puntos del cliente (US6, FR-018): saldo y movimientos. El saldo vive en el
-// usuario; cada premio o canje deja un POINTS_MOVEMENT.
+/*
+  Puntos del cliente: saldo y movimientos. El saldo vive en el usuario y cada premio o
+  canje deja un POINTS_MOVEMENT.
+*/
 
 import { getDb } from '@mocks/db/database.js'
 import { register } from '@mocks/router/mock-router.js'

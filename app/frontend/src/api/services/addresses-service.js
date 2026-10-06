@@ -1,5 +1,7 @@
-// Service de direcciones (US4/US5) contra `/addresses` del backend.
-// La edición es un PUT completo (el formulario manda todos los campos).
+/*
+  Direcciones del cliente. La edición es un PUT completo: el formulario manda todos los
+  campos.
+*/
 
 import { apiClient } from '@api/client/api-client.js'
 

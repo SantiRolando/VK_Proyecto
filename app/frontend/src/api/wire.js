@@ -1,9 +1,9 @@
-// Contrato de red del backend ↔ modelo del FE.
-//
-// La API real escribe los enums en UPPER_SNAKE (`ENDURANCE`, `WITH_WARNING`) y
-// el FE los maneja en PascalCase (`Endurance`, `WithWarning`, ver
-// `constants/enums.js`). Los services convierten con estos codecs en ambos
-// sentidos, y los controllers mock los usan para hablar el mismo contrato.
+/*
+  Contrato de red entre el backend y el modelo del FE. La API escribe los enums en
+  UPPER_SNAKE (`ENDURANCE`, `WITH_WARNING`) y el FE los maneja en PascalCase (`Endurance`,
+  `WithWarning`, ver `constants/enums.js`); los codecs convierten en ambos sentidos y los
+  controllers mock los usan para hablar el mismo contrato.
+*/
 
 import {
   Audience,
@@ -43,8 +43,10 @@ export const outcomeCodec = codec(GenerationOutcome)
 export const warningCodec = codec(FitWarning)
 export const referralCodec = codec(ReferralReason)
 
-// Paginación del backend: `{ items, page, size, totalElements, totalPages }` →
-// `{ items, meta }`, la forma que consumen los hooks de listados.
+/*
+  Paginación del backend: el envelope `{ items, page, size, totalElements, totalPages }` se
+  convierte en `{ items, meta }`, la forma que consumen los hooks de listados.
+*/
 export function decodePage(page, decodeItem = (item) => item) {
   return {
     items: (page?.items ?? []).map(decodeItem),
@@ -70,8 +72,10 @@ export function decodeUser(user) {
   }
 }
 
-// `AuthResponseDTO` → sesión del FE. `token` es el access token (Bearer) y
-// `refreshToken` el opaco de un solo uso para `/auth/refresh` y `/auth/logout`.
+/*
+  `AuthResponseDTO` → sesión del FE. `token` es el access token (Bearer) y `refreshToken` el
+  opaco de un solo uso para `/auth/refresh` y `/auth/logout`.
+*/
 export function decodeAuth(auth) {
   return {
     user: decodeUser(auth.user),
@@ -97,8 +101,10 @@ export function optionalNumber(value) {
   return Number.isFinite(number) ? number : null
 }
 
-// El backend exige solo dígitos con `+` opcional; el formulario admite espacios
-// y guiones para escribir cómodo.
+/*
+  El backend exige solo dígitos con `+` opcional; el formulario admite espacios y guiones para
+  escribir cómodo.
+*/
 export function normalizePhone(value) {
   const raw = String(value ?? '').trim()
   const plus = raw.startsWith('+') ? '+' : ''

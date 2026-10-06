@@ -1,16 +1,18 @@
-// Movimientos de stock del panel (US9/T088, FR-023).
-//
-// El ajuste es auditable: `applyStockTransaction` valida el motivo y la
-// dirección, ajusta el físico de cada variante y devuelve las líneas para que
-// el controller arme la TRANSACTION. Si un ingreso lleva una variante de
-// disponible 0 a > 0, dispara el aviso de reposición (§5.3).
+/*
+  Movimientos de stock del panel. El ajuste es auditable: `applyStockTransaction` valida
+  el motivo y la dirección, ajusta el físico de cada variante y devuelve las líneas para
+  que el controller arme la TRANSACTION. Si un ingreso lleva el disponible de 0 a > 0,
+  dispara el aviso de reposición.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { notifyRestockAlerts } from '@mocks/domain/alerts.js'
 import { availableQuantity } from '@mocks/domain/stock.js'
 
-// Motivos que el admin registra a mano. `SaleConfirmed` lo crea la confirmación
-// de venta (US7) y no se elige desde el formulario.
+/*
+  Motivos que el admin registra a mano. `SaleConfirmed` lo crea la confirmación de venta
+  y no se elige desde el formulario.
+*/
 export const MANUAL_REASONS = [
   'GoodsReceipt',
   'SizeExchange',
@@ -21,8 +23,10 @@ export const MANUAL_REASONS = [
 // Algunos motivos fijan la dirección; el resto la elige el admin.
 const FIXED_DIRECTIONS = { GoodsReceipt: 'Inbound', LossDefective: 'Outbound' }
 
-// Dirección impuesta por el motivo (null = la elige el admin). El FE la recibe
-// por contrato, así no repite la regla.
+/*
+  Dirección impuesta por el motivo (null = la elige el admin). El FE la recibe por
+  contrato, así no repite la regla.
+*/
 export function fixedDirection(reason) {
   return FIXED_DIRECTIONS[reason] ?? null
 }
@@ -65,8 +69,7 @@ export function applyStockTransaction(db, { reason, direction, lines }) {
   const resolved = resolveDirection(reason, direction)
   const normalized = normalizeLines(lines)
 
-  // Validar todo antes de tocar el físico: un movimiento no puede quedar a
-  // medias.
+  // Validar todo antes de tocar el físico: un movimiento no puede quedar a medias.
   const prepared = normalized.map((line) => {
     const variant = db.productVariants.find((item) => item.id === line.variantId)
     if (!variant) throw new ApiError(404, 'NOT_FOUND', { variantId: line.variantId })

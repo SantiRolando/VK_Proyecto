@@ -1,3 +1,8 @@
+/*
+  Rutas de la app. Cada página entra por `lazy` para que el primer render no arrastre el
+  bundle completo; `LandingPage` va directo porque es el entry point.
+*/
+
 import { GuestOnly } from '@app/guards/guest-only.jsx'
 import { RequireAuth } from '@app/guards/require-auth.jsx'
 import { RequireRole } from '@app/guards/require-role.jsx'
@@ -10,178 +15,122 @@ import { LandingPage } from '@features/landing/landing-page.jsx'
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 
-const FitPage = lazy(() =>
-  import('@features/fit/fit-page.jsx').then((module) => ({
-    default: module.FitPage,
-  })),
+/*
+  `lazy` espera un módulo con `default` y las páginas se exportan con nombre: el helper arma
+  ese envoltorio y deja cada ruta en una línea.
+*/
+const lazyPage = (load, name) =>
+  lazy(() => load().then((module) => ({ default: module[name] })))
+
+const FitPage = lazyPage(() => import('@features/fit/fit-page.jsx'), 'FitPage')
+const ResultPage = lazyPage(() => import('@features/fit/result-page.jsx'), 'ResultPage')
+
+const LoginPage = lazyPage(() => import('@features/auth/login-page.jsx'), 'LoginPage')
+const RegisterPage = lazyPage(
+  () => import('@features/auth/register-page.jsx'),
+  'RegisterPage',
+)
+const OtpPage = lazyPage(() => import('@features/auth/otp-page.jsx'), 'OtpPage')
+const ForgotPasswordPage = lazyPage(
+  () => import('@features/auth/forgot-password-page.jsx'),
+  'ForgotPasswordPage',
+)
+const ResetPasswordPage = lazyPage(
+  () => import('@features/auth/reset-password-page.jsx'),
+  'ResetPasswordPage',
 )
 
-const ResultPage = lazy(() =>
-  import('@features/fit/result-page.jsx').then((module) => ({
-    default: module.ResultPage,
-  })),
+const CatalogPage = lazyPage(
+  () => import('@features/catalog/catalog-page.jsx'),
+  'CatalogPage',
+)
+const ProductDetailPage = lazyPage(
+  () => import('@features/catalog/product-detail.jsx'),
+  'ProductDetailPage',
 )
 
-const LoginPage = lazy(() =>
-  import('@features/auth/login-page.jsx').then((module) => ({
-    default: module.LoginPage,
-  })),
+const AlertsPage = lazyPage(
+  () => import('@features/account/alerts-page.jsx'),
+  'AlertsPage',
+)
+const AccountInfoPage = lazyPage(
+  () => import('@features/account/account-info-page.jsx'),
+  'AccountInfoPage',
+)
+const HistoryPage = lazyPage(
+  () => import('@features/account/history-page.jsx'),
+  'HistoryPage',
+)
+const OrdersPage = lazyPage(
+  () => import('@features/account/orders-page.jsx'),
+  'OrdersPage',
+)
+const RewardsPage = lazyPage(
+  () => import('@features/account/rewards-page.jsx'),
+  'RewardsPage',
 )
 
-const RegisterPage = lazy(() =>
-  import('@features/auth/register-page.jsx').then((module) => ({
-    default: module.RegisterPage,
-  })),
+const CheckoutPage = lazyPage(
+  () => import('@features/checkout/checkout-page.jsx'),
+  'CheckoutPage',
+)
+const ConfirmationPage = lazyPage(
+  () => import('@features/checkout/confirmation-page.jsx'),
+  'ConfirmationPage',
 )
 
-const OtpPage = lazy(() =>
-  import('@features/auth/otp-page.jsx').then((module) => ({
-    default: module.OtpPage,
-  })),
+const AdminSalesPage = lazyPage(
+  () => import('@features/admin/sales/sales-page.jsx'),
+  'AdminSalesPage',
+)
+const AdminSaleDetailPage = lazyPage(
+  () => import('@features/admin/sales/sale-detail-page.jsx'),
+  'AdminSaleDetailPage',
+)
+const DashboardPage = lazyPage(
+  () => import('@features/admin/dashboard/dashboard-page.jsx'),
+  'DashboardPage',
+)
+const InventoryPage = lazyPage(
+  () => import('@features/admin/inventory/inventory-page.jsx'),
+  'InventoryPage',
+)
+const MovementsPage = lazyPage(
+  () => import('@features/admin/inventory/movements-page.jsx'),
+  'MovementsPage',
+)
+const ProductsPage = lazyPage(
+  () => import('@features/admin/catalog-admin/products-page.jsx'),
+  'ProductsPage',
+)
+const MissingSizesPage = lazyPage(
+  () => import('@features/admin/analytics/missing-sizes-page.jsx'),
+  'MissingSizesPage',
+)
+const CommentsPage = lazyPage(
+  () => import('@features/admin/analytics/comments-page.jsx'),
+  'CommentsPage',
+)
+const CouponsPage = lazyPage(
+  () => import('@features/admin/coupons/coupons-page.jsx'),
+  'CouponsPage',
+)
+const SettingsPage = lazyPage(
+  () => import('@features/admin/settings/settings-page.jsx'),
+  'SettingsPage',
+)
+const UsersPage = lazyPage(
+  () => import('@features/admin/users/users-page.jsx'),
+  'UsersPage',
 )
 
-const ForgotPasswordPage = lazy(() =>
-  import('@features/auth/forgot-password-page.jsx').then((module) => ({
-    default: module.ForgotPasswordPage,
-  })),
-)
-
-const ResetPasswordPage = lazy(() =>
-  import('@features/auth/reset-password-page.jsx').then((module) => ({
-    default: module.ResetPasswordPage,
-  })),
-)
-
-const CatalogPage = lazy(() =>
-  import('@features/catalog/catalog-page.jsx').then((module) => ({
-    default: module.CatalogPage,
-  })),
-)
-
-const ProductDetailPage = lazy(() =>
-  import('@features/catalog/product-detail.jsx').then((module) => ({
-    default: module.ProductDetailPage,
-  })),
-)
-
-const AlertsPage = lazy(() =>
-  import('@features/account/alerts-page.jsx').then((module) => ({
-    default: module.AlertsPage,
-  })),
-)
-
-const AccountInfoPage = lazy(() =>
-  import('@features/account/account-info-page.jsx').then((module) => ({
-    default: module.AccountInfoPage,
-  })),
-)
-
-const HistoryPage = lazy(() =>
-  import('@features/account/history-page.jsx').then((module) => ({
-    default: module.HistoryPage,
-  })),
-)
-
-const OrdersPage = lazy(() =>
-  import('@features/account/orders-page.jsx').then((module) => ({
-    default: module.OrdersPage,
-  })),
-)
-
-const RewardsPage = lazy(() =>
-  import('@features/account/rewards-page.jsx').then((module) => ({
-    default: module.RewardsPage,
-  })),
-)
-
-const CheckoutPage = lazy(() =>
-  import('@features/checkout/checkout-page.jsx').then((module) => ({
-    default: module.CheckoutPage,
-  })),
-)
-
-const ConfirmationPage = lazy(() =>
-  import('@features/checkout/confirmation-page.jsx').then((module) => ({
-    default: module.ConfirmationPage,
-  })),
-)
-
-const AdminSalesPage = lazy(() =>
-  import('@features/admin/sales/sales-page.jsx').then((module) => ({
-    default: module.AdminSalesPage,
-  })),
-)
-
-const DashboardPage = lazy(() =>
-  import('@features/admin/dashboard/dashboard-page.jsx').then((module) => ({
-    default: module.DashboardPage,
-  })),
-)
-
-const InventoryPage = lazy(() =>
-  import('@features/admin/inventory/inventory-page.jsx').then((module) => ({
-    default: module.InventoryPage,
-  })),
-)
-
-const MovementsPage = lazy(() =>
-  import('@features/admin/inventory/movements-page.jsx').then((module) => ({
-    default: module.MovementsPage,
-  })),
-)
-
-const ProductsPage = lazy(() =>
-  import('@features/admin/catalog-admin/products-page.jsx').then((module) => ({
-    default: module.ProductsPage,
-  })),
-)
-
-const MissingSizesPage = lazy(() =>
-  import('@features/admin/analytics/missing-sizes-page.jsx').then((module) => ({
-    default: module.MissingSizesPage,
-  })),
-)
-
-const CommentsPage = lazy(() =>
-  import('@features/admin/analytics/comments-page.jsx').then((module) => ({
-    default: module.CommentsPage,
-  })),
-)
-
-const CouponsPage = lazy(() =>
-  import('@features/admin/coupons/coupons-page.jsx').then((module) => ({
-    default: module.CouponsPage,
-  })),
-)
-
-const SettingsPage = lazy(() =>
-  import('@features/admin/settings/settings-page.jsx').then((module) => ({
-    default: module.SettingsPage,
-  })),
-)
-
-const UsersPage = lazy(() =>
-  import('@features/admin/users/users-page.jsx').then((module) => ({
-    default: module.UsersPage,
-  })),
-)
-
-const AdminSaleDetailPage = lazy(() =>
-  import('@features/admin/sales/sale-detail-page.jsx').then((module) => ({
-    default: module.AdminSaleDetailPage,
-  })),
-)
-
-// Todas las rutas de la app (§4.5 del plan), con las pantallas reales aún
-// como stubs; cada historia reemplaza su stub por la página definitiva.
 export function AppRouter() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        {/* Público: la landing es el entry point */}
         <Route path={routes.home} element={<LandingPage />} />
 
-        {/* Autenticación (solo sin sesión) */}
+        {/* Autenticación: solo sin sesión */}
         <Route
           element={
             <GuestOnly>
@@ -258,7 +207,6 @@ export function AppRouter() {
           <Route path={routes.adminSettings} element={<SettingsPage />} />
         </Route>
 
-        {/* 404 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>

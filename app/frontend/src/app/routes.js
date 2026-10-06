@@ -1,6 +1,7 @@
-// Constantes de rutas en inglés, centralizadas (constitución IV, §4.5 del
-// plan). Ningún componente escribe paths a mano. Renombrar una ruta es
-// cambiar este archivo (Q-10).
+/*
+  Constantes de rutas, centralizadas y en inglés: ningún componente escribe paths a mano, así
+  que renombrar una ruta es cambiar este archivo.
+*/
 
 function withQuery(path, query) {
   if (!query) return path
@@ -22,24 +23,20 @@ export function safeReturnTo(returnTo) {
 }
 
 export const routes = {
-  // La landing pública es el entry point (bug squash sesión #1, F1).
+  // La landing pública es el entry point.
   home: '/',
 
-  // Destino post-login / post-logout del cliente. No puede ser `home` porque
-  // `home` es la landing pública: mandar ahí a un cliente logueado lo dejaría
-  // en la página de marketing.
-  //
-  // Apunta al resumen (`/account/overview`) y no a `/account` a secas: el layout
-  // autenticado no tiene `path`, y el `index` de una ruta sin path matchea la
-  // ruta del padre (o sea `/`), no `/account`. Con un `index`, `/account` caía en
-  // el catch-all y mostraba el 404. Con una ruta con path real, resuelve siempre.
+  /*
+    Destino post-login y post-logout del cliente: no puede ser `home`, que es la landing
+    pública, porque mandaría a un cliente logueado a la página de marketing. Apunta al
+    resumen y no a `/account` a secas porque el layout autenticado no tiene `path`: un
+    `index` matchea `/` y no `/account`, así que `/account` caía en el 404.
+  */
   account: '/account/overview',
   accountRoot: '/account',
 
-  // Información de cuenta: datos del usuario y agenda de perfiles/direcciones.
-  // Antes no existía ninguna pantalla para ver los datos de la cuenta.
+  // Datos del usuario y agenda de perfiles y direcciones.
   accountInfo: '/account/info',
-  accountInfoProfiles: '/account/info/perfiles',
 
   login: '/login',
   loginOtp: '/login/otp',

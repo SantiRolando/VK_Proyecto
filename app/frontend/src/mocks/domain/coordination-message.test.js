@@ -119,8 +119,10 @@ describe('coordination-message', () => {
 
     expect(contact.to).toBeNull()
     expect(contact.url).toBeNull()
-    // El cuerpo se sigue armando: la venta ya existe y la pantalla puede
-    // ofrecer un respaldo.
+    /*
+      El cuerpo se sigue armando: la venta ya existe y la pantalla puede ofrecer un
+      respaldo.
+    */
     expect(contact.body).toContain('endurance-classic')
   })
 })

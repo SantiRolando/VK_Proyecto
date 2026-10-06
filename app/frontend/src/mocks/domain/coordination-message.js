@@ -1,9 +1,9 @@
-// Composición del mensaje de coordinación (T057, Q-09).
-//
-// El destino (SETTING `coordination_email` / `coordination_whatsapp`) y el
-// texto los arma el "backend" — acá el mock —: el FE solo abre la URL. El
-// idioma viaja en el request (el perfil del usuario aún no lo guarda) y las
-// plantillas viven acá, no en el FE.
+/*
+  Composición del mensaje de coordinación. El destino lo toma de SETTING
+  (`coordination_email` / `coordination_whatsapp`) y el texto lo arma el backend (acá, el
+  mock): el FE solo abre la URL. El idioma viaja en el request porque el perfil aún no lo
+  guarda, y las plantillas viven en el mock, no en el FE.
+*/
 
 const LOCALES = ['es', 'en']
 
@@ -74,9 +74,11 @@ function formatAddress(address) {
     .join(', ')
 }
 
-// Devuelve `{ channel, to, subject, body, url }`. `url` es null si falta el
-// destino configurado: la venta ya existe, así que la pantalla debe poder
-// ofrecer un respaldo en vez de fallar.
+/*
+  Devuelve `{ channel, to, subject, body, url }`. `url` es null si falta el destino
+  configurado: la venta ya existe, así que la pantalla debe poder ofrecer un respaldo
+  en vez de fallar.
+*/
 export function buildCoordinationMessage({
   sale,
   lines,

@@ -1,6 +1,7 @@
-// Usuarios de la plataforma (panel): directorio con rol, alta/revocación de admin y
-// los indicadores de uso. Antes este controller solo listaba clientes para el
-// modo asistente (US12).
+/*
+  Usuarios de la plataforma (panel): directorio con rol, alta y revocación de admin, e
+  indicadores de uso.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb } from '@mocks/db/database.js'
@@ -13,7 +14,7 @@ function within(dateish, days) {
   return Date.now() - new Date(dateish).getTime() <= days * DAY
 }
 
-/** Actividad por usuario, derivada de datos reales (no hay tabla de sesiones). */
+// Actividad por usuario: no hay tabla de sesiones, se deriva de mediciones y ventas.
 function activityByUser(db) {
   const map = new Map()
   const mark = (userId, date) => {
@@ -45,8 +46,10 @@ function monthKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
-// Clientes registrados (US12): insumo del modo asistente para vincular una
-// generación. Se mantiene con la forma mínima que espera ese flujo.
+/*
+  Clientes registrados: insumo del modo asistente para vincular una generación. Se mantiene
+  con la forma mínima que espera ese flujo.
+*/
 register(
   'GET',
   '/admin/customers',
@@ -61,7 +64,6 @@ register(
   { auth: 'admin' },
 )
 
-// GET /admin/users — directorio completo, con filtro por rol y por actividad.
 register(
   'GET',
   '/admin/users',
@@ -95,10 +97,10 @@ register(
   { auth: 'admin' },
 )
 
-// GET /admin/users/analytics — indicadores del directorio y tendencia de altas.
-//
-// Alcance: "usuarios activos" se deriva de la última medición o compra, porque el
-// mock no registra inicios de sesión. Mide uso del producto, no logins.
+/*
+  Alcance: "usuarios activos" se deriva de la última medición o compra, porque el mock no
+  registra inicios de sesión. Mide uso del producto, no logins.
+*/
 register(
   'GET',
   '/admin/users/analytics',
@@ -147,7 +149,6 @@ register(
   { auth: 'admin' },
 )
 
-// PATCH /admin/users/:id/role — otorga o revoca el rol de administrador.
 register(
   'PATCH',
   '/admin/users/:id/role',
@@ -161,8 +162,10 @@ register(
     const user = db.users.find((item) => item.id === Number(req.params.id))
     if (!user) throw new ApiError(404, 'NOT_FOUND')
 
-    // Salvaguardas: no quedarse sin administradores ni auto-revocarse, que es la
-    // forma más fácil de perder el acceso al panel.
+    /*
+      Salvaguardas: no quedarse sin administradores ni auto-revocarse, que es la forma más
+      fácil de perder el acceso al panel.
+    */
     if (type === 'Customer' && user.type === 'Admin') {
       const adminCount = db.users.filter((item) => item.type === 'Admin').length
       if (adminCount <= 1) throw new ApiError(409, 'LAST_ADMIN')

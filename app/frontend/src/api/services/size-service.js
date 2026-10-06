@@ -1,8 +1,10 @@
-// Service de talles y generaciones (US1) contra el contrato del backend:
-// recomendación pública, detalle, historial y tablas de talles.
-//
-// La respuesta de `recommend` y la del historial son DTOs distintos en el
-// backend; acá se llevan a una misma forma de "generación" para las pantallas.
+/*
+  Talles y generaciones contra el contrato del backend: recomendación pública, detalle,
+  historial y tablas de talles.
+
+  La respuesta de `recommend` y la del historial son DTOs distintos en el backend; acá se
+  llevan a una misma forma de "generación" para las pantallas.
+*/
 
 import { apiClient } from '@api/client/api-client.js'
 import { getGuestSessionId } from '@api/client/session.js'
@@ -73,9 +75,10 @@ function decodeHistoryItem(dto) {
   }
 }
 
-// El `guestSessionId` del dispositivo viaja siempre: sin sesión identifica al
-// invitado (y es el que luego permite releer el resultado); con sesión el
-// backend lo ignora.
+/*
+  El `guestSessionId` del dispositivo viaja siempre: sin sesión identifica al invitado (y es
+  el que luego permite releer el resultado); con sesión el backend lo ignora.
+*/
 function encodeRecommendRequest(payload) {
   const body = {
     line: lineCodec.encode(payload.line),
@@ -102,8 +105,10 @@ export const sizeService = {
   // Detalle con medidas, solo para el dueño con sesión (o un admin).
   getGenerationDetail: (generationId) =>
     apiClient.get(`/fit/generations/${generationId}`).then(decodeHistoryItem),
-  // El backend pagina y no filtra por perfil: se pide la primera página grande y
-  // el filtro por `profileId` se resuelve acá.
+  /*
+    El backend pagina y no filtra por perfil: se pide la primera página grande y el filtro por
+    `profileId` se resuelve acá.
+  */
   listGenerations: (params) =>
     apiClient
       .get('/fit/generations', { page: 1, size: 100 })

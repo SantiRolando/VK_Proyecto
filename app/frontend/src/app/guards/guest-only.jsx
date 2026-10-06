@@ -1,5 +1,8 @@
-// Guard de ruta: solo para usuarios sin sesión (login, registro…).
-// Registro desde invitado queda permitido porque el invitado no tiene sesión.
+/*
+  Guard de ruta: solo para usuarios sin sesión (login, registro…). Mientras se rehidrata la
+  sesión no se decide nada: redirigir ahí trataría como invitado a quien ya tiene sesión
+  guardada.
+*/
 
 import { routes } from '@app/routes.js'
 import { useAuth } from '@features/auth/auth-context.js'

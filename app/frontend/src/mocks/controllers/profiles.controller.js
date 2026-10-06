@@ -1,10 +1,11 @@
-// Controller de perfiles de medidas (US5/T071) con el contrato del backend
-// (`/profiles`): listado, alta, edición completa (PUT), baja y default.
-// Un solo perfil predeterminado por usuario; borrar el default deja al usuario
-// sin default (igual que el backend).
-//
-// La baja es lógica (`active`) para no romper el historial, que referencia
-// `profileId`; el backend en cambio pone `profileId` en null.
+/*
+  Perfiles de medidas con el contrato del backend (`/profiles`): listado, alta, edición
+  completa (PUT), baja y default. Un solo perfil predeterminado por usuario; borrar el
+  default deja al usuario sin default, igual que el backend.
+
+  La baja es lógica (`active`) para no romper el historial, que referencia `profileId`; el
+  backend en cambio pone `profileId` en null.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
@@ -20,7 +21,7 @@ const RANGES = {
   age: [1, 120],
 }
 
-export function serializeProfile(profile) {
+function serializeProfile(profile) {
   return {
     id: profile.id,
     name: profile.name,
@@ -36,7 +37,7 @@ export function serializeProfile(profile) {
   }
 }
 
-// `MeasurementProfileRequestDTO`: nombre obligatorio, medidas opcionales en rango.
+// `MeasurementProfileRequestDTO` del backend.
 function readProfile(body) {
   const fields = {}
   const name = String(body.name ?? '').trim()

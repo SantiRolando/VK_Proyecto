@@ -1,14 +1,13 @@
-// Router REST simulado (§4.3 del plan).
-//
-// Los controllers se registran con `register(method, pattern, handler, {auth})`
-// y `handle(request)` se comporta como un servidor:
-//   - matchea método + path con `:params`,
-//   - resuelve auth por rol (401/403 como HTTP),
-//   - aplica latencia simulada y tasa de fallos configurable,
-//   - propaga `ApiError` tal cual lo haría el backend.
-//
-// Forma del request:  { method, url, query, body, auth: {token}, guestSessionId }
-// Forma del response: { status, data, meta } (o `ApiError` lanzado).
+/*
+  Router REST simulado del modo `mock`: permite desarrollar y probar el FE sin backend.
+  Los controllers se registran con `register(method, pattern, handler, { auth })` y
+  `handle(request)` se comporta como el servidor: match de método y path con `:params`,
+  auth por rol, latencia y tasa de fallos, y `ApiError` propagado tal cual.
+
+  Request: `{ method, url, query, body, auth: { token }, guestSessionId }`. Response:
+  `{ status, data, meta }`, con `meta` opcional para lo que no es el payload (paginación,
+  totales, ejes); un status >= 400 se lanza como `ApiError`, no se devuelve.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb } from '@mocks/db/database.js'
@@ -68,13 +67,12 @@ async function applyLatency() {
   await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// Tokens mock (prototipo: sin firma ni expiración): access `vkfit.<userId>.<nonce>`
-// y refresh `vkfit-refresh.<userId>.<nonce>`. Un refresh nunca autentica.
-//
-// En modo híbrido llega el JWT del backend: se lee su payload (sin verificar la
-// firma, es un mock) y se usa el usuario mock con el mismo id y rol, o uno
-// sintético con los datos del token, para que las rutas que siguen en el mock
-// no rechacen una sesión real.
+/*
+  Tokens mock (`vkfit.<userId>.<nonce>`): sin firma ni expiración, y un refresh nunca
+  autentica. En modo híbrido también llega el JWT del backend y se lee su payload sin
+  verificar la firma, porque las rutas que siguen en el mock no deben rechazar una sesión
+  real.
+*/
 function resolveUser(auth) {
   if (!auth?.token) return null
   const match = /^vkfit\.(\d+)\./.exec(auth.token)
@@ -126,8 +124,8 @@ export async function handle(request) {
   await applyLatency()
 
   /*
-      Las herramientas de la suite (`/__test/*`) no simulan fallos: si lo hicieran,
-      no habría forma de apagar la simulación desde el test que la encendió.
+    Las herramientas de la suite (`/__test/*`) no simulan fallos: si lo hicieran, no
+    habría forma de apagar la simulación desde el test que la encendió.
   */
   const isTestTool = request.url.startsWith('/__test/')
   if (!isTestTool && config.failRate > 0 && Math.random() < config.failRate) {

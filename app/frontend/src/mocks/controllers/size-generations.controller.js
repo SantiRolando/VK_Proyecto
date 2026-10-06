@@ -1,10 +1,12 @@
-// Controller de generaciones de talle (US1) con el contrato del backend:
-// `POST /public/fit/recommend`, `GET /public/fit/generations/:id` (resultado)
-// y `GET /fit/generations[/:id]` (historial del usuario).
-//
-// Regla del ER: una generación pertenece a un cliente (`customerId`) o a un
-// invitado (`guestSessionId`). En modo asistente (US12) el admin la genera
-// (`adminId`) para un tercero, opcionalmente vinculada a un cliente.
+/*
+  Generaciones de talle con el contrato del backend: `POST /public/fit/recommend`,
+  `GET /public/fit/generations/:id` (resultado) y `GET /fit/generations[/:id]` (historial
+  del usuario).
+
+  Regla del ER: una generación pertenece a un cliente (`customerId`) o a un invitado
+  (`guestSessionId`). En modo asistente el admin la genera (`adminId`) para un tercero,
+  opcionalmente vinculada a un cliente.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import {
@@ -36,7 +38,7 @@ function createUuid() {
 }
 
 // `FitRecommendationResponseDTO`: lo que ve quien pidió la recomendación.
-export function serializeRecommendation(db, generation) {
+function serializeRecommendation(db, generation) {
   const size = db.sizes.find((item) => item.id === generation.suggestedSizeId) ?? null
   return {
     id: generation.id,
@@ -52,7 +54,7 @@ export function serializeRecommendation(db, generation) {
 }
 
 // `SizeGenerationResponseDTO`: la fila del historial.
-export function serializeGeneration(db, generation) {
+function serializeGeneration(db, generation) {
   const size = db.sizes.find((item) => item.id === generation.suggestedSizeId) ?? null
   return {
     id: generation.id,

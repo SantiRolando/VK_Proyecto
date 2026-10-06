@@ -1,6 +1,3 @@
-// Colores de producto: dato del catálogo (no se traduce, §4.7). Se mapea el
-// valor estable del ERD a un hex para el swatch visual.
-
 const COLOR_SWATCHES = {
   black: '#111827',
   white: '#f3f4f6',
@@ -12,16 +9,11 @@ const COLOR_SWATCHES = {
   purple: '#7c3aed',
 }
 
-// El color es texto libre del catálogo (`Negro`, `navy`): el swatch sale del
-// mapa cuando el nombre coincide y gris en el resto.
 export function colorHex(color) {
   return COLOR_SWATCHES[String(color ?? '').toLowerCase()] ?? '#9ca3af'
 }
-
-// Opciones del alta/edición de variantes en el panel (US9).
 export const COLOR_OPTIONS = Object.keys(COLOR_SWATCHES)
 
-// Etiqueta del color tal cual el dato (capitalizada para mostrar).
 export function colorLabel(color) {
   const value = String(color ?? '')
   return value.charAt(0).toUpperCase() + value.slice(1)

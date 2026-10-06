@@ -1,9 +1,8 @@
-// Reglas de composición de SALE (§5.3 del plan).
-//
-// "Crear venta" es atómico: se resuelven las líneas contra el catálogo y se
-// valida la disponibilidad de todas antes de escribir nada. La reserva es
-// derivada de las ventas abiertas (domain/stock.js), no hay tabla de reservas
-// (Q-03).
+/*
+  Reglas de composición de SALE. "Crear venta" es atómico: se resuelven las líneas contra
+  el catálogo y se valida la disponibilidad de todas antes de escribir nada. La reserva es
+  derivada de las ventas abiertas (`domain/stock.js`): no hay tabla de reservas.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { round2 } from '@mocks/domain/money.js'
@@ -14,8 +13,10 @@ import { availableQuantity } from '@mocks/domain/stock.js'
 export const SALE_CHANNELS = ['Email', 'Whatsapp']
 export const DELIVERY_METHODS = ['StorePickup', 'HomeDelivery']
 
-// Une ítems repetidos de la misma variante: dos líneas de 1 unidad no pueden
-// pasar la validación de stock cuando solo hay una disponible.
+/*
+  Une ítems repetidos de la misma variante: dos líneas de 1 unidad no pueden pasar la
+  validación de stock cuando solo hay una disponible.
+*/
 function normalizeItems(items) {
   if (!Array.isArray(items) || items.length === 0) {
     throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['items'] })
@@ -42,8 +43,10 @@ function normalizeItems(items) {
   }))
 }
 
-// Resuelve cada ítem contra el catálogo: variante y producto activos, talle y
-// precio unitario del producto. No valida stock (`checkAvailability`).
+/*
+  Resuelve cada ítem contra el catálogo: variante y producto activos, talle y precio
+  unitario del producto. No valida stock (`checkAvailability`).
+*/
 export function resolveSaleLines(db, items) {
   return normalizeItems(items).map(({ variantId, quantity }) => {
     const variant = db.productVariants.find(
@@ -72,8 +75,10 @@ export function subtotalOf(lines) {
   return round2(lines.reduce((sum, line) => sum + line.lineTotal, 0))
 }
 
-// 409 con la variante y las unidades disponibles para que la pantalla pueda
-// explicar el conflicto sin perder la selección.
+/*
+  409 con la variante y las unidades disponibles para que la pantalla pueda explicar el
+  conflicto sin perder la selección.
+*/
 export function checkAvailability(db, lines) {
   for (const line of lines) {
     const available = availableQuantity(db, line.variantId)
@@ -87,8 +92,10 @@ export function checkAvailability(db, lines) {
   }
 }
 
-// Líneas de una venta con el detalle que consumen las pantallas (producto,
-// talle, color y totales).
+/*
+  Líneas de una venta con el detalle que consumen las pantallas: producto, talle, color y
+  totales.
+*/
 export function saleLinesWithDetails(db, sale) {
   return db.saleLines
     .filter((line) => line.saleId === sale.id)
@@ -123,14 +130,15 @@ export function saleLinesWithDetails(db, sale) {
     })
 }
 
-// Antigüedad de una venta en días, para que el admin vea las que llevan mucho
-// tiempo abiertas (Q-11: sin TTL, la decisión es suya).
-//
-// Redondeo y no `floor`: la seed fija las fechas a las 12:00, así que una venta
-// de "hace 4 días" lleva 3 días y 12 horas transcurridas. Con `floor` el número
-// dependía de la hora a la que corriera el proceso —a la mañana daba 3, a la
-// tarde 4— y el umbral de antigüedad quedaba a merced del reloj. `round` hace que
-// "hace 4 días" sea 4 sin importar la hora.
+/*
+  Antigüedad de una venta en días, para que el admin vea las que llevan mucho tiempo
+  abiertas. Sin TTL: la decisión de cerrarlas es suya.
+
+  Se redondea y no se aplica `floor`: la seed fija las fechas a las 12:00, así que una
+  venta de "hace 4 días" lleva 3 días y 12 horas transcurridas. Con `floor` el resultado
+  dependía de la hora a la que corriera el proceso y el umbral de antigüedad quedaba a
+  merced del reloj.
+*/
 export function saleAgeDays(sale, now = new Date()) {
   const created = new Date(sale.createdAt).getTime()
   return Math.max(0, Math.round((now.getTime() - created) / 86_400_000))
@@ -143,8 +151,10 @@ export function isStaleSale(db, sale, now = new Date()) {
   return saleAgeDays(sale, now) >= threshold
 }
 
-// Confirmar la venta: descuenta el físico de cada variante (§5.3) y devuelve
-// sus líneas para registrar el movimiento de stock.
+/*
+  Confirmar la venta: descuenta el físico de cada variante y devuelve sus líneas para
+  registrar el movimiento de stock.
+*/
 export function applyConfirmationToStock(db, sale) {
   const lines = db.saleLines.filter((line) => line.saleId === sale.id)
 
@@ -157,8 +167,7 @@ export function applyConfirmationToStock(db, sale) {
   return lines
 }
 
-// Cancelar la venta: la reserva se libera sola (es derivada, no hay nada que
-// ajustar) y el cupón recupera su uso.
+// Cancelar la venta: la reserva se libera sola (es derivada) y el cupón recupera su uso.
 export function releaseCouponUsage(db, sale) {
   if (!sale.couponId) return null
 

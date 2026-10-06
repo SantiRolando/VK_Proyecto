@@ -1,9 +1,10 @@
-// Feedback de una generación (US6, FR-017/FR-018): calificación Chico/Correcto/
-// Grande con comentario opcional, sin exigir compra. Una sola vez por
-// generación (`ALREADY_RATED`).
-//
-// El invitado puede calificar (Q-15) pero no suma puntos: `POINTS_MOVEMENT`
-// exige usuario. El cálculo de puntos vive en `domain/points.js`.
+/*
+  Feedback de una generación: calificación Chico/Correcto/Grande con comentario opcional,
+  sin exigir compra, y una sola vez por generación (`ALREADY_RATED`).
+
+  El invitado puede calificar pero no suma puntos: `POINTS_MOVEMENT` exige usuario. El
+  cálculo de puntos vive en `domain/points.js`.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { mutate } from '@mocks/db/database.js'

@@ -1,5 +1,6 @@
-// Service de compras (US4): crear la venta, ver las propias y validar el
-// cupón del checkout. Solo conoce paths y DTOs (§6.2).
+/*
+  Compras del cliente: crear la venta, ver las propias y validar el cupón del checkout.
+*/
 
 import { apiClient } from '@api/client/api-client.js'
 

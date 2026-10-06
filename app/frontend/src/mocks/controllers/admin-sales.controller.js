@@ -1,7 +1,8 @@
-// Controller de administración de ventas (US7/T066): listado con filtros,
-// detalle y transiciones de estado. Confirmar registra el movimiento de stock
-// `SaleConfirmed` y descuenta el físico; cancelar solo libera la reserva
-// (derivada) y devuelve el uso del cupón (§5.3/Q-03).
+/*
+  Administración de ventas: listado con filtros, detalle y transiciones de estado.
+  Confirmar registra el movimiento de stock `SaleConfirmed` y descuenta el físico;
+  cancelar solo libera la reserva (derivada) y devuelve el uso del cupón.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { serializeAddress } from '@mocks/controllers/addresses.controller.js'
@@ -31,7 +32,7 @@ const TARGET_STATUSES = [SaleStatus.Contacted, SaleStatus.Confirmed, SaleStatus.
 
 const DEFAULT_PAGE_SIZE = 20
 
-// El admin necesita los datos de contacto del cliente para coordinar (T069).
+// El admin necesita los datos de contacto del cliente para coordinar.
 function serializeCustomer(db, userId) {
   const user = db.users.find((item) => item.id === userId) ?? null
   if (!user) return null
@@ -44,7 +45,7 @@ function serializeCustomer(db, userId) {
   }
 }
 
-export function serializeAdminSale(db, sale, now = new Date()) {
+function serializeAdminSale(db, sale, now = new Date()) {
   const lines = saleLinesWithDetails(db, sale)
   const subtotal = subtotalOf(lines)
   const discount = saleDiscount(db, sale, subtotal)
@@ -60,12 +61,14 @@ export function serializeAdminSale(db, sale, now = new Date()) {
     contactedAt: sale.contactedAt ?? null,
     confirmedAt: sale.confirmedAt ?? null,
     cancelledAt: sale.cancelledAt ?? null,
-    // Sin TTL de reserva (Q-11): la antigüedad es solo informativa.
+    // Sin TTL de reserva: la antigüedad es solo informativa.
     reservedUntil: null,
     ageDays: saleAgeDays(sale, now),
     isStale: isStaleSale(db, sale, now),
-    // Las acciones posibles las decide el backend (la máquina de estados vive
-    // acá): el FE solo dibuja los botones que recibe.
+    /*
+      Las acciones posibles las decide el backend (la máquina de estados vive acá): el FE
+      solo dibuja los botones que recibe.
+    */
     allowedTransitions: TRANSITIONS[sale.status] ?? [],
     generationId: sale.generationId ?? null,
     customer: serializeCustomer(db, sale.userId),
@@ -84,8 +87,10 @@ register(
   (req) => {
     const db = getDb()
     const { status, channel } = req.query
-    // `open=true` trae las ventas en vuelo (todavía retienen reserva): es lo
-    // que consume el bloque de ventas en vuelo del dashboard (US8).
+    /*
+      `open=true` trae las ventas en vuelo (todavía retienen reserva): es lo que consume el
+      bloque de ventas en vuelo del dashboard.
+    */
     const open = req.query.open === true || req.query.open === 'true'
     const page = Math.max(1, Number(req.query.page) || 1)
     const pageSize = Math.max(1, Number(req.query.pageSize) || DEFAULT_PAGE_SIZE)

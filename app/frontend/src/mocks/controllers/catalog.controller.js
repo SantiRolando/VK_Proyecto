@@ -1,9 +1,10 @@
-// Controller de catálogo (US3): lista solo lo que hay disponible en el talle
-// consultado y expone el detalle de un producto con la disponibilidad por
-// color.
-//
-// La demanda no satisfecha no se registra acá: el ER la deriva de
-// `SIZE_GENERATION.stock_available_at_query = false` (§4.7).
+/*
+  Catálogo: lista solo lo que hay disponible en el talle consultado y expone el detalle de
+  un producto con la disponibilidad por color.
+
+  La demanda no satisfecha no se registra acá: el ER la deriva de
+  `SIZE_GENERATION.stock_available_at_query = false`.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb } from '@mocks/db/database.js'
@@ -33,10 +34,11 @@ register('GET', '/catalog', (req) => {
   const { sizeId, line } = req.query
   const db = getDb()
 
-  // Sin talle: se puede explorar el catálogo igual (bug squash sesión #1). Antes
-  // esta rama devolvía 422 y la pantalla quedaba bloqueada. Ahora se listan los
-  // productos activos de la línea, sin filtrar por disponibilidad, y el meta
-  // marca `hasStock: null` para que el FE sepa que no hubo filtro de talle.
+  /*
+    Sin talle se puede explorar el catálogo igual: se listan los productos activos de la
+    línea, sin filtrar por disponibilidad, y el meta marca `hasStock: null` para que el FE
+    sepa que no hubo filtro de talle. Devolver 422 bloqueaba la pantalla.
+  */
   if (!sizeId) {
     const lineValue = line ?? null
     const items = db.products

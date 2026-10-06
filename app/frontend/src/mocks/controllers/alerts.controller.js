@@ -1,9 +1,9 @@
-// Controller de avisos de reposición (US3, Q-06).
-//
-// `POST /restock-alerts {line,sizeId}` crea una alerta por variante (el ER
-// exige `variantId` obligatorio en ALERT) y es idempotente: no duplica las
-// suscripciones activas del mismo usuario. La lista agrupa por línea × talle
-// para que el cliente vea una sola suscripción.
+/*
+  Avisos de reposición. `POST /restock-alerts {line,sizeId}` crea una alerta por variante
+  (el ER exige `variantId` obligatorio en ALERT) y es idempotente: no duplica las
+  suscripciones activas del mismo usuario. La lista agrupa por línea × talle para que el
+  cliente vea una sola suscripción.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
@@ -93,7 +93,6 @@ register(
       }
       group.ids.push(alert.id)
       group.variantCount += 1
-      // Notificada solo si todas las alertas del grupo lo están.
       if (alert.status === 'Active') group.status = 'Active'
       groups.set(key, group)
     }

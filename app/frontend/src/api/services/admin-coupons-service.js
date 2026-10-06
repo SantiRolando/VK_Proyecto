@@ -1,12 +1,9 @@
-// Service de cupones del panel (US11/T097): plantillas y cupones (§6.2).
+// Plantillas de cupón y cupones del panel.
 
 import { apiClient } from '@api/client/api-client.js'
 
 export const adminCouponsService = {
-  list: () =>
-    apiClient
-      .request({ method: 'GET', url: '/admin/coupons' })
-      .then((response) => ({ items: response.data, meta: response.meta })),
+  list: () => apiClient.getList('/admin/coupons'),
   create: (payload) => apiClient.post('/admin/coupons', payload),
   update: (couponId, payload) => apiClient.patch(`/admin/coupons/${couponId}`, payload),
 }

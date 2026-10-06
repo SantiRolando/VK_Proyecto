@@ -1,10 +1,12 @@
-// Máquina de estados de SALE (§4.2 y §5.4 del plan).
-//
-//   PendingCoordination ──► Contacted ──► Confirmed   (descuenta stock físico)
-//           │                   │
-//           └────────┬──────────┘
-//                    ▼
-//                Cancelled   (libera reserva; no válido desde Confirmed)
+/*
+  Máquina de estados de SALE.
+
+  PendingCoordination ──► Contacted ──► Confirmed   (descuenta stock físico)
+          │                   │
+          └────────┬──────────┘
+                   ▼
+               Cancelled   (libera reserva; no válido desde Confirmed)
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 
@@ -32,8 +34,10 @@ export function canTransition(from, to) {
   return (TRANSITIONS[from] ?? []).includes(to)
 }
 
-// Aplica una transición válida devolviendo la venta actualizada con la marca
-// de tiempo que corresponde (§4.2). Transición inválida → 409.
+/*
+  Aplica una transición válida devolviendo la venta actualizada con la marca de
+  tiempo que corresponde. Una transición inválida responde 409.
+*/
 export function applyTransition(sale, to) {
   if (!canTransition(sale.status, to)) {
     throw new ApiError(409, 'INVALID_TRANSITION', { from: sale.status, to })

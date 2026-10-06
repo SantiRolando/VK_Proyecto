@@ -206,7 +206,7 @@ describe('GET /public/fit/generations/:id y /fit/generations', () => {
 
   it('expone /public/sizes con rangos, filtrado por línea y público', async () => {
     const all = await call('GET', '/public/sizes')
-    // 7 Endurance + 7 Soft + 6 Jammer + 6 Sunga adultos, 3 + 3 varones, 4 niñas
+    // Total del catálogo de talles del seed (adultos, varones y niñas).
     expect(all.data).toHaveLength(36)
 
     const endurance = await call('GET', '/public/sizes', {
@@ -238,7 +238,7 @@ describe('GET /public/fit/generations/:id y /fit/generations', () => {
   })
 })
 
-describe('modo asistente (US12)', () => {
+describe('modo asistente', () => {
   const ADMIN = { token: 'vkfit.1.test' }
   const ANA = { token: 'vkfit.2.test' }
 

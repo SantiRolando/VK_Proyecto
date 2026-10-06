@@ -1,6 +1,7 @@
-// Controller de configuración pública (US1): destino de contacto de VK para
-// la derivación a atención personalizada (fuera de rango). Los valores viven
-// en SETTING (R-12); el CRUD admin llega en US11.
+/*
+  Configuración pública: destino de contacto de VK para la derivación a atención
+  personalizada (fuera de rango). Los valores viven en SETTING.
+*/
 
 import { getDb } from '@mocks/db/database.js'
 import { settingValue } from '@mocks/domain/settings.js'

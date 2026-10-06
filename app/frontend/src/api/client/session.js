@@ -1,10 +1,11 @@
-// Estado de sesión a nivel transporte: access token (con su vencimiento),
-// refresh token, snapshot del usuario y `guestSessionId` del dispositivo. Vive
-// fuera de React para que `api-client` pueda adjuntar las cabeceras sin
-// depender del árbol de componentes.
-//
-// Los tokens se guardan en localStorage (R-15 del plan). El refresh token es de
-// un solo uso: se reemplaza en cada renovación (`api-client`).
+/*
+  Estado de sesión a nivel transporte: access token (con su vencimiento), refresh token,
+  snapshot del usuario y `guestSessionId` del dispositivo. Vive fuera de React para que
+  `api-client` adjunte las cabeceras sin depender del árbol de componentes.
+
+  Los tokens se guardan en localStorage y el refresh token es de un solo uso: se reemplaza en
+  cada renovación.
+*/
 
 const SESSION_KEY = 'vkfit.session'
 const GUEST_KEY = 'vkfit.guest'
@@ -65,16 +66,14 @@ export function isAccessTokenExpired(session, marginMs = 30_000) {
 export function clearSession() {
   try {
     window.localStorage.removeItem(SESSION_KEY)
-  } catch {
-    // ignorar
-  }
-  // El service worker cachea GETs públicos; lo privado nunca se cachea, pero
-  // se limpia igual para que otro usuario del dispositivo no herede nada.
+  } catch {}
+  /*
+    El service worker cachea GETs públicos; lo privado nunca se cachea, pero se limpia igual
+    para que otro usuario del dispositivo no herede nada.
+  */
   try {
     if (typeof caches !== 'undefined') caches.delete(API_CACHE)
-  } catch {
-    // ignorar
-  }
+  } catch {}
 }
 
 function createUuid() {
@@ -88,8 +87,10 @@ function createUuid() {
   })
 }
 
-// Identificador persistente del invitado en el dispositivo (FR-008), un UUID
-// como exige el backend. Si el navegador lo pierde se crea uno nuevo.
+/*
+  Identificador persistente del invitado en el dispositivo, un UUID como exige el backend. Si
+  el navegador lo pierde se crea uno nuevo.
+*/
 export function getGuestSessionId() {
   let id
   try {
@@ -108,13 +109,13 @@ export function getGuestSessionId() {
   return id
 }
 
-// Se rota al entrar y al salir: las mediciones de invitado ya pasaron a la
-// cuenta, y las que haga el próximo invitado del dispositivo no deben ir a
-// parar a la cuenta de quien se logueó antes.
+/*
+  Se rota al entrar y al salir: las mediciones de invitado ya pasaron a la cuenta, y las que
+  haga el próximo invitado del dispositivo no deben ir a parar a la cuenta de quien se logueó
+  antes.
+*/
 export function resetGuestSessionId() {
   try {
     window.localStorage.removeItem(GUEST_KEY)
-  } catch {
-    // ignorar
-  }
+  } catch {}
 }

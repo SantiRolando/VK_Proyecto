@@ -1,5 +1,4 @@
-// Composición de la seed: construye una DB completa y consistente con el
-// ER nuevo (15 entidades, camelCase — §5.2 del plan).
+// Composición de la seed: arma una DB completa y consistente entre entidades.
 
 import { buildCatalog } from '@mocks/db/seed/catalog.js'
 import { buildHistory } from '@mocks/db/seed/history.js'
@@ -23,9 +22,10 @@ export function seedDatabase() {
     alerts,
   } = buildHistory({ sizes, products, productVariants })
 
-  // Clon profundo: cada seed devuelve instancias nuevas. Sin esto, los
-  // builders comparten arrays a nivel de módulo y un reset contamina la
-  // base con mutaciones de seeds anteriores.
+  /*
+    Clon profundo: los builders comparten arrays a nivel de módulo, así que un reset
+    contamina la base con las mutaciones de la seed anterior.
+  */
   return structuredClone({
     users,
     measurementProfiles,

@@ -21,8 +21,10 @@ function call(method, url, { body, auth, query } = {}) {
 
 const ADMIN = { token: 'vkfit.1.test' }
 
-// Endurance talle M no tiene stock en ningún color en la seed, y Ana está
-// suscripta al aviso de reposición de la variante navy.
+/*
+  Endurance talle M no tiene stock en ningún color en la seed, y Ana está suscripta al
+  aviso de reposición de la variante navy.
+*/
 function enduranceMSize() {
   return getDb().sizes.find((item) => item.line === 'Endurance' && item.code === 'M')
 }

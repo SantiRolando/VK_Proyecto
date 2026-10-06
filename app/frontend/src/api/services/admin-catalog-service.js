@@ -1,8 +1,10 @@
-// Service del catálogo del panel (US9) contra `/admin/catalog/products` del
-// backend: productos, sus variantes y el alta/baja lógica de ambos.
-//
-// `quantity` de una variante no se edita acá: nace en 0 y solo cambia por
-// movimientos de stock (`admin-inventory-service`).
+/*
+  Catálogo del panel contra `/admin/catalog/products`: productos, sus variantes y el alta y
+  baja lógica de ambos.
+
+  `quantity` de una variante no se edita acá: nace en 0 y solo cambia por movimientos de
+  stock (`admin-inventory-service`).
+*/
 
 import { apiClient } from '@api/client/api-client.js'
 import { audienceCodec, decodePage, lineCodec } from '@api/wire.js'

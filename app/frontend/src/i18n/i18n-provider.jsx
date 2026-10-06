@@ -1,7 +1,9 @@
-// Provider de i18n (T009): idioma por defecto `es` (Uruguay), detección
-// inicial por navegador y persistencia en localStorage. Expone `t` con
-// interpolación `{{var}}` y plurales (`key.one` / `key.other` según
-// `Intl.PluralRules`) más los formateadores `formatNumber/Date/Currency`.
+/*
+  Provider de i18n: idioma por defecto `es` (Uruguay), detección inicial por navegador y
+  persistencia en localStorage. Expone `t` con interpolación `{{var}}` y plurales
+  (`key.one` / `key.other` según `Intl.PluralRules`), más los formateadores
+  `formatNumber` / `formatDate` / `formatCurrency`.
+*/
 
 import { I18nContext } from '@i18n/context.js'
 import {
@@ -23,7 +25,7 @@ function readStoredLanguage() {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (stored === 'es' || stored === 'en') return stored
   } catch {
-    // ignorar
+    // Sin localStorage (bloqueado o modo privado): se cae a la detección por navegador.
   }
   return null
 }
@@ -33,7 +35,6 @@ export function I18nProvider({ children }) {
     () => readStoredLanguage() ?? detectBrowserLanguage(),
   )
 
-  // El idioma del documento acompaña al idioma activo (lectores de pantalla).
   useEffect(() => {
     document.documentElement.lang = language
   }, [language])
@@ -44,7 +45,7 @@ export function I18nProvider({ children }) {
       try {
         window.localStorage.setItem(STORAGE_KEY, next)
       } catch {
-        // ignorar
+        // No se pudo persistir: el idioma queda solo en memoria.
       }
     }
 

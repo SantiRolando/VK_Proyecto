@@ -1,13 +1,9 @@
-// Seed: catálogo (PRODUCT, PRODUCT_VARIANT) — §4.8 del plan.
-// ~12 productos (2–3 por línea y público) con variantes producto × talle × color y
-// casos sembrados a propósito:
-//   - Endurance talle M sin stock en ningún color (flujo "sin stock").
-//   - Una variante con disponible = 1 (prueba de carrera/conflicto).
-//   - Variantes por debajo del mínimo (alertas de stock crítico).
+/*
+  Seed de PRODUCT y PRODUCT_VARIANT. Además del catálogo base se siembran casos límite de
+  stock para ejercitar los flujos de venta y las alertas.
+*/
 
 import { between, createRandom } from '@mocks/db/seed/helpers.js'
-
-export const COLORS = ['navy', 'black', 'blue', 'red', 'pink', 'green', 'purple']
 
 // model es único por producto: la base del SKU.
 const PRODUCTS = [
@@ -87,7 +83,7 @@ const PRODUCTS = [
     price: 990,
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     colors: ['black', 'red', 'blue'],
-    singleUnit: ['S:red'], // disponible = 1 (carrera/conflicto)
+    singleUnit: ['S:red'], // disponible = 1: caso de carrera al reservar
   },
   {
     id: 9,
@@ -185,8 +181,10 @@ export function buildCatalog(sizes) {
   return { products, productVariants }
 }
 
-// Busca una variante por modelo de producto + código de talle + color
-// (usado por el seed histórico para enlazar ventas/movimientos).
+/*
+  Busca una variante por modelo, talle y color. La usa el seed histórico para enlazar las
+  ventas y los movimientos.
+*/
 export function findVariant(sizes, products, productVariants, model, sizeCode, color) {
   const product = products.find((item) => item.model === model)
   if (!product) throw new Error(`Producto de seed no encontrado: ${model}`)

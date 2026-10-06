@@ -1,12 +1,14 @@
-// Reglas derivadas de POINTS_MOVEMENT y DISCOUNT_COUPON (§5.3 del plan,
-// FR-017/FR-018/FR-019). Vive en el mock: el FE solo muestra el resultado.
-//
-// Feedback: una sola vez por generación. Si el cliente está autenticado, no
-// agotó el tope diario y el sorteo acierta → suma puntos. El azar se inyecta
-// (`random`) para poder testear sin depender de `Math.random`.
-//
-// Canje: requiere `pointsBalance >= pointsCost`; crea una copia del cupón
-// plantilla con dueño y código único, y registra el movimiento negativo.
+/*
+  Reglas derivadas de POINTS_MOVEMENT y DISCOUNT_COUPON. Viven en el mock: el FE solo
+  muestra el resultado.
+
+  Feedback: una sola vez por generación. Si el cliente está autenticado, no agotó el tope
+  diario y el sorteo acierta, suma puntos. El azar se inyecta (`random`) para poder
+  testear sin depender de `Math.random`.
+
+  Canje: requiere `pointsBalance >= pointsCost`; crea una copia del cupón plantilla con
+  dueño y código único, y registra el movimiento negativo.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { settingNumber } from '@mocks/domain/settings.js'
@@ -27,8 +29,10 @@ function sameDay(a, b) {
   )
 }
 
-// Feedback que *otorgó* puntos hoy: el tope diario cuenta premios, no
-// calificaciones (un feedback sin puntos no consume cupo — §2.5).
+/*
+  Feedback que *otorgó* puntos hoy: el tope diario cuenta premios, no calificaciones
+  (un feedback sin puntos no consume cupo).
+*/
 export function feedbackAwardsToday(db, userId, now = new Date()) {
   return db.pointsMovements.filter(
     (movement) =>
@@ -44,8 +48,10 @@ export function dailyLimitReached(db, userId, now = new Date()) {
   return feedbackAwardsToday(db, userId, now) >= limit
 }
 
-// Otorga (o no) puntos por un feedback ya validado. Muta al usuario y los
-// movimientos; devuelve el `reward` que consume el FE.
+/*
+  Otorga (o no) puntos por un feedback ya validado. Muta al usuario y los movimientos, y
+  devuelve el `reward` que consume el FE.
+*/
 export function grantFeedbackReward(
   db,
   { user, generationId, now = new Date(), random = Math.random },
@@ -102,8 +108,7 @@ function uniqueCouponCode(db, base) {
   return code
 }
 
-// Canjea una plantilla por una copia propia. Lanza 422 si no alcanzan los
-// puntos (caso borde del plan §2.5).
+// Canjea una plantilla por una copia propia. Lanza 422 si no alcanzan los puntos.
 export function redeemTemplate(db, { user, template, now = new Date() }) {
   const cost = Number(template.pointsCost ?? 0)
   if (user.pointsBalance < cost) {

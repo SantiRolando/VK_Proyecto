@@ -1,11 +1,8 @@
-// Seed: tabla SIZE (talles y rangos por línea y público), copia de la tabla de
-// referencia del backend (`V2__seed_reference_data.sql`) con los mismos ids y
-// el mismo orden, así un `sizeId` vale igual en modo mock e híbrido.
-//   - Endurance/Soft adulto: busto + cintura (mismos rangos, etiquetas Soft
-//     corridas un paso).
-//   - Jammer/Sunga adulto: cintura + cadera.
-//   - Jammer/Sunga niños: cintura + cadera puntuales (min = max), edad orientativa.
-//   - Endurance niñas: solo edad.
+/*
+  Seed de SIZE: talles y rangos por línea y público. Replica la tabla de referencia del
+  backend (`V2__seed_reference_data.sql`), con los mismos ids y el mismo orden, para que
+  un `sizeId` valga igual en modo mock e híbrido.
+*/
 
 let nextId = 1
 

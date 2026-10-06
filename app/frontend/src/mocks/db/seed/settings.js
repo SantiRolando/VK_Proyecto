@@ -1,5 +1,4 @@
-// Seed: SETTING (configuración de reglas de negocio, clave-valor).
-// Claves del ERD más las extensiones de contacto del plan (Q-09).
+// Seed de SETTING: reglas de negocio en clave-valor.
 
 import { daysAgo } from '@mocks/db/seed/helpers.js'
 
@@ -11,8 +10,10 @@ export function buildSettings() {
     { key: 'max_daily_feedback', value: '5', updatedAt },
     { key: 'coordination_email', value: 'ventas@vikinga.com.uy', updatedAt },
     { key: 'coordination_whatsapp', value: '+59899000000', updatedAt },
-    // Q-11: sin TTL de reserva. A partir de estos días el admin ve la venta
-    // como "vieja" y decide si la mueve o la cancela.
+    /*
+      Sin TTL de reserva: pasados estos días el admin ve la venta como vieja y decide si
+      moverla o cancelarla.
+    */
     { key: 'stale_sale_days', value: '3', updatedAt },
   ]
 }

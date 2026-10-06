@@ -1,10 +1,10 @@
-// Catálogo del panel (US9/T088) con el contrato del backend
-// (`/admin/catalog/products`): productos paginados, detalle con variantes,
-// alta, edición completa (PUT), activar/desactivar, y las variantes de cada
-// producto (alta, edición, activar/desactivar).
-//
-// `quantity` (físico) no se toca acá: nace en 0 y cambia solo con movimientos
-// de stock, para que todo ajuste quede auditado.
+/*
+  Catálogo del panel con el contrato del backend (`/admin/catalog/products`): productos
+  paginados y las variantes de cada producto (alta, edición y activar/desactivar).
+
+  `quantity` (físico) no se toca acá: nace en 0 y cambia solo con movimientos de stock,
+  para que todo ajuste quede auditado.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { audienceCodec, lineCodec } from '@api/wire.js'
@@ -13,7 +13,7 @@ import { register } from '@mocks/router/mock-router.js'
 
 const BASE = '/admin/catalog/products'
 
-export function serializeProduct(product) {
+function serializeProduct(product) {
   return {
     id: product.id,
     line: lineCodec.encode(product.line),
@@ -27,7 +27,7 @@ export function serializeProduct(product) {
   }
 }
 
-export function serializeVariant(db, variant) {
+function serializeVariant(db, variant) {
   const size = db.sizes.find((item) => item.id === variant.sizeId) ?? null
   return {
     id: variant.id,

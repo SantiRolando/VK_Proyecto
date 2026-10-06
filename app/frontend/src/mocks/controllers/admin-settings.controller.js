@@ -1,7 +1,8 @@
-// Reglas del juego (US11/T097, FR-026). SETTING es clave-valor con claves
-// snake_case del ERD; acá se expone un DTO en camelCase y se valida la edición
-// en bloque (`PATCH`). Los valores los leen los controllers de negocio
-// (probabilidad de puntos, tope diario, contacto de coordinación, Q-11).
+/*
+  Reglas del juego. La tabla SETTING es clave-valor con claves snake_case del ERD; acá se
+  expone un DTO en camelCase y se valida la edición en bloque (`PATCH`). Los valores los
+  leen los controllers de negocio.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb, mutate } from '@mocks/db/database.js'

@@ -1,6 +1,7 @@
-// Utilidades puras de i18n (testeables sin React):
-// interpolación `{{var}}`, plurales vía Intl.PluralRules y formatos con Intl
-// (`es-UY` / `en`) — R-06 del plan.
+/*
+  Utilidades puras de i18n, testeables sin React: interpolación `{{var}}`, plurales vía
+  `Intl.PluralRules` y formatos con `Intl` (`es-UY` / `en`).
+*/
 
 export const LOCALES = { es: 'es-UY', en: 'en' }
 

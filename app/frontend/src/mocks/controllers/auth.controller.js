@@ -1,10 +1,12 @@
-// Controller mock de autenticación con el contrato del backend (`/auth/**`):
-// registro, login, refresh, logout, OTP (ingreso y cambio de clave) y `me`.
-// Un solo formulario para clientes y admins (el rol del usuario decide el lado).
-//
-// Migración de invitado: al registrarse o iniciar sesión con un
-// `guestSessionId`, las generaciones de ese invitado pasan al usuario y, si no
-// tiene perfiles, la última con medidas se guarda como perfil «Mis medidas».
+/*
+  Autenticación con el contrato del backend (`/auth/**`): registro, login, refresh, logout,
+  OTP (ingreso y cambio de clave) y `me`. Un solo formulario para clientes y admins (el rol
+  del usuario decide el lado).
+
+  Migración de invitado: al registrarse o iniciar sesión con un `guestSessionId`, las
+  generaciones de ese invitado pasan al usuario y, si no tiene perfiles, la última con
+  medidas se guarda como perfil «Mis medidas».
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { roleCodec } from '@api/wire.js'
@@ -16,7 +18,7 @@ const MOCK_OTP_CODE = '123456'
 const ACCESS_TTL_SECONDS = 30 * 60
 const REFRESH_TTL_SECONDS = 30 * 24 * 60 * 60
 
-// `UserResponseDTO` del backend: rol en UPPER_SNAKE, nunca credenciales.
+// `UserResponseDTO` del backend: nunca expone credenciales.
 export function serializeUser(user) {
   return {
     id: user.id,
@@ -33,12 +35,12 @@ function nonce() {
   return Math.random().toString(36).slice(2, 10)
 }
 
-export function issueToken(userId) {
+function issueToken(userId) {
   return `vkfit.${userId}.${nonce()}`
 }
 
 // `AuthResponseDTO` del backend.
-export function issueSession(user) {
+function issueSession(user) {
   return {
     accessToken: issueToken(user.id),
     expiresInSeconds: ACCESS_TTL_SECONDS,

@@ -1,6 +1,8 @@
-// Recompensas (US6, FR-019): plantillas de cupón canjeables por puntos, canje y
-// "mis cupones". La validez del cupón canjeado es la misma que la de la
-// plantilla (`domain/coupons.js` la evalúa en el checkout).
+/*
+  Recompensas: plantillas de cupón canjeables por puntos, canje y "mis cupones". La validez
+  del cupón canjeado es la misma que la de la plantilla (`domain/coupons.js` la evalúa en
+  el checkout).
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { serializeMovement } from '@mocks/controllers/points.controller.js'
@@ -10,7 +12,7 @@ import { redeemableTemplates, redeemTemplate } from '@mocks/domain/points.js'
 import { register } from '@mocks/router/mock-router.js'
 
 // Plantilla disponible para canjear (el `pointsCost` es lo que ve el cliente).
-export function serializeTemplate(coupon) {
+function serializeTemplate(coupon) {
   return {
     id: coupon.id,
     code: coupon.couponCode,
@@ -21,8 +23,7 @@ export function serializeTemplate(coupon) {
   }
 }
 
-// Cupón propio: código, beneficio y vigencia.
-export function serializeOwnedCoupon(coupon) {
+function serializeOwnedCoupon(coupon) {
   return {
     id: coupon.id,
     code: coupon.couponCode,

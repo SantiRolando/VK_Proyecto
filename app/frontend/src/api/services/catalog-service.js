@@ -1,13 +1,9 @@
-// Service de catálogo (US3).
+// Catálogo público, sin sesión.
 
 import { apiClient } from '@api/client/api-client.js'
 
 export const catalogService = {
-  // Devuelve `{ items, meta }` porque la pantalla necesita `meta.hasStock`
-  // y los talles adyacentes (§6.2).
-  list: (params) =>
-    apiClient
-      .request({ method: 'GET', url: '/catalog', params })
-      .then((response) => ({ items: response.data, meta: response.meta })),
+  // La pantalla necesita `meta.hasStock` y los talles adyacentes.
+  list: (params) => apiClient.getList('/catalog', params),
   get: (productId, params) => apiClient.get(`/catalog/${productId}`, params),
 }

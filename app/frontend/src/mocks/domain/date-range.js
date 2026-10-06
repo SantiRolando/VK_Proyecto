@@ -1,7 +1,8 @@
-// Rangos de fecha para los filtros de administración (§6.2: `?from=&to=`).
-//
-// Las fechas llegan como ISO-8601 o como `YYYY-MM-DD` (input de fecha del FE);
-// una fecha sin hora cubre el día completo cuando es el límite superior.
+/*
+  Rangos de fecha para los filtros de administración (`?from=&to=`). Las fechas llegan
+  como ISO-8601 o como `YYYY-MM-DD` (input de fecha del FE); sin hora, una fecha cubre
+  el día completo cuando es el límite superior.
+*/
 
 export function timeOrNull(value, { endOfDay = false } = {}) {
   if (!value) return null

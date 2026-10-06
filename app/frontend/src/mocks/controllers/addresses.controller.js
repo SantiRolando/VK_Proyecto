@@ -1,6 +1,8 @@
-// Controller de direcciones (US4/T059 + US5/T075) con el contrato del backend
-// (`/addresses`): listado, alta, edición completa (PUT), baja lógica y default.
-// Borrar la default deja al usuario sin default (igual que el backend).
+/*
+  Controller de direcciones con el contrato del backend (`/addresses`): listado, alta,
+  edición completa (PUT), baja lógica y default. Borrar la default deja al usuario sin
+  default, igual que el backend.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
@@ -23,7 +25,7 @@ export function serializeAddress(address) {
   }
 }
 
-// `AddressRequestDTO`: calle, ciudad y departamento obligatorios.
+// `AddressRequestDTO` del backend.
 function readAddress(body) {
   const fields = {}
   const values = {}

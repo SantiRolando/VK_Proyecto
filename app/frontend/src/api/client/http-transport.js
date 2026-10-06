@@ -1,9 +1,9 @@
-// Transporte HTTP real (`http` / `hybrid`): `fetch` contra la API REST.
-//
-// El backend responde el cuerpo "pelado" (sin envelope) y los errores con
-// `{ status, error, code, message, fields? }` (`error` es el nombre del código
-// HTTP, `code` el estable); acá se adaptan a la forma que consume el resto del
-// FE: `{ status, data, meta }` y `ApiError(status, code, details)`.
+/*
+  Transporte HTTP real (`http` / `hybrid`): `fetch` contra la API REST. El backend responde el
+  cuerpo pelado (sin envelope) y los errores con `{ status, error, code, message, fields? }`
+  (`error` es el nombre del código HTTP y `code` el estable); acá se adaptan a la forma que
+  consume el resto del FE: `{ status, data, meta }` y `ApiError(status, code, details)`.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { env } from '@config/env.js'
@@ -55,8 +55,10 @@ export const httpTransport = {
     if (body !== undefined) {
       requestHeaders['Content-Type'] = 'application/json'
     }
-    // Identifica al invitado (lo lee `/public/fit/generations/{id}`); con
-    // sesión el backend lo ignora.
+    /*
+      Identifica al invitado (lo lee `/public/fit/generations/{id}`); con sesión el backend lo
+      ignora.
+    */
     if (guestSessionId) {
       requestHeaders['X-Guest-Session-Id'] = guestSessionId
     }

@@ -1,7 +1,7 @@
-// Error de API con la forma del contrato (§6.1 del plan):
-// HTTP status + { error: { code, details? } }.
-//
-// El FE nunca muestra `message` del servidor: traduce `code` con `useI18n()`.
+/*
+  Error de API: status HTTP + `{ code, details? }`. El FE nunca muestra el `message` del
+  servidor, traduce `code` con `useI18n()`.
+*/
 
 export class ApiError extends Error {
   constructor(status, code, details) {

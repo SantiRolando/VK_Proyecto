@@ -12,9 +12,11 @@
 
 ## Comentarios
 
-- Un comentario de más de una línea va en bloque: `/*` solo en su línea, el texto adentro y `*/` solo en la suya. No se repite `//` por línea.
-- El bloque dice el porqué y qué se descartó; se corta la historia del cambio, las referencias a tickets y el detalle que el código ya muestra.
-- Un comentario de una sola línea sigue en `//`.
+- Un comentario de más de una línea va en bloque: `/*` solo en su línea, el texto adentro (un nivel de indentación más) y `*/` solo en la suya. No se repite `//` por línea; un comentario de una sola línea sigue en `//`.
+- El bloque dice el porqué y qué alternativa se descartó. Se corta la historia del cambio («antes era…»), el detalle que el código ya muestra y las enumeraciones que se pueden resumir.
+- Sin referencias a Jira ni a user stories: nada de `(T107)`, `(US10)`, `F6`, `R-06`, «bug squash sesión #1» ni «§4.5 del plan». Eso vive en el ticket, no en el código.
+- El registro es el mismo que el de los tickets: español formal, sin voseo, frases cortas y directas, sin jerga decorativa («robusto», «escalable», «potenciar»), con el vocabulario técnico natural (`API`, `hook`, `service`, `mock`, `endpoint`).
+- Un comentario sin contenido es ruido: si hay un `catch` que no hace nada, se dice qué caso cubre; si no hay nada que decir, no se comenta.
 
 ## Imports
 

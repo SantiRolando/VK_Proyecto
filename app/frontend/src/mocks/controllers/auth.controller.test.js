@@ -107,7 +107,7 @@ describe('auth controller (contrato del backend)', () => {
     ).rejects.toMatchObject({ status: 401, code: 'INVALID_CREDENTIALS' })
   })
 
-  it('también migra el invitado al iniciar sesión (Q-05)', async () => {
+  it('también migra el invitado al iniciar sesión', async () => {
     const guestGenerationIds = getDb()
       .sizeGenerations.filter(
         (generation) => generation.guestSessionId === 'guest-demo-1',

@@ -1,9 +1,10 @@
-// Controller de ventas (T058): crea la venta con reserva atómica y expone las
-// compras del usuario con el mensaje de coordinación ya armado (Q-09).
-//
-// La reserva es derivada de las ventas abiertas (domain/stock.js): crear la
-// venta no descuenta `quantity`. El movimiento de stock se crea recién al
-// confirmar (US7), según Q-03.
+/*
+  Ventas: crea la venta con reserva atómica y expone las compras del usuario con el mensaje
+  de coordinación ya armado.
+
+  La reserva es derivada de las ventas abiertas (`domain/stock.js`): crear la venta no
+  descuenta `quantity`. El movimiento de stock se crea recién al confirmar.
+*/
 
 import { ApiError } from '@api/client/api-error.js'
 import { serializeAddress } from '@mocks/controllers/addresses.controller.js'
@@ -29,8 +30,10 @@ import { register } from '@mocks/router/mock-router.js'
 
 const LOCALES = ['es', 'en']
 
-// El mensaje de coordinación solo tiene sentido mientras la venta está abierta
-// (después de confirmar o cancelar ya no hay nada que coordinar).
+/*
+  El mensaje de coordinación solo tiene sentido mientras la venta está abierta: después de
+  confirmar o cancelar ya no hay nada que coordinar.
+*/
 const COORDINABLE_STATUSES = ['PendingCoordination', 'Contacted']
 
 function positiveInteger(value) {
@@ -38,7 +41,7 @@ function positiveInteger(value) {
   return Number.isInteger(number) && number > 0 ? number : null
 }
 
-export function serializeSale(db, sale, { locale = 'es' } = {}) {
+function serializeSale(db, sale, { locale = 'es' } = {}) {
   const lines = saleLinesWithDetails(db, sale)
   const subtotal = subtotalOf(lines)
   const discount = saleDiscount(db, sale, subtotal)
@@ -54,7 +57,7 @@ export function serializeSale(db, sale, { locale = 'es' } = {}) {
     contactedAt: sale.contactedAt ?? null,
     confirmedAt: sale.confirmedAt ?? null,
     cancelledAt: sale.cancelledAt ?? null,
-    // La reserva no vence todavía (Q-11 abierto).
+    // La reserva no vence todavía.
     reservedUntil: null,
     generationId: sale.generationId ?? null,
     coupon: coupon ? { id: coupon.id, code: coupon.couponCode } : null,
@@ -119,8 +122,10 @@ register(
     return mutate((db) => {
       const userId = req.auth.user.id
 
-      // 1) Validar todo antes de escribir: la venta es atómica (§5.3), y un
-      // error a mitad de camino no debe dejar la venta a medio crear.
+      /*
+        Validar todo antes de escribir: la venta es atómica y un error a mitad de camino no
+        debe dejar la venta a medio crear.
+      */
       const lines = resolveSaleLines(db, items)
       checkAvailability(db, lines)
 
@@ -157,7 +162,6 @@ register(
       const subtotal = subtotalOf(lines)
       const discount = computeDiscount(coupon, subtotal)
 
-      // 2) Escribir: venta + líneas + uso del cupón.
       const sale = {
         id: nextId(db.sales),
         userId,
@@ -171,9 +175,11 @@ register(
         contactedAt: null,
         confirmedAt: null,
         cancelledAt: null,
-        // Snapshot del descuento, con el mismo criterio que `dominantMeasure` en
-        // SIZE_GENERATION: el ER no lo guarda y así el historial no cambia si el
-        // cupón cambia después.
+        /*
+          Snapshot del descuento, con el mismo criterio que `dominantMeasure` en
+          SIZE_GENERATION: el ER no lo guarda y así el historial no cambia si el cupón
+          cambia después.
+        */
         discountAmount: discount,
       }
       db.sales.push(sale)
