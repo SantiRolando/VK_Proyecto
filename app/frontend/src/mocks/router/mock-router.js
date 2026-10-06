@@ -125,10 +125,12 @@ function toApiError(result) {
 export async function handle(request) {
   await applyLatency()
 
-  // Las herramientas de `/dev` no simulan fallos: si lo hicieran, no habría
-  // forma de apagar la simulación desde la app (ni de testearlo).
-  const isDevTool = request.url.startsWith('/dev/')
-  if (!isDevTool && config.failRate > 0 && Math.random() < config.failRate) {
+  /*
+      Las herramientas de la suite (`/__test/*`) no simulan fallos: si lo hicieran,
+      no habría forma de apagar la simulación desde el test que la encendió.
+  */
+  const isTestTool = request.url.startsWith('/__test/')
+  if (!isTestTool && config.failRate > 0 && Math.random() < config.failRate) {
     throw new ApiError(500, 'SERVER_ERROR')
   }
 

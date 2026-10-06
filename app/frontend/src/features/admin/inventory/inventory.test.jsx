@@ -1,12 +1,13 @@
-import { setSession } from '@api/client/session.js'
 import { adminInventoryService } from '@api/services/admin-inventory-service.js'
 import { catalogService } from '@api/services/catalog-service.js'
-import { devService } from '@api/services/dev-service.js'
 import { sizeService } from '@api/services/size-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -14,8 +15,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 // US9 sobre el router y los providers reales: ajuste de stock con motivo
 // (auditado) y CRUD del catálogo del panel.
-
-const ADMIN = 1
 
 // Endurance talle M no tiene stock en ningún color en la seed.
 const EMPTY_SKU = 'ENDURANCE-CLASSIC-NAVY-M'
@@ -30,11 +29,6 @@ function renderAt(path) {
   )
 }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 async function rowOf(sku) {
   return (await screen.findByText(sku)).closest('tr')
 }
@@ -42,13 +36,13 @@ async function rowOf(sku) {
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('inventario (US9)', () => {
   it('ajusta el stock con motivo, deja el movimiento auditado y el catálogo lo refleja', async () => {
     const user = userEvent.setup()
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminInventory)
 
     // La variante sin stock arranca en crítico.
@@ -105,7 +99,7 @@ describe('inventario (US9)', () => {
   })
 
   it('lista la auditoría de movimientos con motivo, dirección y autor', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminMovements)
 
     expect(await screen.findByText('Movimientos de stock')).toBeInTheDocument()
@@ -119,7 +113,7 @@ describe('inventario (US9)', () => {
 describe('catálogo del panel (US9)', () => {
   it('crea un producto y lo da de baja sin borrarlo', async () => {
     const user = userEvent.setup()
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminProducts)
 
     expect(await screen.findByText('endurance-classic')).toBeInTheDocument()

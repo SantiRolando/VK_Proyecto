@@ -1,11 +1,6 @@
-/* Superficie con desenfoque para superponer contenido sobre imágenes de fondo
- * (pantallas de autenticación). Tailwind v4 no trae utilidades de
- * `backdrop-filter` por defecto, así que vive acá.
- *
- * El fondo es `--mantine-color-body`, el mismo color que usan las cards de
- * adentro: antes era una mezcla translúcida distinta y la pantalla mostraba dos
- * blancos diferentes (contenedor vs. formulario). */
-
+/*
+    Superficie con desenfoque para superponer contenido sobre imágenes de fondo
+*/
 .vk-scrim {
   backdrop-filter: blur(8px) saturate(1.05);
   -webkit-backdrop-filter: blur(8px) saturate(1.05);

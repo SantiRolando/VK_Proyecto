@@ -1,9 +1,10 @@
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -16,9 +17,8 @@ describe('destino post-login del cliente', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
-    await devService.reset()
-    const { user, token } = await devService.loginAs(2) // Ana
-    setSession(token, user)
+    await testTools.resetDatabase()
+    await signInAs(SeedUser.Ana)
   })
 
   const renderAt = (path) =>

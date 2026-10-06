@@ -1,12 +1,14 @@
-import { clearSession, setSession } from '@api/client/session.js'
+import { clearSession } from '@api/client/session.js'
 import { catalogService } from '@api/services/catalog-service.js'
-import { devService } from '@api/services/dev-service.js'
 import { salesService } from '@api/services/sales-service.js'
 import { sizeService } from '@api/services/size-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -27,13 +29,6 @@ function renderAt(path) {
       </MemoryRouter>
     </Providers>,
   )
-}
-
-// Entra como Ana (cliente con perfiles, direcciones y puntos) por la misma vía
-// que la pantalla `/dev`, sin pasar por el formulario de login.
-async function signInAsAna() {
-  const { user, token } = await devService.loginAs(2)
-  setSession(token, user)
 }
 
 async function sizeOf(line, code) {
@@ -60,15 +55,15 @@ async function goToSummary(user) {
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  // La DB mock es un módulo con estado: se re-siembra vía la API de `/dev`.
-  await devService.reset()
+  // La DB mock es un módulo con estado: se re-siembra con las herramientas de la suite.
+  await testTools.resetDatabase()
 })
 
 describe('checkout (flujo completo)', () => {
   it('va del detalle de producto a la confirmación con el mensaje de coordinación', async () => {
     const user = userEvent.setup()
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
-    await signInAsAna()
+    await signInAs(SeedUser.Ana)
 
     // Talle L de Endurance (la generación 100 es de Ana).
     const sizeL = await sizeOf('Endurance', 'L')
@@ -161,7 +156,7 @@ describe('checkout (flujo completo)', () => {
 
   it('informa el conflicto de stock sin perder la selección', async () => {
     const user = userEvent.setup()
-    await signInAsAna()
+    await signInAs(SeedUser.Ana)
 
     // `sunga-classic` S rojo: la única unidad está reservada por una venta
     // sembrada de otro cliente, así que no hay disponible.
@@ -206,7 +201,7 @@ describe('checkout (flujo completo)', () => {
 
   it('rechaza un cupón inválido sin frenar la compra', async () => {
     const user = userEvent.setup()
-    await signInAsAna()
+    await signInAs(SeedUser.Ana)
 
     const sizeL = await sizeOf('Endurance', 'L')
     const product = await firstEnduranceProduct(sizeL.id)

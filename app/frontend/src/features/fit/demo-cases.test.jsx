@@ -1,12 +1,12 @@
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
-import { GenerationOutcome } from '@constants/enums.js'
+import { GenerationOutcome, SeedUser } from '@constants/enums.js'
 import { DEMO_CASES } from '@features/fit/demo-cases.js'
 import es from '@i18n/locales/es.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -19,9 +19,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 // El último bloque corre **todos** los casos contra el motor: es lo que
 // garantiza que el "esperado" que muestra la pantalla siga siendo el que la
 // tabla devuelve. Si una tabla cambia, el test cae.
-
-const ADMIN = 1
-const CUSTOMER = 2
 
 const caseName = (demoCase) => es[`fit.demo.case.${demoCase.id}`]
 const loadCaseName = (demoCase) => `Cargar caso: ${caseName(demoCase)}`
@@ -40,11 +37,6 @@ const lineSelect = () => screen.getByRole('combobox', { name: LINE_LABEL })
 // El `NumberInput` muestra el sufijo " cm" en el valor cuando no está enfocado.
 const MEASURE_SUFFIX = { bust: ' cm', waist: ' cm', hip: ' cm', age: '' }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 function renderAt(path) {
   return render(
     <Providers>
@@ -59,11 +51,11 @@ describe('VK-82 · precarga de casos para demo', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
-    await devService.reset()
+    await testTools.resetDatabase()
   })
 
   it('la ve un admin y el aviso de que es temporal está en pantalla', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.fit())
 
     expect(await screen.findByText('Casos de demostración')).toBeInTheDocument()
@@ -75,7 +67,7 @@ describe('VK-82 · precarga de casos para demo', () => {
   })
 
   it('no la ve un cliente', async () => {
-    await signInAs(CUSTOMER)
+    await signInAs(SeedUser.Ana)
     renderAt(routes.fit())
 
     // El formulario tiene que estar montado antes de afirmar una ausencia.
@@ -92,7 +84,7 @@ describe('VK-82 · precarga de casos para demo', () => {
   })
 
   it('cada caso menciona su talle esperado', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.fit())
     await screen.findByText('Casos de demostración')
 
@@ -120,7 +112,7 @@ describe('VK-82 · precarga de casos para demo', () => {
 
   it('elegir un caso llena el formulario y no dispara la generación', async () => {
     const user = userEvent.setup()
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.fit())
 
     await user.click(
@@ -150,12 +142,12 @@ describe.each(DEMO_CASES)('VK-82 · caso $id contra el motor', (demoCase) => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
-    await devService.reset()
+    await testTools.resetDatabase()
   })
 
   it('llena el formulario con sus medidas y devuelve el talle esperado', async () => {
     const user = userEvent.setup()
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.fit())
 
     await user.click(await screen.findByRole('button', { name: loadCaseName(demoCase) }))

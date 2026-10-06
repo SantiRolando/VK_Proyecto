@@ -1,10 +1,11 @@
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
 import { rewardsService } from '@api/services/rewards-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -12,8 +13,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 // Cupones del panel (US11/T098) sobre el router y los providers reales. El
 // efecto en el cliente se comprueba contra `GET /rewards`.
-
-const ADMIN = 1
 
 function renderAt(path) {
   return render(
@@ -25,20 +24,15 @@ function renderAt(path) {
   )
 }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('cupones (US11)', () => {
   it('lista plantillas y cupones asignados', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminCoupons)
 
     expect(await screen.findByText('VIKI10')).toBeInTheDocument()
@@ -50,7 +44,7 @@ describe('cupones (US11)', () => {
 
   it('editar el costo de canje se refleja en el catálogo de recompensas', async () => {
     const user = userEvent.setup()
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminCoupons)
 
     const row = (await screen.findByText('ENVIO5')).closest('tr')

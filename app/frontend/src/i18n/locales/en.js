@@ -91,15 +91,6 @@ export default {
   'cta.guest': 'Try',
   'cta.login': 'Sign in',
 
-  'dev.title': 'Demo tools',
-  'dev.subtitle':
-    'Only available in mock mode. Useful to reset data or sign in as a seeded user without going through the login.',
-  'dev.reset': 'Reset database',
-  'dev.resetDone': 'Database reset.',
-  'dev.resetError': 'Could not reset the database.',
-  'dev.loginError': 'Could not sign in as that user.',
-  'dev.users': 'Demo users',
-
   'errors.UNAUTHENTICATED': 'Session expired. Please sign in again.',
   'errors.FORBIDDEN': 'You do not have permission for this action.',
   'errors.NOT_FOUND': 'We could not find what you were looking for.',

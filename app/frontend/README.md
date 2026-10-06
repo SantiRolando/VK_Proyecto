@@ -23,7 +23,6 @@ npm run dev        # http://localhost:5173
 | `npm run build` / `npm run preview` | Build de producción y servidor local del bundle. |
 | `npm test` / `npm run test:watch` | Vitest + jsdom + Testing Library. |
 | `npm run lint` / `npm run format` | Biome (lint + formato + imports restringidos). Es el único tool. |
-| `npm run i18n:check` | Verifica paridad de claves entre `es` y `en`. |
 
 ### Contra el backend (modo `hybrid`)
 
@@ -56,7 +55,8 @@ Límites conocidos del modo híbrido, hasta que el backend sume esos módulos:
 - Las rutas del mock que piden sesión aceptan el JWT del backend (leen su payload
   sin verificar la firma) y usan el usuario mock con el mismo id y rol, o uno
   sintético.
-- `/dev` (reset, entrar como usuario) solo afecta al mock.
+- Las herramientas de la suite (`POST /__test/*`) solo afectan al mock: re-siembran
+  la base y reconfiguran latencia y fallos.
 
 ### Cuentas demo (modo mock)
 
@@ -64,12 +64,9 @@ Límites conocidos del modo híbrido, hasta que el backend sume esos módulos:
 |---|---|---|
 | Admin | `admin@vikinga.test` / `admin123` | Panel completo (`/admin`). |
 | Cliente | `ana@example.test` / `cliente123` | 2 perfiles, 2 direcciones, saldo de puntos. |
-| Cliente vacío | `cliente@example.test` / `cliente123` | Sin datos (estados vacíos). |
+| Cliente vacío | `nuevo@example.test` / `cliente123` | Sin datos (estados vacíos). |
 
-En desarrollo también está **`/dev`**: re-siembra la base (`reset`), entra como
-cualquier usuario sin pasar por el login (`login-as`) y regula en caliente la
-latencia y la tasa de fallos del mock — así se ven los estados de carga y error
-sin reiniciar la app.
+Los tests entran con esas mismas cuentas por el login real (`src/test/session.js`).
 
 ## Arquitectura de la capa de datos
 
@@ -94,7 +91,7 @@ src/
 ├── mocks/            # descartable: router, controllers, domain (reglas), db (seed + persistencia)
 ├── app/              # router, routes, providers, guards, env
 ├── i18n/             # provider + locales es/en (todas las claves)
-├── theme/, utils/, constants/, hooks/, pages/ (landing y /dev), test/
+├── theme/, utils/, constants/, hooks/, test/
 ```
 
 Contrato de la capa de datos (§6.1 del plan):
@@ -170,13 +167,13 @@ export const reviewsService = {
    `queryKey` estable (el prefijo se reutiliza para invalidar).
 6. **UI**: consumir el hook dentro de `<QueryBoundary isLoading isError error
    onRetry>` y mostrar todo el texto con `t('…')`.
-7. **Claves i18n** en `src/i18n/locales/{es,en}.js` (misma clave en los dos) y
-   correr `npm run i18n:check`.
+7. **Claves i18n** en `src/i18n/locales/{es,en}.js` (misma clave en los dos); la
+   paridad la verifica `src/i18n/i18n-parity.test.js` con `npm test`.
 
 ### Seed y persistencia
 
 `src/mocks/db/` siembra el ER completo (`seed/`) y persiste en `localStorage`.
-`resetDatabase()` vuelve al seed (lo usa `POST /dev/reset`). Los ids del seed
+`resetDatabase()` vuelve al seed (lo usa `POST /__test/reset`). Los ids del seed
 son estables (admin = 1, Ana = 2, cliente vacío = 3).
 
 ## Pasar a la API real
@@ -203,7 +200,7 @@ Variables de entorno (ver `.env.example`, leídas en `src/config/env.js`):
 ## Convenciones
 
 - **Aliases** (`vite.aliases.js`, replicados en `jsconfig.json`): `@api @app
-  @assets @components @config @constants @features @hooks @i18n @mocks @pages
+  @assets @components @config @constants @features @hooks @i18n @mocks
   @test @theme @utils`. No se usan rutas relativas que suban de nivel.
 - **Archivos** kebab-case, **componentes** PascalCase.
 - **i18n total**: ningún string visible se escribe literal en el código; todo
@@ -224,8 +221,7 @@ dominio del mock (contratos), utilidades y flujos de UI de punta a punta
   formularios usan `Radio.Group` para opciones cortas y los tests de menús
   consultan el DOM crudo.
 - Los tests de componentes montan el router real (pesados): `testTimeout` es 20 s.
-- `npm test` antes de cerrar cualquier cambio, más `npm run lint` y
-  `npm run i18n:check`.
+- `npm test` antes de cerrar cualquier cambio, más `npm run lint`.
 
 ## PWA (instalable y offline)
 

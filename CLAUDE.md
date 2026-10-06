@@ -10,9 +10,15 @@
 - Archivos de componentes de React en kebab-case (ejemplo: `landing-page.jsx`).
 - Los componentes en sí en PascalCase (ejemplo: `LandingPage`), según las mejores prácticas de React.
 
+## Comentarios
+
+- Un comentario de más de una línea va en bloque: `/*` solo en su línea, el texto adentro y `*/` solo en la suya. No se repite `//` por línea.
+- El bloque dice el porqué y qué se descartó; se corta la historia del cambio, las referencias a tickets y el detalle que el código ya muestra.
+- Un comentario de una sola línea sigue en `//`.
+
 ## Imports
 
-- Usa los alias de `vite.aliases.js` en lugar de rutas relativas que suban de nivel: `@app`, `@api`, `@assets`, `@components`, `@config`, `@constants`, `@features`, `@hooks`, `@i18n`, `@mocks`, `@pages`, `@test`, `@theme`, `@utils`.
+- Usa los alias de `vite.aliases.js` en lugar de rutas relativas que suban de nivel: `@app`, `@api`, `@assets`, `@components`, `@config`, `@constants`, `@features`, `@hooks`, `@i18n`, `@mocks`, `@test`, `@theme`, `@utils`.
 - Ejemplo: `import { Money } from '@components/money.jsx'`.
 - `src/mocks/**` solo puede importarse desde `src/api/**` y desde el propio `src/mocks/**` (constitución VI); Biome lo verifica con `noRestrictedImports`.
 
@@ -20,7 +26,7 @@
 
 - Biome es el único tool (`biome.json`): `npm run lint` (= `biome check .`) y `npm run format` (= `biome format --write .`).
 - No hay regla automática de "sin literales visibles en JSX" ni de kebab-case: revisalas a mano (ver T005 del plan).
-- Los literales de UI siempre van por `useI18n()`; el gate automático de paridad es `npm run i18n:check`.
+- Los literales de UI siempre van por `useI18n()`; la paridad es/en la verifica `src/i18n/i18n-parity.test.js`, que corre con `npm test`.
 
 ## Arquitectura de datos
 

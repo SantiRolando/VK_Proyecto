@@ -6,7 +6,7 @@ import { AppShellLayout } from '@components/layout/app-shell-layout.jsx'
 import { PublicLayout } from '@components/layout/public-layout.jsx'
 import { NotFoundPage } from '@components/not-found-page.jsx'
 import { RouteFallback } from '@components/route-fallback.jsx'
-import { LandingPage } from '@pages/landing-page/landing-page.jsx'
+import { LandingPage } from '@features/landing/landing-page.jsx'
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 
@@ -172,18 +172,6 @@ const AdminSaleDetailPage = lazy(() =>
   })),
 )
 
-// La página /dev solo existe en modo mock; en el build http la rama es
-// constante false y la página (y su chunk) se eliminan del bundle.
-const IS_MOCK = (import.meta.env.VITE_API_MODE ?? 'mock') === 'mock'
-
-const DevPage = IS_MOCK
-  ? lazy(() =>
-      import('@pages/dev/dev-page.jsx').then((module) => ({
-        default: module.DevPage,
-      })),
-    )
-  : null
-
 // Todas las rutas de la app (§4.5 del plan), con las pantallas reales aún
 // como stubs; cada historia reemplaza su stub por la página definitiva.
 export function AppRouter() {
@@ -269,9 +257,6 @@ export function AppRouter() {
           <Route path={routes.adminCoupons} element={<CouponsPage />} />
           <Route path={routes.adminSettings} element={<SettingsPage />} />
         </Route>
-
-        {/* Herramientas de demo */}
-        {DevPage && <Route path={routes.dev} element={<DevPage />} />}
 
         {/* 404 */}
         <Route path="*" element={<NotFoundPage />} />

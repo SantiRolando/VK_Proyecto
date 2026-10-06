@@ -1,10 +1,11 @@
-import { setSession } from '@api/client/session.js'
 import { adminSalesService } from '@api/services/admin-sales-service.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -24,21 +25,15 @@ function renderAt(path) {
   )
 }
 
-// Entra como el admin sembrado, igual que la pantalla `/dev`.
-async function signInAsAdmin() {
-  const { user, token } = await devService.loginAs(1)
-  setSession(token, user)
-}
-
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('admin sales — listado', () => {
   it('muestra las ventas con su estado, canal y antigüedad', async () => {
-    await signInAsAdmin()
+    await signInAs(SeedUser.Admin)
 
     renderAt(routes.adminSales)
 
@@ -58,7 +53,7 @@ describe('admin sales — listado', () => {
 
   it('filtra por pestaña de estado y por canal', async () => {
     const user = userEvent.setup()
-    await signInAsAdmin()
+    await signInAs(SeedUser.Admin)
 
     renderAt(routes.adminSales)
     await screen.findByText('5 ventas')
@@ -79,7 +74,7 @@ describe('admin sales — listado', () => {
 describe('admin sales — detalle y acciones', () => {
   it('confirma una venta contactada después de pedir confirmación', async () => {
     const user = userEvent.setup()
-    await signInAsAdmin()
+    await signInAs(SeedUser.Admin)
 
     renderAt(routes.adminSale(2))
 
@@ -115,7 +110,7 @@ describe('admin sales — detalle y acciones', () => {
 
   it('cancela una venta pendiente sin tocar el stock', async () => {
     const user = userEvent.setup()
-    await signInAsAdmin()
+    await signInAs(SeedUser.Admin)
 
     renderAt(routes.adminSale(1))
     await screen.findByRole('heading', { name: 'Compra #1' })
@@ -136,7 +131,7 @@ describe('admin sales — detalle y acciones', () => {
 
   it('deja cerrar la confirmación sin cambiar nada', async () => {
     const user = userEvent.setup()
-    await signInAsAdmin()
+    await signInAs(SeedUser.Admin)
 
     renderAt(routes.adminSale(1))
     await screen.findByRole('heading', { name: 'Compra #1' })

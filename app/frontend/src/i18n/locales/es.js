@@ -94,15 +94,6 @@ export default {
   'cta.guest': 'Probar',
   'cta.login': 'Iniciar Sesión',
 
-  'dev.title': 'Herramientas de demo',
-  'dev.subtitle':
-    'Solo disponibles en modo mock. Útiles para restablecer datos o entrar como un usuario sembrado sin pasar por el login.',
-  'dev.reset': 'Restablecer base de datos',
-  'dev.resetDone': 'Base de datos restablecida.',
-  'dev.resetError': 'No se pudo restablecer la base de datos.',
-  'dev.loginError': 'No se pudo iniciar sesión como ese usuario.',
-  'dev.users': 'Usuarios demo',
-
   'errors.UNAUTHENTICATED': 'Sesión expirada. Iniciá sesión de nuevo.',
   'errors.FORBIDDEN': 'No tenés permisos para esta acción.',
   'errors.NOT_FOUND': 'No encontramos lo que buscabas.',

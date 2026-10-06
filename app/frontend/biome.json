@@ -6,13 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "src/**",
-      "scripts/**",
-      "vite.config.js",
-      "vitest.config.js",
-      "vite.aliases.js"
-    ],
+    "includes": ["src/**", "vite.config.js", "vitest.config.js", "vite.aliases.js"],
     "ignoreUnknown": true
   },
   "formatter": {

@@ -1,6 +1,6 @@
+import { Section } from '@features/landing/section.jsx'
 import { useI18n } from '@i18n/context.js'
 import { Text, Title } from '@mantine/core'
-import { Section } from '@pages/landing-page/section.jsx'
 import { IconBell, IconChartLine, IconPackage } from '@tabler/icons-react'
 
 const STORE_FEATURES = [

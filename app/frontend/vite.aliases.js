@@ -1,6 +1,8 @@
-// Alias de imports (`@components/...`, `@api/...`). Los comparten Vite y Vitest
-// para que el build y los tests resuelvan igual; `jsconfig.json` los replica
-// para el editor.
+/*
+  Alias de imports (`@components/...`, `@api/...`). Los comparten Vite y Vitest
+  para que el build y los tests resuelvan igual; `jsconfig.json` los replica
+  para el editor.
+*/
 
 import { fileURLToPath } from 'node:url'
 
@@ -19,7 +21,6 @@ export const aliases = {
   '@hooks': dir('./src/hooks'),
   '@i18n': dir('./src/i18n'),
   '@mocks': dir('./src/mocks'),
-  '@pages': dir('./src/pages'),
   '@test': dir('./src/test'),
   '@theme': dir('./src/theme'),
   '@utils': dir('./src/utils'),

@@ -74,6 +74,4 @@ export const routes = {
   adminUsers: '/admin/users',
   adminCoupons: '/admin/coupons',
   adminSettings: '/admin/settings',
-
-  dev: '/dev',
 }

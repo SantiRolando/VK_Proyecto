@@ -1,9 +1,10 @@
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -13,15 +14,10 @@ import { beforeEach, describe, expect, it } from 'vitest'
 // para un admin. `/fit` ahora es compartido, así que hay que garantizar que un
 // cliente NO vea los controles de personal.
 describe('medición: controles de personal', () => {
-  const signInAs = async (userId) => {
-    const { user, token } = await devService.loginAs(userId)
-    setSession(token, user)
-  }
-
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
-    await devService.reset()
+    await testTools.resetDatabase()
   })
 
   const renderAt = (path) =>
@@ -34,7 +30,7 @@ describe('medición: controles de personal', () => {
     )
 
   it('un admin ve el switch "Para terceros" en /fit', async () => {
-    await signInAs(1) // Vikinga Admin
+    await signInAs(SeedUser.Admin)
     renderAt(routes.fit())
 
     await waitFor(() => {
@@ -43,7 +39,7 @@ describe('medición: controles de personal', () => {
   })
 
   it('un cliente NO ve los controles de personal', async () => {
-    await signInAs(2) // Ana
+    await signInAs(SeedUser.Ana)
     renderAt(routes.fit())
 
     // El formulario tiene que estar montado antes de afirmar una ausencia.
@@ -58,7 +54,7 @@ describe('medición: controles de personal', () => {
   })
 
   it('la ruta vieja del asistente ya no existe', async () => {
-    await signInAs(1)
+    await signInAs(SeedUser.Admin)
     renderAt('/admin/assistant')
 
     await waitFor(() => {

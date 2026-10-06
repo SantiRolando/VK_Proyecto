@@ -1,10 +1,11 @@
 import { apiClient } from '@api/client/api-client.js'
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -13,18 +14,11 @@ import { beforeEach, describe, expect, it } from 'vitest'
 // Bug squash sesión #1: la información de cuenta no existía como pantalla. Ahora
 // vive en `/account/info` con dos pestañas, y las rutas viejas de la agenda
 // redirigen ahí para no romper enlaces.
-const ANA = 2
-
 describe('información de cuenta', () => {
-  const signInAs = async (userId) => {
-    const { user, token } = await devService.loginAs(userId)
-    setSession(token, user)
-  }
-
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
-    await devService.reset()
+    await testTools.resetDatabase()
   })
 
   const renderAt = (path) =>
@@ -41,7 +35,7 @@ describe('información de cuenta', () => {
   const main = async () => within(await screen.findByRole('main'))
 
   it('muestra los datos de la cuenta en la pestaña Cuenta', async () => {
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
     renderAt(routes.accountInfo)
 
     const view = await main()
@@ -52,7 +46,7 @@ describe('información de cuenta', () => {
   })
 
   it('la pestaña de agenda muestra perfiles y direcciones de la seed', async () => {
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
     renderAt(`${routes.accountInfo}?tab=agenda`)
 
     const view = await main()
@@ -65,7 +59,7 @@ describe('información de cuenta', () => {
 
   it('las pestañas se pueden cambiar y reflejan el estado en la URL', async () => {
     const user = userEvent.setup()
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
     renderAt(routes.accountInfo)
 
     const view = await main()
@@ -79,7 +73,7 @@ describe('información de cuenta', () => {
   })
 
   it('la ruta vieja /account/profiles redirige a la pestaña de agenda', async () => {
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
     // El controlador de perfiles debe responder: si la redirección no ocurre, la
     // pantalla muestra el 404 y no hay perfiles.
     const profiles = await apiClient.get('/profiles')

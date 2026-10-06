@@ -111,3 +111,13 @@ export const PointsMovementType = {
   Redemption: 'Redemption',
   Adjustment: 'Adjustment',
 }
+
+// Cuentas fijas del seed de demo (`src/mocks/db/seed/users.js`). A diferencia de
+// los enums de arriba, los valores son los ids estables de esas tres cuentas:
+// `signInAs` los usa para entrar por el login real, así que el id nunca debería
+// escribirse a mano en un test.
+export const SeedUser = {
+  Admin: 1,
+  Ana: 2,
+  EmptyCustomer: 3,
+}

@@ -1,18 +1,17 @@
-import { setSession } from '@api/client/session.js'
 import { adminSettingsService } from '@api/services/admin-settings-service.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 // Reglas del juego (US11/T098) sobre el router y los providers reales.
-
-const ADMIN = 1
 
 function renderAt(path) {
   return render(
@@ -24,21 +23,16 @@ function renderAt(path) {
   )
 }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('reglas del juego (US11)', () => {
   it('edita la probabilidad de puntos y confirma el guardado', async () => {
     const user = userEvent.setup()
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminSettings)
 
     const probability = await screen.findByLabelText(/Probabilidad de acierto/)

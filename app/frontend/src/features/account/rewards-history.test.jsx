@@ -1,11 +1,12 @@
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
 import { rewardsService } from '@api/services/rewards-service.js'
 import { sizeService } from '@api/services/size-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -14,8 +15,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 // US6 de punta a punta sobre el router y los providers reales, contra el
 // transporte mock: historial por perfil con feedback, canje de puntos y "mis
 // compras". El idioma se fija en español para asertar texto visible real.
-
-const ANA = 2
 
 function renderAt(path) {
   return render(
@@ -27,11 +26,6 @@ function renderAt(path) {
   )
 }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 // El contenido vive en `<main>`: el header (selector de perfil) y los drawers
 // (portales) quedan fuera y no ensucian las consultas por texto.
 async function mainView() {
@@ -41,13 +35,13 @@ async function mainView() {
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('historial y feedback (US6)', () => {
   it('arranca con todos los perfiles y permite calificar una medición pendiente', async () => {
     const user = userEvent.setup()
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
 
     // Hay al menos una medición sin calificar.
     const pending = (await sizeService.listGenerations()).find(
@@ -92,7 +86,7 @@ describe('historial y feedback (US6)', () => {
 describe('puntos y cupones (US6)', () => {
   it('canjea puntos por un cupón y lo muestra en mis cupones', async () => {
     const user = userEvent.setup()
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
 
     renderAt(routes.accountRewards)
     const view = await mainView()
@@ -118,7 +112,7 @@ describe('puntos y cupones (US6)', () => {
 
 describe('mis compras (US6)', () => {
   it('lista las compras coordinadas con su estado', async () => {
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
 
     renderAt(routes.accountOrders)
     const view = await mainView()

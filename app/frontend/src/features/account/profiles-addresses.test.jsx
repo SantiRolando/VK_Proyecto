@@ -1,12 +1,13 @@
-import { setSession } from '@api/client/session.js'
 import { addressesService } from '@api/services/addresses-service.js'
-import { devService } from '@api/services/dev-service.js'
 import { profilesService } from '@api/services/profiles-service.js'
 import { sizeService } from '@api/services/size-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
@@ -30,12 +31,9 @@ function renderAt(path) {
   )
 }
 
-// Ana (id 2) arranca con dos perfiles ("Training" predeterminado y "Son"),
-// dos direcciones y generaciones en ambos perfiles; el cliente nuevo (id 3)
-// arranca sin perfiles ni direcciones.
-const ANA = 2
-const EMPTY_CLIENT = 3
-
+// Ana arranca con dos perfiles ("Training" predeterminado y "Son"), dos
+// direcciones y generaciones en ambos perfiles; el cliente nuevo arranca sin
+// perfiles ni direcciones.
 // El contenido de la pantalla vive en `<main>`; el header (con el selector de
 // perfil) y los modales (portales) quedan fuera, así el scope no se confunde.
 // El router es perezoso: se espera a que el layout monte antes de acotar.
@@ -57,11 +55,6 @@ const ADDRESS_LABELS = {
   city: /Ciudad/,
   department: /Departamento/,
   reference: /Referencia/,
-}
-
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
 }
 
 async function fillProfile(user, dialog, name, measures) {
@@ -120,14 +113,14 @@ async function openProfileMenu(trigger, targetName) {
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  // La DB mock es un módulo con estado: se re-siembra vía la API de `/dev`.
-  await devService.reset()
+  // La DB mock es un módulo con estado: se re-siembra con las herramientas de la suite.
+  await testTools.resetDatabase()
 })
 
 describe('perfiles de medidas (US5)', () => {
   it('crea dos perfiles y administra la agenda: edición, predeterminado y baja', async () => {
     const user = userEvent.setup()
-    await signInAs(EMPTY_CLIENT)
+    await signInAs(SeedUser.EmptyCustomer)
 
     renderAt(routes.accountProfiles)
     const view = await mainView()
@@ -200,7 +193,7 @@ describe('perfiles de medidas (US5)', () => {
   })
 
   it('alterna el perfil activo desde el selector global y precarga la medición', async () => {
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
 
     renderAt(routes.fit({ line: 'endurance' }))
 
@@ -221,7 +214,7 @@ describe('perfiles de medidas (US5)', () => {
 
   it('separa el historial de mediciones por perfil', async () => {
     const user = userEvent.setup()
-    await signInAs(ANA)
+    await signInAs(SeedUser.Ana)
 
     // Ana ya tiene generaciones repartidas entre sus dos perfiles.
     const allBefore = await sizeService.listGenerations()
@@ -255,7 +248,7 @@ describe('perfiles de medidas (US5)', () => {
 describe('agenda de direcciones (US5)', () => {
   it('crea, edita, marca como predeterminada y elimina direcciones', async () => {
     const user = userEvent.setup()
-    await signInAs(EMPTY_CLIENT)
+    await signInAs(SeedUser.EmptyCustomer)
 
     renderAt(routes.accountAddresses)
     const view = await mainView()

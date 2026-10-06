@@ -1,10 +1,11 @@
-import { setSession } from '@api/client/session.js'
 import { adminAnalyticsService } from '@api/services/admin-analytics-service.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,8 +15,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 // `DatePickerInput` de `@mantine/dates` (popover difícil de manejar en jsdom):
 // su efecto sobre los datos está cubierto por los tests de contrato
 // (`date-range` + `admin-analytics`).
-
-const ADMIN = 1
 
 function renderAt(path) {
   return render(
@@ -27,23 +26,18 @@ function renderAt(path) {
   )
 }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 const isoDaysAgo = (days) =>
   new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10)
 
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('dashboard (US8)', () => {
   it('muestra los cuatro bloques con datos de la seed', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.admin)
 
     // Los cuatro bloques.
@@ -69,7 +63,7 @@ describe('dashboard (US8)', () => {
 
   it('pide los KPIs con el rango de fechas por defecto', async () => {
     const conversion = vi.spyOn(adminAnalyticsService, 'conversion')
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.admin)
 
     // El filtro está en pantalla y arranca en los últimos 30 días.

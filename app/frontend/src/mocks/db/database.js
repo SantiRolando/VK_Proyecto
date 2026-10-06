@@ -1,9 +1,11 @@
-// Base de datos mock en memoria + persistencia en localStorage (R-07).
-//
-// - `getDb()` devuelve el estado vivo.
-// - `mutate(fn)` ejecuta `fn(db)` y persiste (usar para toda escritura).
-// - `resetDatabase()` re-siembra y persiste (botón de `/dev`).
-// - `nextId(items)` genera el próximo id numérico de una colección.
+/*
+    Base de datos mock en memoria + persistencia en localStorage (R-07).
+
+    - `getDb()` devuelve el estado vivo.
+    - `mutate(fn)` ejecuta `fn(db)` y persiste (usar para toda escritura).
+    - `resetDatabase()` re-siembra y persiste; la usan las herramientas de la suite.
+    - `nextId(items)` genera el próximo id numérico de una colección.
+*/
 
 import { loadPersisted, persist } from '@mocks/db/persistence.js'
 import { seedDatabase } from '@mocks/db/seed/seed.js'

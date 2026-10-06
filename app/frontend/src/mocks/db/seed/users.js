@@ -5,6 +5,8 @@ import { createRandom, daysAgo, pick } from '@mocks/db/seed/helpers.js'
 
 // Los tres primeros usuarios son fijos: sus credenciales están documentadas y los
 // tests de otros módulos dependen de ellas (Ana y su historial, Nuevo Cliente).
+// Los ids de esas cuentas viven en `SeedUser` (`@constants/enums.js`): no se
+// escriben a mano en los tests.
 const fixedUsers = [
   {
     id: 1,

@@ -2,7 +2,7 @@
 // A medida que se agregan historias se suman acá.
 
 import '@mocks/controllers/auth.controller.js'
-import '@mocks/controllers/dev.controller.js'
+import '@mocks/controllers/test-tools.controller.js'
 import '@mocks/controllers/size-generations.controller.js'
 import '@mocks/controllers/sizes.controller.js'
 import '@mocks/controllers/settings.controller.js'

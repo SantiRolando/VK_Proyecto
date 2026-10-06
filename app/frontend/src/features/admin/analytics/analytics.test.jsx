@@ -1,17 +1,16 @@
-import { setSession } from '@api/client/session.js'
-import { devService } from '@api/services/dev-service.js'
+import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
 import { routes } from '@app/routes.js'
+import { SeedUser } from '@constants/enums.js'
+import { signInAs } from '@test/session.js'
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 // Reportes de US10 sobre el router y los providers reales: demanda no
 // satisfecha y comentarios del feedback.
-
-const ADMIN = 1
 
 function renderAt(path) {
   return render(
@@ -23,11 +22,6 @@ function renderAt(path) {
   )
 }
 
-async function signInAs(userId) {
-  const { user, token } = await devService.loginAs(userId)
-  setSession(token, user)
-}
-
 async function mainView() {
   return within(await screen.findByRole('main'))
 }
@@ -35,12 +29,12 @@ async function mainView() {
 beforeEach(async () => {
   window.localStorage.setItem('vkfit.language', 'es')
   queryClient.clear()
-  await devService.reset()
+  await testTools.resetDatabase()
 })
 
 describe('demanda no satisfecha (US10)', () => {
   it('dibuja el mapa por línea × talle y ofrece exportar', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminMissingSizes)
     const view = await mainView()
 
@@ -55,7 +49,7 @@ describe('demanda no satisfecha (US10)', () => {
 
 describe('comentarios (US10)', () => {
   it('lista los comentarios del feedback con su calificación', async () => {
-    await signInAs(ADMIN)
+    await signInAs(SeedUser.Admin)
     renderAt(routes.adminComments)
     const view = await mainView()
 

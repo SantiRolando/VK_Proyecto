@@ -7,7 +7,7 @@
 // tiene perfiles, la última con medidas se guarda como perfil «Mis medidas».
 
 import { ApiError } from '@api/client/api-error.js'
-import { decodeAuth, roleCodec } from '@api/wire.js'
+import { roleCodec } from '@api/wire.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { register } from '@mocks/router/mock-router.js'
@@ -192,9 +192,3 @@ register(
   },
   { auth: 'user' },
 )
-
-// Forma que consumen las herramientas de `/dev` y los tests para adoptar una
-// sesión sin pasar por el login (la misma que devuelve `authService`).
-export function sessionFor(user) {
-  return decodeAuth(issueSession(user))
-}

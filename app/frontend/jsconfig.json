@@ -14,7 +14,6 @@
       "@hooks/*": ["src/hooks/*"],
       "@i18n/*": ["src/i18n/*"],
       "@mocks/*": ["src/mocks/*"],
-      "@pages/*": ["src/pages/*"],
       "@test/*": ["src/test/*"],
       "@theme/*": ["src/theme/*"],
       "@utils/*": ["src/utils/*"]
