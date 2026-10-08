@@ -5,7 +5,7 @@
 
   Migración de invitado: al registrarse o iniciar sesión con un `guestSessionId`, las
   generaciones de ese invitado pasan al usuario y, si no tiene perfiles, la última con
-  medidas se guarda como perfil «Mis medidas».
+  medidas se guarda como perfil "Mis medidas".
 */
 
 import { ApiError } from '@api/client/api-error.js'

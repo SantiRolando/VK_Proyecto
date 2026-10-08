@@ -1,5 +1,5 @@
 /*
-  Feedbacks de la simulación. Con un número «alto» ej: diez, es más difícil de evaluar el
+  Feedbacks de la simulación. Con un número "alto" ej: diez, es más difícil de evaluar el
   resultado porque cualquier configuración parece premiar casi siempre.
 */
 export const SAMPLE_FEEDBACKS = 3

@@ -108,7 +108,7 @@ describe('admin sales — listado', () => {
     expect(combined.data).toHaveLength(0)
   })
 
-  it('filtra por rango de fechas (el día «hasta» entra completo)', async () => {
+  it('filtra por rango de fechas (el día "hasta" entra completo)', async () => {
     const sale5 = saleById(5)
 
     // Un rango con los límites exactos incluye esa venta (bordes inclusivos).
@@ -164,7 +164,7 @@ describe('admin sales — listado', () => {
     */
     expect(byId[2].ageDays).toBe(saleAgeDays(byId[2]))
     expect(byId[1].isStale).toBe(false)
-    // Confirmadas y canceladas ya no retienen stock: nunca son «antiguas».
+    // Confirmadas y canceladas ya no retienen stock: nunca son "antiguas".
     expect(byId[3].isStale).toBe(false)
     expect(byId[4].isStale).toBe(false)
 

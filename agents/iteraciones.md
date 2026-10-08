@@ -199,7 +199,7 @@
   reserva) para el bloque de ventas en vuelo. 6 tests.
 - Controller `admin-analytics` (T084): `GET /admin/analytics/{conversion,precision,critical-stock}`. 4 tests.
   - Conversión = generaciones vs. compras coordinadas del rango (+ `ratio`).
-  - Precisión = % de feedback «Correcto» separando **compró** (tiene venta no cancelada) de **solo consultó**.
+  - Precisión = % de feedback "Correcto" separando **compró** (tiene venta no cancelada) de **solo consultó**.
   - Stock crítico reusa `listCriticalVariants` (dominio) y ordena por faltante; el serializer expone
     `quantity/reserved/available/minStock/deficit` (base para inventario, US9).
 - Service `admin-analytics-service` + hooks `use-conversion`/`use-precision`/`use-critical-stock` con el rango en la
@@ -210,7 +210,7 @@
 - i18n (T087): `admin.dashboard.*` (18 claves nuevas) en es/en; paridad en **433 claves**.
 - Test de componentes `dashboard.test.jsx` (2 tests): los cuatro bloques con datos de la seed (precisión 2/2, stock
   crítico presente, ventas en vuelo #1/#2/#5 con teléfono y sin las cerradas) y el filtro de fechas (verifica que el
-  rango pedido cambie a 7 días y a «todo»).
+  rango pedido cambie a 7 días y a "todo").
 - **Desvío consciente**: el rango se elige con presets (`SegmentedControl`) y los KPIs usan solo componentes de core
   (`RingProgress`/`Progress`): menos bundle y testeable en jsdom. `@mantine/dates`/`@mantine/charts`/`dayjs` se
   instalaron después (iteración 13); `DatePickerInput` es un popover que jsdom no maneja bien, así que pasarlo y sumar

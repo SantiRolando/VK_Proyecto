@@ -61,7 +61,7 @@ describe('auth controller (contrato del backend)', () => {
     })
   })
 
-  it('migra las generaciones del invitado y crea el perfil «Mis medidas»', async () => {
+  it('migra las generaciones del invitado y crea el perfil "Mis medidas"', async () => {
     const result = await call('POST', '/auth/register', {
       body: { ...REGISTER_PAYLOAD, guestSessionId: 'guest-demo-1' },
     })
