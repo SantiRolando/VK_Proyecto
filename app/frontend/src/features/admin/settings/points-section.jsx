@@ -70,7 +70,7 @@ function SimulationPhrase({ summary }) {
   )
 }
 
-export function PointsSection({ values, onChange }) {
+export function PointsSection({ values, errors, onChange }) {
   const { t } = useI18n()
   // Se recalcula con cada tecla: la lectura es la respuesta inmediata a lo que se movió.
   const summary = summarizePointsConfig(values)
@@ -152,6 +152,7 @@ export function PointsSection({ values, onChange }) {
               key={name}
               field={FIELD_BY_NAME[name]}
               value={values[name]}
+              error={errors[name]}
               onChange={(value) => onChange({ [name]: value })}
             />
           ))}

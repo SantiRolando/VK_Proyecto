@@ -124,4 +124,36 @@ describe('configuración', () => {
       screen.getByText('Feedbacks premiados por cliente y por día.'),
     ).toBeInTheDocument()
   })
+
+  it('no deja guardar sin el email de coordinación', async () => {
+    const user = userEvent.setup()
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminSettings)
+
+    const email = await screen.findByRole('textbox', {
+      name: 'Email de coordinación',
+    })
+    await user.clear(email)
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('Campo obligatorio')).toBeInTheDocument()
+    // La regla corta antes de la API: el valor guardado no se tocó.
+    const settings = await adminSettingsService.get()
+    expect(settings.coordinationEmail).toBe('ventas@vikinga.com.uy')
+  })
+
+  it('pide un email con formato válido', async () => {
+    const user = userEvent.setup()
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminSettings)
+
+    const email = await screen.findByRole('textbox', {
+      name: 'Email de coordinación',
+    })
+    await user.clear(email)
+    await user.type(email, 'ventas@vikinga')
+    await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+    expect(await screen.findByText('Email inválido')).toBeInTheDocument()
+  })
 })

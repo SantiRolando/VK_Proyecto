@@ -8,7 +8,7 @@ import { IconMinus, IconPlus } from '@tabler/icons-react'
   Un ajuste numérico con su propio control: botones grandes para mover la aguja de a poco y
   campo editable para cuando se sabe el número exacto.
 */
-export function SettingStepper({ field, value, onChange }) {
+export function SettingStepper({ field, value, error, onChange }) {
   const { t } = useI18n()
   const label = t(`admin.settings.form.${field.name}`)
   const set = (next) => onChange(clampToField(field, next))
@@ -38,6 +38,7 @@ export function SettingStepper({ field, value, onChange }) {
           <NumberInput
             value={value}
             onChange={set}
+            error={error}
             min={field.min}
             max={field.max}
             step={field.step}

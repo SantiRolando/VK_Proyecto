@@ -7,7 +7,7 @@ import { IconReceipt } from '@tabler/icons-react'
 const FIELD = FIELD_BY_NAME.staleSaleDays
 
 // El control chico de Mantine alcanza acá: es un solo número y no se toca seguido.
-export function SalesSection({ values, onChange }) {
+export function SalesSection({ values, errors, onChange }) {
   const { t } = useI18n()
 
   return (
@@ -21,6 +21,7 @@ export function SalesSection({ values, onChange }) {
         label={t('admin.settings.form.staleSaleDays')}
         description={t('admin.settings.form.staleSaleDaysHint')}
         value={values.staleSaleDays}
+        error={errors.staleSaleDays}
         onChange={(value) => onChange({ staleSaleDays: clampToField(FIELD, value) })}
         min={FIELD.min}
         max={FIELD.max}
