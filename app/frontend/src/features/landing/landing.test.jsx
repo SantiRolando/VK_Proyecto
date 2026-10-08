@@ -6,11 +6,11 @@ import { MemoryRouter, useLocation } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 /*
-  La landing es la única pantalla fuera del armazón. El test amarra las tres cosas que el
-  barrido dejó fijas: los enlaces del header apuntan a secciones que existen, las tres
-  secciones del medio comparten la estructura de tres tarjetas, y el cierre lleva al
-  generador como invitado y al login. Se monta el router real para que el `href` de cada
-  enlace se pruebe contra el árbol de rutas, no contra un componente suelto.
+  La landing es la única pantalla fuera del shell de la aplicación. El test chequea lo siguiente
+  - los enlaces del header apuntan a secciones que existen
+  - las tres secciones del medio comparten la estructura de tres tarjetas,
+  - el cierre lleva al generador como invitado y al login.
+  Se monta el router real para que el `href` de cada enlace se pruebe contra el árbol de rutas.
 */
 function LocationProbe() {
   const { pathname, search } = useLocation()

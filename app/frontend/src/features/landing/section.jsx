@@ -3,9 +3,7 @@ import { useI18n } from '@i18n/context.js'
 import { Container, Text, Title } from '@mantine/core'
 
 /*
-  Armazón de las secciones de contenido de la landing: contenedor, título y subtítulo. No
-  fija fondo ni color de texto: el fondo de la página y el color lo pone el tema, así que el
-  claro y el oscuro salen sin ramas propias.
+  Armazón de las secciones de contenido de la landing: contenedor, título y subtítulo.
 */
 export function Section({ id, title, subtitle, children }) {
   return (
@@ -25,10 +23,6 @@ export function Section({ id, title, subtitle, children }) {
   Sección de tres tarjetas con icono, título y descripción. Las tres secciones del medio
   eran esta misma estructura copiada, así que la pieza vive acá y cada sección aporta
   sólo sus claves de idioma.
-
-  La tarjeta es la `SurfaceCard` del armazón, la misma que usan las pantallas de la app,
-  y el encabezado (icono, título y descripción) lo arma el componente. `titleKey` es la
-  clave y no el texto traducido porque además hace de `key` de la lista.
 */
 export function FeatureSection({ id, titleKey, subtitleKey, items }) {
   const { t } = useI18n()

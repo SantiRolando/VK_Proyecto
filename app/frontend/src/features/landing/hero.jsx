@@ -15,12 +15,6 @@ export function Hero() {
       <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/40 to-black" />
 
       <div className="relative z-10 flex flex-col items-center gap-8">
-        {/*
-          El tamaño va en `fz` y no en una clase de Tailwind: Mantine define el
-          `font-size` del título en su propia clase y, con la misma especificidad,
-          gana la que se inyecta después. `text-5xl md:text-7xl` quedaba sin efecto y
-          el título se veía a 34 px en todos los anchos.
-        */}
         <Title order={1} c="white" fw={900} fz={{ base: 48, md: 72 }}>
           {t('hero.title')}
         </Title>

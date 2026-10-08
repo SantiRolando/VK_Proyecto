@@ -16,8 +16,7 @@ export function SiteHeader() {
   const lenis = useLenis()
   const { t } = useI18n()
 
-  // `Lenis` resuelve el destino por selector, así que necesita el `#`; el id pelado es el que
-  // comparten el header y las secciones.
+  // `Lenis` calcula el destino por selector, así que necesita el `#`;
   const handleNavClick = (event, target) => {
     event.preventDefault()
     lenis?.scrollTo(`#${target}`, { offset: -64, duration: 1.4 })
@@ -48,11 +47,6 @@ export function SiteHeader() {
       </nav>
 
       <div className="flex items-center gap-2">
-        {/*
-          En un teléfono no entran los dos controles: a 320 px quedan 78 px libres y el
-          selector de tema pide unos 95, así que se muestra desde `sm` y hasta entonces el
-          esquema lo decide el sistema.
-        */}
         <div className="hidden sm:block">
           <ThemePicker />
         </div>
