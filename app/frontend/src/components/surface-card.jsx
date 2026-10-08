@@ -37,6 +37,8 @@ const HEADER_STYLE = {
 
 const ICON_STYLE = { color: 'var(--vk-accent)', flexShrink: 0 }
 const PLACEHOLDER_ICON_STYLE = { color: 'var(--mantine-color-dimmed)' }
+// Un CTA o una badge conservan su ancho: encogidos no se leen.
+const RIGHT_SECTION_STYLE = { flexShrink: 0 }
 
 export function SurfaceCard({
   title,
@@ -53,8 +55,13 @@ export function SurfaceCard({
     title || description || Icon || rightSection || PlaceholderIcon,
   )
 
+  /*
+    La fila del encabezado wrapea y el slot de la derecha no se encoge. Sin eso, en un teléfono
+    el título y la descripción se quedan con el ancho y empujan la badge por debajo de su
+    contenido: Mantine la recorta y "Equilibrada" queda en "E.".
+  */
   const header = (
-    <Group justify="space-between" align="flex-start" gap="md" wrap="nowrap">
+    <Group justify="space-between" align="flex-start" gap="md" wrap="wrap">
       <Group gap="sm" align="flex-start" wrap="nowrap">
         {Icon && (
           <Box style={ICON_STYLE} mt={2}>
@@ -76,7 +83,13 @@ export function SurfaceCard({
       </Group>
 
       {(rightSection || PlaceholderIcon) && (
-        <Group gap="sm" align="center" wrap="nowrap">
+        <Group
+          gap="sm"
+          align="center"
+          wrap="nowrap"
+          ml="auto"
+          style={RIGHT_SECTION_STYLE}
+        >
           {rightSection}
           {PlaceholderIcon && (
             <Box style={PLACEHOLDER_ICON_STYLE} mt={2}>
