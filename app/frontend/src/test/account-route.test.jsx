@@ -14,7 +14,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
   `path` y un `index` sin path matchea la ruta del padre. El porqué completo está en
   `routes.js`.
 */
-describe('destino post-login del cliente', () => {
+describe('destinos post-login', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
@@ -55,5 +55,16 @@ describe('destino post-login del cliente', () => {
     await waitFor(() => {
       expect(screen.getByText('404')).toBeInTheDocument()
     })
+  })
+
+  it('un admin que pasa por el login cae en el panel y no en su cuenta', async () => {
+    // El guard de invitados mandaba a la cuenta a cualquiera con sesión, admin incluido.
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.login)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Panel de administración' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Historial' })).not.toBeInTheDocument()
   })
 })

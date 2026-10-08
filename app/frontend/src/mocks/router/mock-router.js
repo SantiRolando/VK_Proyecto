@@ -6,6 +6,8 @@
 */
 
 import { ApiError } from '@api/client/api-error.js'
+import { roleCodec } from '@api/wire.js'
+import { isAdmin } from '@features/auth/permissions.js'
 import { getDb } from '@mocks/db/database.js'
 
 const registered = []
@@ -82,7 +84,7 @@ function userFromJwt(token) {
   try {
     const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
     const id = Number(payload.sub)
-    const type = payload.role === 'ADMIN' ? 'Admin' : 'Customer'
+    const type = roleCodec.decode(payload.role)
     const local = getDb().users.find((user) => user.id === id && user.type === type)
     return (
       local ?? {
@@ -103,10 +105,11 @@ function userFromJwt(token) {
 function checkAuth(user, required) {
   if (!required) return
   if (!user) throw new ApiError(401, 'UNAUTHENTICATED')
-  if (required === 'admin' && user.type !== 'Admin') {
+  // El único permiso es ser admin; `customer` es cualquier cuenta que no lo sea.
+  if (required === 'admin' && !isAdmin(user)) {
     throw new ApiError(403, 'FORBIDDEN')
   }
-  if (required === 'customer' && user.type !== 'Customer') {
+  if (required === 'customer' && isAdmin(user)) {
     throw new ApiError(403, 'FORBIDDEN')
   }
 }

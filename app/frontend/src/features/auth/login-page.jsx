@@ -5,6 +5,7 @@ import { env } from '@config/env.js'
 import { useAuth } from '@features/auth/auth-context.js'
 import { loginSchema } from '@features/auth/auth-schema.js'
 import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { homeRoute } from '@features/auth/permissions.js'
 import { useI18n } from '@i18n/context.js'
 import {
   Anchor,
@@ -35,8 +36,8 @@ const DEMO_CREDENTIALS = env.isMock
     ]
 
 /*
-  Login unificado de clientes y admins: según el rol se redirige a
-  `/admin` o al `returnTo`/home.
+  Login unificado de clientes y admins: se vuelve al `returnTo` o al destino del rol, el panel
+  para un admin y la cuenta para un cliente.
 */
 export function LoginPage() {
   const { t } = useI18n()
@@ -75,7 +76,7 @@ export function LoginPage() {
     setServerError(null)
     try {
       const user = await login(parsed.data.email, parsed.data.password)
-      navigate(user.type === 'Admin' ? routes.admin : (returnTo ?? routes.account))
+      navigate(returnTo ?? homeRoute(user))
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     } finally {

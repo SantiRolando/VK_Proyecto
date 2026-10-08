@@ -4,8 +4,8 @@
 */
 
 import { GuestOnly } from '@app/guards/guest-only.jsx'
+import { RequireAdmin } from '@app/guards/require-admin.jsx'
 import { RequireAuth } from '@app/guards/require-auth.jsx'
-import { RequireRole } from '@app/guards/require-role.jsx'
 import { routes } from '@app/routes.js'
 import { AppShellLayout } from '@components/layout/app-shell-layout.jsx'
 import { PublicLayout } from '@components/layout/public-layout.jsx'
@@ -49,10 +49,6 @@ const ProductDetailPage = lazyPage(
   'ProductDetailPage',
 )
 
-const AlertsPage = lazyPage(
-  () => import('@features/account/alerts-page.jsx'),
-  'AlertsPage',
-)
 const AccountInfoPage = lazyPage(
   () => import('@features/account/account-info-page.jsx'),
   'AccountInfoPage',
@@ -170,10 +166,9 @@ export function AppRouter() {
           <Route path={routes.accountInfo} element={<AccountInfoPage />} />
           <Route path={routes.accountHistory} element={<HistoryPage />} />
           <Route path={routes.accountOrders} element={<OrdersPage />} />
-          <Route path={routes.accountAlerts} element={<AlertsPage />} />
           <Route path={routes.accountRewards} element={<RewardsPage />} />
-          {/* Rutas viejas de la agenda: redirigen a la pestaña correspondiente de
-              la información de cuenta para no romper enlaces existentes. */}
+          {/* Rutas viejas de la cuenta: redirigen a la pestaña correspondiente de la
+              información de cuenta para no romper enlaces existentes. */}
           <Route
             path={routes.accountProfiles}
             element={<Navigate to={`${routes.accountInfo}?tab=agenda`} replace />}
@@ -182,15 +177,19 @@ export function AppRouter() {
             path={routes.accountAddresses}
             element={<Navigate to={`${routes.accountInfo}?tab=agenda`} replace />}
           />
+          <Route
+            path={routes.accountAlerts}
+            element={<Navigate to={`${routes.accountInfo}?tab=alerts`} replace />}
+          />
         </Route>
 
         {/* Administración */}
         <Route
           element={
             <RequireAuth>
-              <RequireRole requiredRole="Admin">
+              <RequireAdmin>
                 <AppShellLayout />
-              </RequireRole>
+              </RequireAdmin>
             </RequireAuth>
           }
         >

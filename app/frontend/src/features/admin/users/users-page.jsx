@@ -1,26 +1,27 @@
 import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { PageHeader } from '@components/page-header.jsx'
+import { ResponsiveList } from '@components/responsive-list.jsx'
+import { SurfaceCard, SurfaceIcon } from '@components/surface-card.jsx'
+import { UserType } from '@constants/enums.js'
 import {
   useSetUserRole,
   useUsers,
   useUsersAnalytics,
 } from '@features/admin/users/hooks/use-users.js'
 import { useAuth } from '@features/auth/auth-context.js'
+import { isAdmin } from '@features/auth/permissions.js'
 import { useI18n } from '@i18n/context.js'
 import {
   Alert,
   Badge,
   Button,
-  Card,
   Container,
   Group,
   SegmentedControl,
   SimpleGrid,
   Stack,
-  Table,
   Text,
-  ThemeIcon,
   Title,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -29,6 +30,7 @@ import {
   IconChartHistogram,
   IconShieldCheck,
   IconUserCheck,
+  IconUserMinus,
   IconUserPlus,
   IconUsers,
 } from '@tabler/icons-react'
@@ -42,13 +44,11 @@ const BarChart = lazy(() =>
 )
 
 // Tarjeta de indicador: valor grande + etiqueta + detalle opcional.
-function Stat({ icon: Icon, label, value, hint, tone = 'blue' }) {
+function Stat({ icon: Icon, label, value, hint }) {
   return (
-    <Card withBorder radius="md" padding="md">
+    <SurfaceCard>
       <Group gap="sm" wrap="nowrap" align="flex-start">
-        <ThemeIcon variant="light" color={tone} size="lg" radius="md" aria-hidden>
-          <Icon size={20} stroke={1.5} />
-        </ThemeIcon>
+        <SurfaceIcon icon={Icon} />
         <div>
           <Text size="xs" c="dimmed">
             {label}
@@ -63,7 +63,24 @@ function Stat({ icon: Icon, label, value, hint, tone = 'blue' }) {
           )}
         </div>
       </Group>
-    </Card>
+    </SurfaceCard>
+  )
+}
+
+/*
+  Identidad de la cuenta: el nombre y el correo. El `truncate` es para la card de móvil, donde
+  un correo largo no tiene dónde cortar.
+*/
+function UserIdentity({ user }) {
+  return (
+    <div>
+      <Text size="sm" fw={500} truncate>
+        {user.name}
+      </Text>
+      <Text size="xs" c="dimmed" truncate>
+        {user.email}
+      </Text>
+    </div>
   )
 }
 
@@ -86,17 +103,40 @@ export function UsersPage() {
   const analytics = useUsersAnalytics()
   const setRoleMutation = useSetUserRole()
 
-  const users = list.data?.data ?? []
+  const users = list.data?.items ?? []
   const stats = analytics.data
 
   const toggleAdmin = async (target) => {
-    const nextType = target.type === 'Admin' ? 'Customer' : 'Admin'
+    const nextType = isAdmin(target) ? UserType.Customer : UserType.Admin
     try {
       await setRoleMutation.mutateAsync({ userId: target.id, type: nextType })
     } catch (caught) {
       setErrorCode(caught?.code ?? 'SERVER_ERROR')
       openError()
     }
+  }
+
+  /*
+    El botón de rol va en la columna de acciones y en el slot derecho de la card de móvil. El
+    propio queda deshabilitado: la salvaguarda del último administrador la sostiene el endpoint.
+  */
+  const roleButton = (row) => {
+    const isSelf = row.id === currentUser?.id
+    const isTargetAdmin = isAdmin(row)
+    return (
+      <Button
+        variant="light"
+        size="compact-sm"
+        disabled={isSelf || setRoleMutation.isPending}
+        title={isSelf ? t('admin.users.cannotDemoteSelf') : undefined}
+        onClick={() => toggleAdmin(row)}
+        rightSection={
+          isTargetAdmin ? <IconUserMinus size={14} /> : <IconUserPlus size={14} />
+        }
+      >
+        {isTargetAdmin ? t('admin.users.revoke') : t('admin.users.grant')}
+      </Button>
+    )
   }
 
   // El gráfico necesita una etiqueta corta: "2026-09" -> "sep 26".
@@ -122,7 +162,6 @@ export function UsersPage() {
               <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} spacing="md">
                 <Stat
                   icon={IconUsers}
-                  tone="blue"
                   label={t('admin.users.kpi.total')}
                   value={stats.totalUsers}
                   hint={t('admin.users.kpi.totalHint', {
@@ -132,14 +171,12 @@ export function UsersPage() {
                 />
                 <Stat
                   icon={IconUserCheck}
-                  tone="green"
                   label={t('admin.users.kpi.active')}
                   value={stats.activeNow}
                   hint={t('admin.users.kpi.activeHint', { rate: stats.activeRate })}
                 />
                 <Stat
                   icon={IconUserPlus}
-                  tone="grape"
                   label={t('admin.users.kpi.new')}
                   value={stats.newLastMonth}
                   hint={
@@ -150,17 +187,17 @@ export function UsersPage() {
                 />
                 <Stat
                   icon={IconShieldCheck}
-                  tone="gray"
                   label={t('admin.users.kpi.admins')}
                   value={stats.admins}
                   hint={t('admin.users.kpi.adminsHint')}
                 />
               </SimpleGrid>
 
-              <Card withBorder radius="md" padding="lg">
-                <Title order={3} size="h4" mb="md">
-                  {t('admin.users.chart.title')}
-                </Title>
+              <SurfaceCard
+                titleSectionVariant="top"
+                icon={IconChartHistogram}
+                title={t('admin.users.chart.title')}
+              >
                 <Suspense fallback={<div style={{ height: 220 }} />}>
                   <BarChart
                     h={220}
@@ -178,37 +215,36 @@ export function UsersPage() {
                 <Text size="xs" c="dimmed" mt="xs">
                   {t('admin.users.chart.hint')}
                 </Text>
-              </Card>
+              </SurfaceCard>
             </Stack>
           )}
         </QueryBoundary>
 
-        <Card withBorder radius="md" padding="lg">
-          <Group justify="space-between" mb="md" wrap="wrap" gap="sm">
-            <Title order={3} size="h4">
-              {t('admin.users.list.title')}
-            </Title>
-            <Group gap="sm" wrap="wrap">
-              <SegmentedControl
-                size="xs"
-                value={role}
-                onChange={setRole}
-                data={[
-                  { value: 'all', label: t('admin.users.filter.all') },
-                  { value: 'Customer', label: t('admin.users.filter.customers') },
-                  { value: 'Admin', label: t('admin.users.filter.admins') },
-                ]}
-              />
-              <SegmentedControl
-                size="xs"
-                value={activeOnly ? 'active' : 'all'}
-                onChange={(next) => setActiveOnly(next === 'active')}
-                data={[
-                  { value: 'all', label: t('admin.users.filter.anyActivity') },
-                  { value: 'active', label: t('admin.users.filter.active') },
-                ]}
-              />
-            </Group>
+        <SurfaceCard
+          titleSectionVariant="top"
+          icon={IconUsers}
+          title={t('admin.users.list.title')}
+        >
+          <Group justify="flex-end" mb="md" gap="sm" wrap="wrap">
+            <SegmentedControl
+              size="xs"
+              value={role}
+              onChange={setRole}
+              data={[
+                { value: 'all', label: t('admin.users.filter.all') },
+                { value: UserType.Customer, label: t('admin.users.filter.customers') },
+                { value: UserType.Admin, label: t('admin.users.filter.admins') },
+              ]}
+            />
+            <SegmentedControl
+              size="xs"
+              value={activeOnly ? 'active' : 'all'}
+              onChange={(next) => setActiveOnly(next === 'active')}
+              data={[
+                { value: 'all', label: t('admin.users.filter.anyActivity') },
+                { value: 'active', label: t('admin.users.filter.active') },
+              ]}
+            />
           </Group>
 
           {error && (
@@ -237,69 +273,54 @@ export function UsersPage() {
                 description={t('admin.users.emptyBody')}
               />
             ) : (
-              <Table.ScrollContainer minWidth={760}>
-                <Table verticalSpacing="sm" highlightOnHover>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>{t('admin.users.column.user')}</Table.Th>
-                      <Table.Th>{t('admin.users.column.role')}</Table.Th>
-                      <Table.Th>{t('admin.users.column.since')}</Table.Th>
-                      <Table.Th>{t('admin.users.column.activity')}</Table.Th>
-                      <Table.Th>{t('admin.users.column.actions')}</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {users.map((row) => {
-                      const isSelf = row.id === currentUser?.id
-                      return (
-                        <Table.Tr key={row.id}>
-                          <Table.Td>
-                            <Text size="sm" fw={500}>
-                              {row.name}
-                            </Text>
-                            <Text size="xs" c="dimmed">
-                              {row.email}
-                            </Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Badge
-                              variant="light"
-                              color={row.type === 'Admin' ? 'gray' : 'blue'}
-                            >
-                              {t(`enums.userType.${row.type}`)}
-                            </Badge>
-                          </Table.Td>
-                          <Table.Td>
-                            <Text size="sm">{formatDate(row.createdAt)}</Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Text size="sm" c={row.lastActivity ? undefined : 'dimmed'}>
-                              {row.lastActivity
-                                ? formatDate(row.lastActivity)
-                                : t('admin.users.noActivity')}
-                            </Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Button
-                              variant="subtle"
-                              size="compact-xs"
-                              disabled={isSelf || setRoleMutation.isPending}
-                              title={
-                                isSelf ? t('admin.users.cannotDemoteSelf') : undefined
-                              }
-                              onClick={() => toggleAdmin(row)}
-                            >
-                              {row.type === 'Admin'
-                                ? t('admin.users.revoke')
-                                : t('admin.users.grant')}
-                            </Button>
-                          </Table.Td>
-                        </Table.Tr>
-                      )
-                    })}
-                  </Table.Tbody>
-                </Table>
-              </Table.ScrollContainer>
+              <ResponsiveList
+                data={users}
+                getKey={(row) => row.id}
+                minWidth={760}
+                verticalSpacing="sm"
+                highlightOnHover
+                cardTitle={(row) => <UserIdentity user={row} />}
+                cardActions={roleButton}
+                columns={[
+                  {
+                    key: 'user',
+                    header: t('admin.users.column.user'),
+                    hideInCard: true,
+                    render: (row) => <UserIdentity user={row} />,
+                  },
+                  {
+                    key: 'role',
+                    header: t('admin.users.column.role'),
+                    render: (row) => (
+                      <Badge variant="light" color={isAdmin(row) ? 'gray' : 'blue'}>
+                        {t(`enums.userType.${row.type}`)}
+                      </Badge>
+                    ),
+                  },
+                  {
+                    key: 'since',
+                    header: t('admin.users.column.since'),
+                    render: (row) => <Text size="sm">{formatDate(row.createdAt)}</Text>,
+                  },
+                  {
+                    key: 'activity',
+                    header: t('admin.users.column.activity'),
+                    render: (row) => (
+                      <Text size="sm" c={row.lastActivity ? undefined : 'dimmed'}>
+                        {row.lastActivity
+                          ? formatDate(row.lastActivity)
+                          : t('admin.users.noActivity')}
+                      </Text>
+                    ),
+                  },
+                  {
+                    key: 'actions',
+                    header: t('admin.users.column.actions'),
+                    hideInCard: true,
+                    render: roleButton,
+                  },
+                ]}
+              />
             )}
           </QueryBoundary>
 
@@ -314,7 +335,7 @@ export function UsersPage() {
               </Text>
             </Group>
           )}
-        </Card>
+        </SurfaceCard>
       </Stack>
     </Container>
   )

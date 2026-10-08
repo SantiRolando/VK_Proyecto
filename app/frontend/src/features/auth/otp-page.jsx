@@ -6,6 +6,7 @@ import { env } from '@config/env.js'
 import { useAuth } from '@features/auth/auth-context.js'
 import { otpRequestSchema, otpVerifySchema } from '@features/auth/auth-schema.js'
 import { AuthShell } from '@features/auth/auth-shell.jsx'
+import { homeRoute } from '@features/auth/permissions.js'
 import { useI18n } from '@i18n/context.js'
 import { Anchor, Button, Stack, Text, TextInput } from '@mantine/core'
 import { collectFieldErrors } from '@utils/zod-errors.js'
@@ -64,7 +65,7 @@ export function OtpPage() {
     try {
       const auth = await authService.loginWithOtp(parsed.data)
       adoptSession(auth)
-      navigate(auth.user.type === 'Admin' ? routes.admin : (returnTo ?? routes.account))
+      navigate(returnTo ?? homeRoute(auth.user))
     } catch (error) {
       setServerError(isApiError(error) ? error : null)
     } finally {

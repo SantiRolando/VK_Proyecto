@@ -1,7 +1,9 @@
 import { PageHeader } from '@components/page-header.jsx'
 import { AddressesBody } from '@features/account/addresses-page.jsx'
+import { AlertsBody } from '@features/account/alerts-body.jsx'
 import { ProfilesBody } from '@features/account/profiles-page.jsx'
 import { useAuth } from '@features/auth/auth-context.js'
+import { isAdmin } from '@features/auth/permissions.js'
 import { useI18n } from '@i18n/context.js'
 import {
   Badge,
@@ -15,6 +17,7 @@ import {
   Title,
 } from '@mantine/core'
 import {
+  IconBell,
   IconBrandWhatsapp,
   IconId,
   IconMail,
@@ -22,6 +25,14 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router'
+
+const BASE_TABS = ['cuenta', 'agenda']
+
+/*
+  Los avisos de reposición son de las cuentas de cliente: un admin no tiene suscripciones y el
+  endpoint responde 403, así que su pestaña no se le ofrece y `?tab=alerts` cae en la de cuenta.
+*/
+const ALERTS_TAB = 'alerts'
 
 // Fila de dato: etiqueta + valor, con ícono. Se usa para los datos de la cuenta.
 function Field({ icon: Icon, label, value }) {
@@ -43,15 +54,19 @@ function Field({ icon: Icon, label, value }) {
 }
 
 /*
-  Información de cuenta: los datos de `/auth/me` y, en la segunda pestaña, la agenda de
-  perfiles y direcciones.
+  Información de cuenta: los datos de `/auth/me`, la agenda de perfiles y direcciones y los avisos
+  de reposición, cada uno en su pestaña.
 */
 export function AccountInfoPage() {
   const { t } = useI18n()
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const tab = searchParams.get('tab') === 'agenda' ? 'agenda' : 'cuenta'
+  const withAlerts = !isAdmin(user)
+  const tabs = withAlerts ? [...BASE_TABS, ALERTS_TAB] : BASE_TABS
+
+  const requested = searchParams.get('tab')
+  const tab = tabs.includes(requested) ? requested : BASE_TABS[0]
 
   return (
     <Container size="md" py="xl">
@@ -59,7 +74,7 @@ export function AccountInfoPage() {
 
       <Tabs
         value={tab}
-        onChange={(next) => setSearchParams(next === 'agenda' ? { tab: 'agenda' } : {})}
+        onChange={(next) => setSearchParams(next === 'cuenta' ? {} : { tab: next })}
         keepMounted={false}
       >
         <Tabs.List mb="md">
@@ -69,6 +84,11 @@ export function AccountInfoPage() {
           <Tabs.Tab value="agenda" leftSection={<IconRuler size={16} />}>
             {t('account.info.tabAgenda')}
           </Tabs.Tab>
+          {withAlerts && (
+            <Tabs.Tab value={ALERTS_TAB} leftSection={<IconBell size={16} />}>
+              {t('account.info.tabAlerts')}
+            </Tabs.Tab>
+          )}
         </Tabs.List>
 
         <Tabs.Panel value="cuenta">
@@ -125,6 +145,17 @@ export function AccountInfoPage() {
             </section>
           </Stack>
         </Tabs.Panel>
+
+        {withAlerts && (
+          <Tabs.Panel value={ALERTS_TAB}>
+            <section>
+              <Title order={3} size="h4" mb="sm">
+                {t('account.alerts.title')}
+              </Title>
+              <AlertsBody />
+            </section>
+          </Tabs.Panel>
+        )}
       </Tabs>
     </Container>
   )

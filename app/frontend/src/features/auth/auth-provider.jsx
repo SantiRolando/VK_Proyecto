@@ -116,7 +116,6 @@ export function AuthProvider({ children }) {
       token: state.token,
       status: state.status,
       isAuthenticated: Boolean(state.user),
-      isAdmin: state.user?.type === 'Admin',
       login,
       register,
       logout,

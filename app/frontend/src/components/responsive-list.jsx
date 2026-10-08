@@ -21,9 +21,16 @@ export function ResponsiveList({
         {data.map((item) => (
           <SurfaceCard key={getKey(item)}>
             <Stack gap="sm">
+              {/*
+                El encabezado no wrapea: el título se encoge y la acción no. Sin el `minWidth: 0`
+                un texto sin cortes (un correo) empuja la acción afuera de la card y el recorte
+                se la come.
+              */}
               <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
-                {cardTitle && <div style={{ flex: 1 }}>{cardTitle(item)}</div>}
-                {cardActions && <div>{cardActions(item)}</div>}
+                {cardTitle && (
+                  <div style={{ flex: 1, minWidth: 0 }}>{cardTitle(item)}</div>
+                )}
+                {cardActions && <div style={{ flexShrink: 0 }}>{cardActions(item)}</div>}
               </Group>
 
               <Stack gap="xs">

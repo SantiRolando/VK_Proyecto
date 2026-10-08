@@ -314,9 +314,10 @@ export default {
   'checkout.confirmation.continue': 'Keep shopping',
   'checkout.confirmation.home': 'Back to home',
   'account.info.title': 'My account',
-  'account.info.subtitle': 'Your details and your profiles and addresses.',
+  'account.info.subtitle': 'Your details, the agenda and the restock alerts.',
   'account.info.tabAccount': 'Account',
   'account.info.tabAgenda': 'Profiles and addresses',
+  'account.info.tabAlerts': 'Alerts',
   'account.info.email': 'Email',
   'account.info.whatsapp': 'WhatsApp',
   'account.info.whatsappHint':

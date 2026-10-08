@@ -83,13 +83,17 @@ register(
       if (!size || !product) continue
 
       const key = `${product.line}:${size.id}`
+      /*
+        El grupo se muestra notificado salvo que le quede alguna alerta sin notificar: una línea ×
+        talle puede tener varias variantes y no todas se reponen a la vez.
+      */
       const group = groups.get(key) ?? {
         key,
         line: product.line,
         size: { id: size.id, code: size.code },
         ids: [],
         variantCount: 0,
-        status: 'Active',
+        status: 'Notified',
       }
       group.ids.push(alert.id)
       group.variantCount += 1

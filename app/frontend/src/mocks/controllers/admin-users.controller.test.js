@@ -57,7 +57,7 @@ describe('admin users controller', () => {
     expect(admins.data.length).toBeGreaterThan(0)
     expect(admins.data.every((user) => user.type === 'Admin')).toBe(true)
     expect(customers.data.every((user) => user.type === 'Customer')).toBe(true)
-    expect(admins.meta.admins).toBe(admins.data.length)
+    expect(admins.meta.total).toBe(admins.data.length)
   })
 
   it('el filtro de actividad solo devuelve quien midió o compró', async () => {

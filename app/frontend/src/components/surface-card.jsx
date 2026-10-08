@@ -25,6 +25,18 @@ const ICON_STYLE = { color: 'var(--vk-accent)', flexShrink: 0 }
 const PLACEHOLDER_ICON_STYLE = { color: 'var(--mantine-color-dimmed)' }
 const RIGHT_SECTION_STYLE = { flexShrink: 0 }
 
+/*
+  Icono de la superficie: sin fondo, en el color de acento del tema. Lo usa el encabezado y las
+  tarjetas que necesitan el mismo icono con un cuerpo propio, como los indicadores.
+*/
+export function SurfaceIcon({ icon: Icon, size = 22 }) {
+  return (
+    <Box style={ICON_STYLE} mt={2}>
+      <Icon size={size} stroke={1.7} />
+    </Box>
+  )
+}
+
 export function SurfaceCard({
   title,
   description,
@@ -47,11 +59,7 @@ export function SurfaceCard({
   const header = (
     <Group justify="space-between" align="flex-start" gap="md" wrap="wrap">
       <Group gap="sm" align="flex-start" wrap="nowrap">
-        {Icon && (
-          <Box style={ICON_STYLE} mt={2}>
-            <Icon size={22} stroke={1.7} />
-          </Box>
-        )}
+        {Icon && <SurfaceIcon icon={Icon} />}
         <div>
           {title && (
             <Text fw={600} size={isTop ? 'lg' : 'md'}>

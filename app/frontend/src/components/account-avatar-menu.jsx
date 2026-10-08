@@ -2,6 +2,7 @@ import { routes } from '@app/routes.js'
 import { useActiveProfile } from '@features/account/active-profile-context.js'
 import { useResolvedProfile } from '@features/account/hooks/use-profiles.js'
 import { useAuth } from '@features/auth/auth-context.js'
+import { useIsAdmin } from '@features/auth/hooks/use-is-admin.js'
 import { useI18n } from '@i18n/context.js'
 import { Avatar, Badge, Button, Menu, Text, UnstyledButton } from '@mantine/core'
 import {
@@ -36,6 +37,7 @@ export function AccountAvatarMenu({ size = 'md' }) {
   const { user, isAuthenticated, logout } = useAuth()
   const { setProfileId } = useActiveProfile()
   const { profile, profiles } = useResolvedProfile()
+  const isAdmin = useIsAdmin()
 
   const handleLogout = async () => {
     await logout()
@@ -49,8 +51,6 @@ export function AccountAvatarMenu({ size = 'md' }) {
       </Button>
     )
   }
-
-  const isAdmin = user?.type === 'Admin'
 
   return (
     <Menu position="bottom-end" width={260} withinPortal shadow="md">

@@ -17,6 +17,7 @@ import {
   sourceCodec,
   warningCodec,
 } from '@api/wire.js'
+import { isAdmin } from '@features/auth/permissions.js'
 import { serializeSize } from '@mocks/controllers/sizes.controller.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { adjacentSizes, recommend, tableFor } from '@mocks/domain/size-engine.js'
@@ -114,7 +115,7 @@ register('POST', '/public/fit/recommend', (req) => {
       message: 'profileId, onBehalf and customerId require authentication',
     })
   }
-  if (onBehalf && user?.type !== 'Admin') {
+  if (onBehalf && !isAdmin(user)) {
     throw new ApiError(403, 'FORBIDDEN')
   }
 
@@ -137,7 +138,7 @@ register('POST', '/public/fit/recommend', (req) => {
     let customerId = onBehalf ? null : (user?.id ?? null)
     if (body.customerId != null) {
       const customer = db.users.find(
-        (item) => item.id === Number(body.customerId) && item.type === 'Customer',
+        (item) => item.id === Number(body.customerId) && !isAdmin(item),
       )
       if (!customer)
         throw new ApiError(404, 'NOT_FOUND', { message: 'Customer not found' })
@@ -193,7 +194,7 @@ function requireVisible(db, req, id, guestSessionId) {
   const generation = db.sizeGenerations.find((item) => item.id === id)
   const visible =
     generation &&
-    (user?.type === 'Admin' ||
+    (isAdmin(user) ||
       (user && generation.customerId === user.id) ||
       (!user && guestSessionId && generation.guestSessionId === guestSessionId))
   if (!visible) throw new ApiError(404, 'NOT_FOUND')

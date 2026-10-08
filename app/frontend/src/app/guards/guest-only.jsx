@@ -4,17 +4,17 @@
   guardada.
 */
 
-import { routes } from '@app/routes.js'
 import { useAuth } from '@features/auth/auth-context.js'
+import { homeRoute } from '@features/auth/permissions.js'
 import { Navigate } from 'react-router'
 
 export function GuestOnly({ children }) {
-  const { isAuthenticated, status } = useAuth()
+  const { user, status } = useAuth()
 
   if (status === 'hydrating') return null
 
-  if (isAuthenticated) {
-    return <Navigate to={routes.account} replace />
+  if (user) {
+    return <Navigate to={homeRoute(user)} replace />
   }
 
   return children

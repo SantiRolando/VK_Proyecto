@@ -314,9 +314,10 @@ export default {
   'checkout.confirmation.continue': 'Seguir comprando',
   'checkout.confirmation.home': 'Volver al inicio',
   'account.info.title': 'Mi cuenta',
-  'account.info.subtitle': 'Tus datos y la agenda de perfiles y direcciones.',
+  'account.info.subtitle': 'Tus datos, la agenda y los avisos de reposición.',
   'account.info.tabAccount': 'Cuenta',
   'account.info.tabAgenda': 'Perfiles y direcciones',
+  'account.info.tabAlerts': 'Avisos',
   'account.info.email': 'Email',
   'account.info.whatsapp': 'WhatsApp',
   'account.info.whatsappHint':

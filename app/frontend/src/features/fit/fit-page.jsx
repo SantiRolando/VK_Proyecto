@@ -6,6 +6,7 @@ import { slugToAudience, slugToLine } from '@constants/lines.js'
 import { useResolvedProfile } from '@features/account/hooks/use-profiles.js'
 import { useCustomers } from '@features/admin/assistant/hooks/use-customers.js'
 import { useAuth } from '@features/auth/auth-context.js'
+import { useIsAdmin } from '@features/auth/hooks/use-is-admin.js'
 import { DemoCasesCard } from '@features/fit/demo-cases-card.jsx'
 import { FitForm } from '@features/fit/fit-form.jsx'
 import { useI18n } from '@i18n/context.js'
@@ -35,10 +36,10 @@ function resolveSource(searchParams) {
 export function FitPage() {
   const { t } = useI18n()
   const [searchParams] = useSearchParams()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated } = useAuth()
   const { profile, isPending } = useResolvedProfile()
 
-  const isAdmin = user?.type === 'Admin'
+  const isAdmin = useIsAdmin()
   const [onBehalf, setOnBehalf] = useState(false)
   const [customerId, setCustomerId] = useState(null)
   /*

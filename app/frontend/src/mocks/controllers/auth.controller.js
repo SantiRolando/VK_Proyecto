@@ -8,6 +8,7 @@
 
 import { ApiError } from '@api/client/api-error.js'
 import { roleCodec } from '@api/wire.js'
+import { isAdmin } from '@features/auth/permissions.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { register } from '@mocks/router/mock-router.js'
@@ -129,7 +130,7 @@ register('POST', '/auth/login', (req) => {
     if (!user || user.password !== password) {
       throw new ApiError(401, 'INVALID_CREDENTIALS')
     }
-    if (user.type === 'Customer') migrateGuest(db, guestSessionId, user.id)
+    if (!isAdmin(user)) migrateGuest(db, guestSessionId, user.id)
     return { status: 200, data: issueSession(user) }
   })
 })
@@ -169,7 +170,7 @@ register('POST', '/auth/otp/login', (req) => {
   requireFields(req.body, ['email', 'code'])
   return mutate((db) => {
     const user = verifyOtp(db, email, code)
-    if (user.type === 'Customer') migrateGuest(db, guestSessionId, user.id)
+    if (!isAdmin(user)) migrateGuest(db, guestSessionId, user.id)
     return { status: 200, data: issueSession(user) }
   })
 })

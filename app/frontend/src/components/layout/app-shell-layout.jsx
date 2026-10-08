@@ -4,6 +4,7 @@ import { LanguageSwitch } from '@components/language-switch.jsx'
 import { ThemePicker } from '@components/theme-picker.jsx'
 import { CUSTOMER_NAV_ITEMS, matchNavItem, PANEL_NAV_ITEMS } from '@config/navigation.js'
 import { useAuth } from '@features/auth/auth-context.js'
+import { useIsAdmin } from '@features/auth/hooks/use-is-admin.js'
 import { useI18n } from '@i18n/context.js'
 import {
   AppShell,
@@ -35,7 +36,7 @@ export function AppShellLayout() {
   const { colorScheme } = useMantineColorScheme()
   const [opened, { open, close }] = useDisclosure(false)
 
-  const isAdmin = user?.type === 'Admin'
+  const isAdmin = useIsAdmin()
   const location = useLocation()
   // El Drawer se renderiza en un portal: se le pasa el esquema de color explícito.
   const resolvedScheme = colorScheme === 'auto' ? undefined : colorScheme

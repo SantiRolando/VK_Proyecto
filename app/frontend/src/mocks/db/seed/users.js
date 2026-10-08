@@ -3,6 +3,7 @@
   mock.
 */
 
+import { UserType } from '@constants/enums.js'
 import { createRandom, daysAgo, pick } from '@mocks/db/seed/helpers.js'
 
 /*
@@ -13,7 +14,7 @@ import { createRandom, daysAgo, pick } from '@mocks/db/seed/helpers.js'
 const fixedUsers = [
   {
     id: 1,
-    type: 'Admin',
+    type: UserType.Admin,
     name: 'Vikinga Admin',
     email: 'admin@vikinga.test',
     password: 'admin123',
@@ -23,7 +24,7 @@ const fixedUsers = [
   },
   {
     id: 2,
-    type: 'Customer',
+    type: UserType.Customer,
     name: 'Ana Rodríguez',
     email: 'ana@example.test',
     password: 'cliente123',
@@ -33,7 +34,7 @@ const fixedUsers = [
   },
   {
     id: 3,
-    type: 'Customer',
+    type: UserType.Customer,
     name: 'Nuevo Cliente',
     email: 'nuevo@example.test',
     password: 'cliente123',
@@ -130,7 +131,7 @@ function buildDemoUsers() {
 
       generated.push({
         id,
-        type: 'Customer',
+        type: UserType.Customer,
         name: `${first} ${last}`,
         email: `${slug(first)}.${slug(last)}${id}@example.test`,
         password: 'cliente123',
@@ -150,7 +151,7 @@ function buildDemoUsers() {
   for (const role of SALES_STAFF) {
     generated.push({
       id,
-      type: 'Admin',
+      type: UserType.Admin,
       name: `${role} Vikinga`,
       email: `${slug(role)}@vikinga.test`,
       password: 'admin123',
