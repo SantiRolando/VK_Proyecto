@@ -10,7 +10,6 @@ import { requireFields } from '@mocks/controllers/controller-utils.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { saleDiscount } from '@mocks/domain/coupons.js'
 import { inRange, rangeFromQuery } from '@mocks/domain/date-range.js'
-import { round2 } from '@mocks/domain/money.js'
 import {
   applyTransition,
   RESERVING_SALE_STATUSES,
@@ -26,6 +25,7 @@ import {
   subtotalOf,
 } from '@mocks/domain/sales.js'
 import { register } from '@mocks/router/mock-router.js'
+import { round2 } from '@utils/money.js'
 
 // El PATCH mueve la venta hacia adelante; `PendingCoordination` es el origen.
 const TARGET_STATUSES = [SaleStatus.Contacted, SaleStatus.Confirmed, SaleStatus.Cancelled]

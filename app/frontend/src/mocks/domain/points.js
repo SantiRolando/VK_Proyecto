@@ -9,6 +9,7 @@
 */
 
 import { ApiError } from '@api/client/api-error.js'
+import { couponProblem } from '@features/admin/coupons/coupon-rules.js'
 import { settingNumber } from '@mocks/domain/settings.js'
 
 export const FEEDBACK_RATINGS = ['Small', 'Correct', 'Large']
@@ -85,14 +86,10 @@ export function grantFeedbackReward(
   return { awarded: true, points, balance: user.pointsBalance, dailyLimitReached: false }
 }
 
-// Plantillas canjeables: activas, con costo en puntos y dentro de vigencia.
+// Plantillas canjeables: con costo en puntos y sin ningún problema de vigencia, estado o usos.
 export function redeemableTemplates(db, now = new Date()) {
   return db.discountCoupons.filter(
-    (coupon) =>
-      coupon.active &&
-      coupon.pointsCost != null &&
-      new Date(coupon.validFrom) <= now &&
-      new Date(coupon.validUntil) >= now,
+    (coupon) => coupon.pointsCost != null && couponProblem(coupon, { now }) === null,
   )
 }
 
@@ -127,6 +124,8 @@ export function redeemTemplate(db, { user, template, now = new Date() }) {
     discountType: template.discountType,
     discountValue: template.discountValue,
     maxDiscount: template.maxDiscount ?? null,
+    // El cupón canjeado se usa una sola vez.
+    maxUses: 1,
     pointsCost: null,
     validFrom: now.toISOString(),
     validUntil: template.validUntil,

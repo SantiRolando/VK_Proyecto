@@ -195,6 +195,8 @@ describe('canje de cupones', () => {
       userId: 2,
       couponCode: 'VIKI10-2',
       usageCount: 0,
+      // El cupón canjeado se usa una sola vez.
+      maxUses: 1,
       discountType: 'Percentage',
       discountValue: 10,
       pointsCost: null,

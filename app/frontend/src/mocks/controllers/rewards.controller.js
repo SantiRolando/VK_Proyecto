@@ -1,13 +1,13 @@
 /*
   Recompensas: plantillas de cupón canjeables por puntos, canje y "mis cupones". La validez
-  del cupón canjeado es la misma que la de la plantilla (`domain/coupons.js` la evalúa en
-  el checkout).
+  del cupón canjeado es la misma que la de la plantilla (`coupon-rules.js` la evalúa en el
+  checkout).
 */
 
 import { ApiError } from '@api/client/api-error.js'
+import { couponProblem } from '@features/admin/coupons/coupon-rules.js'
 import { serializeMovement } from '@mocks/controllers/points.controller.js'
 import { getDb, mutate } from '@mocks/db/database.js'
-import { couponProblem } from '@mocks/domain/coupons.js'
 import { redeemableTemplates, redeemTemplate } from '@mocks/domain/points.js'
 import { register } from '@mocks/router/mock-router.js'
 

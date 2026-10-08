@@ -4,16 +4,13 @@
 */
 
 import { ApiError } from '@api/client/api-error.js'
+import { computeDiscount } from '@features/admin/coupons/coupon-rules.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
 import { getDb } from '@mocks/db/database.js'
-import {
-  assertCouponUsable,
-  computeDiscount,
-  findCouponByCode,
-} from '@mocks/domain/coupons.js'
-import { round2 } from '@mocks/domain/money.js'
+import { assertCouponUsable, findCouponByCode } from '@mocks/domain/coupons.js'
 import { resolveSaleLines, subtotalOf } from '@mocks/domain/sales.js'
 import { register } from '@mocks/router/mock-router.js'
+import { round2 } from '@utils/money.js'
 
 register(
   'POST',

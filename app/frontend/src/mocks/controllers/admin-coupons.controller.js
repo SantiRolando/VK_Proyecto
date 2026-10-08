@@ -1,15 +1,19 @@
 /*
-  Cupones del panel: plantillas canjeables y cupones asignados. Editar el `pointsCost` de
-  una plantilla se refleja al instante en el cliente (`GET /rewards` lee la misma
-  colección).
+  Cupones del panel: plantillas canjeables y cupones asignados. Editar el `pointsCost` de una
+  plantilla se refleja al instante en el cliente (`GET /rewards` lee la misma colección).
+  La validación es la de las reglas compartidas, con los campos que usa el formulario.
 */
 
 import { ApiError } from '@api/client/api-error.js'
-import { requireFields } from '@mocks/controllers/controller-utils.js'
+import {
+  couponDraftErrors,
+  endOfCouponDay,
+  normalizeCouponCode,
+  optionalNumber,
+  startOfCouponDay,
+} from '@features/admin/coupons/coupon-rules.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { register } from '@mocks/router/mock-router.js'
-
-const DISCOUNT_TYPES = ['Fixed', 'Percentage']
 
 function serializeAdminCoupon(db, coupon, now = new Date()) {
   const owner = db.users.find((item) => item.id === coupon.userId) ?? null
@@ -20,6 +24,7 @@ function serializeAdminCoupon(db, coupon, now = new Date()) {
     discountType: coupon.discountType,
     discountValue: coupon.discountValue,
     maxDiscount: coupon.maxDiscount ?? null,
+    maxUses: coupon.maxUses ?? null,
     pointsCost: coupon.pointsCost ?? null,
     validFrom: coupon.validFrom,
     validUntil: coupon.validUntil,
@@ -35,48 +40,42 @@ function serializeAdminCoupon(db, coupon, now = new Date()) {
   }
 }
 
-function validateDiscount(type, value) {
-  if (!DISCOUNT_TYPES.includes(type)) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['discountType'] })
+// Rechaza la plantilla nombrando los campos, como los manda el formulario.
+function assertDraft(db, draft, ignoreId = null) {
+  const takenCodes = db.discountCoupons
+    .filter((coupon) => coupon.id !== ignoreId)
+    .map((coupon) => coupon.couponCode)
+  const fields = Object.keys(couponDraftErrors(draft, { takenCodes }))
+  if (fields.length > 0) {
+    throw new ApiError(422, 'VALIDATION_ERROR', { fields })
   }
-  const number = Number(value)
-  if (!Number.isFinite(number) || number <= 0) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['discountValue'] })
-  }
-  if (type === 'Percentage' && number > 100) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['discountValue'] })
-  }
-  return number
 }
 
-function validateDate(field, value) {
-  const time = new Date(String(value)).getTime()
-  if (Number.isNaN(time)) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: [field] })
+// Un PATCH puede traer solo un campo: se valida la plantilla que queda, no el parche suelto.
+function draftFrom(coupon, body) {
+  return {
+    couponCode: coupon.couponCode,
+    discountType: coupon.discountType,
+    discountValue: coupon.discountValue,
+    maxDiscount: coupon.maxDiscount ?? null,
+    maxUses: coupon.maxUses ?? null,
+    pointsCost: coupon.pointsCost ?? null,
+    validFrom: coupon.validFrom,
+    validUntil: coupon.validUntil,
+    ...body,
   }
-  return new Date(time).toISOString()
 }
 
-function validatePointsCost(value) {
-  if (value === null || value === undefined || value === '') return null
-  const number = Number(value)
-  if (!Number.isInteger(number) || number < 0) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['pointsCost'] })
-  }
-  return number
-}
-
-function normalizeCode(db, code, ignoreId = null) {
-  const value = String(code ?? '')
-    .trim()
-    .toUpperCase()
-  if (!value) throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['couponCode'] })
-
-  const taken = db.discountCoupons.some(
-    (coupon) => coupon.id !== ignoreId && coupon.couponCode.toUpperCase() === value,
-  )
-  if (taken) throw new ApiError(422, 'VALIDATION_ERROR', { fields: ['couponCode'] })
-  return value
+function applyDraft(coupon, draft) {
+  coupon.couponCode = normalizeCouponCode(draft.couponCode)
+  coupon.discountType = draft.discountType
+  coupon.discountValue = Number(draft.discountValue)
+  coupon.maxDiscount = optionalNumber(draft.maxDiscount)
+  coupon.maxUses = optionalNumber(draft.maxUses)
+  coupon.pointsCost = optionalNumber(draft.pointsCost)
+  // El formulario manda días: el "desde" abre su día y el "hasta" lo cierra entero.
+  coupon.validFrom = startOfCouponDay(draft.validFrom)
+  coupon.validUntil = endOfCouponDay(draft.validUntil)
 }
 
 register(
@@ -97,45 +96,22 @@ register(
   'POST',
   '/admin/coupons',
   (req) => {
-    const {
-      couponCode,
-      discountType,
-      discountValue,
-      maxDiscount = null,
-      pointsCost = null,
-      validFrom,
-      validUntil,
-      active = true,
-    } = req.body
-    requireFields(req.body, [
-      'couponCode',
-      'discountType',
-      'discountValue',
-      'validFrom',
-      'validUntil',
-    ])
+    const db = getDb()
+    assertDraft(db, req.body)
 
-    const value = validateDiscount(discountType, discountValue)
-    const cost = validatePointsCost(pointsCost)
-
-    return mutate((db) => {
+    return mutate((current) => {
       const coupon = {
-        id: nextId(db.discountCoupons),
+        id: nextId(current.discountCoupons),
         productId: null,
         userId: null,
-        couponCode: normalizeCode(db, couponCode),
         usageCount: 0,
-        discountType,
-        discountValue: value,
-        maxDiscount: maxDiscount === null ? null : Number(maxDiscount),
-        pointsCost: cost,
-        validFrom: validateDate('validFrom', validFrom),
-        validUntil: validateDate('validUntil', validUntil),
-        active: Boolean(active),
+        active: true,
       }
-      db.discountCoupons.push(coupon)
+      applyDraft(coupon, req.body)
+      coupon.active = req.body.active === undefined ? true : Boolean(req.body.active)
+      current.discountCoupons.push(coupon)
 
-      return { status: 201, data: serializeAdminCoupon(db, coupon) }
+      return { status: 201, data: serializeAdminCoupon(current, coupon) }
     })
   },
   { auth: 'admin' },
@@ -149,34 +125,9 @@ register(
       const coupon = db.discountCoupons.find((item) => item.id === Number(req.params.id))
       if (!coupon) throw new ApiError(404, 'NOT_FOUND')
 
-      if (req.body.couponCode !== undefined) {
-        coupon.couponCode = normalizeCode(db, req.body.couponCode, coupon.id)
-      }
-      if (req.body.discountType !== undefined) {
-        coupon.discountType = req.body.discountType
-        coupon.discountValue = validateDiscount(
-          coupon.discountType,
-          req.body.discountValue ?? coupon.discountValue,
-        )
-      } else if (req.body.discountValue !== undefined) {
-        coupon.discountValue = validateDiscount(
-          coupon.discountType,
-          req.body.discountValue,
-        )
-      }
-      if (req.body.maxDiscount !== undefined) {
-        coupon.maxDiscount =
-          req.body.maxDiscount === null ? null : Number(req.body.maxDiscount)
-      }
-      if (req.body.pointsCost !== undefined) {
-        coupon.pointsCost = validatePointsCost(req.body.pointsCost)
-      }
-      if (req.body.validFrom !== undefined) {
-        coupon.validFrom = validateDate('validFrom', req.body.validFrom)
-      }
-      if (req.body.validUntil !== undefined) {
-        coupon.validUntil = validateDate('validUntil', req.body.validUntil)
-      }
+      const draft = draftFrom(coupon, req.body)
+      assertDraft(db, draft, coupon.id)
+      applyDraft(coupon, draft)
       if (req.body.active !== undefined) {
         coupon.active = Boolean(req.body.active)
       }

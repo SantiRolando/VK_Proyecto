@@ -1,7 +1,8 @@
-import { Card, Group, Stack, Table, Text } from '@mantine/core'
+import { SurfaceCard } from '@components/surface-card.jsx'
+import { Group, Stack, Table, Text } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 
-// Listado responsive genérico: `Table` en desktop y cards en móvil.
+// Listado responsive genérico: `Table` en desktop y `SurfaceCard` por fila en móvil.
 
 export function ResponsiveList({
   data,
@@ -18,7 +19,7 @@ export function ResponsiveList({
     return (
       <Stack gap="sm">
         {data.map((item) => (
-          <Card key={getKey(item)} withBorder radius="md" padding="md">
+          <SurfaceCard key={getKey(item)}>
             <Stack gap="sm">
               <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
                 {cardTitle && <div style={{ flex: 1 }}>{cardTitle(item)}</div>}
@@ -44,7 +45,7 @@ export function ResponsiveList({
                   ))}
               </Stack>
             </Stack>
-          </Card>
+          </SurfaceCard>
         ))}
       </Stack>
     )

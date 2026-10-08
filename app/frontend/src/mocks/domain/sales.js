@@ -5,10 +5,10 @@
 */
 
 import { ApiError } from '@api/client/api-error.js'
-import { round2 } from '@mocks/domain/money.js'
 import { RESERVING_SALE_STATUSES } from '@mocks/domain/sale-state-machine.js'
 import { settingNumber } from '@mocks/domain/settings.js'
 import { availableQuantity } from '@mocks/domain/stock.js'
+import { round2 } from '@utils/money.js'
 
 export const SALE_CHANNELS = ['Email', 'Whatsapp']
 export const DELIVERY_METHODS = ['StorePickup', 'HomeDelivery']

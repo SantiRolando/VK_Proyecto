@@ -5,17 +5,16 @@
 */
 
 import { ApiError } from '@api/client/api-error.js'
+import { computeDiscount } from '@features/admin/coupons/coupon-rules.js'
 import { serializeAddress } from '@mocks/controllers/addresses.controller.js'
 import { requireFields } from '@mocks/controllers/controller-utils.js'
 import { getDb, mutate, nextId } from '@mocks/db/database.js'
 import { buildCoordinationMessage } from '@mocks/domain/coordination-message.js'
 import {
   assertCouponUsable,
-  computeDiscount,
   findCouponByCode,
   saleDiscount,
 } from '@mocks/domain/coupons.js'
-import { round2 } from '@mocks/domain/money.js'
 import {
   checkAvailability,
   DELIVERY_METHODS,
@@ -25,6 +24,7 @@ import {
   subtotalOf,
 } from '@mocks/domain/sales.js'
 import { register } from '@mocks/router/mock-router.js'
+import { round2 } from '@utils/money.js'
 
 const LOCALES = ['es', 'en']
 

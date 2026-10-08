@@ -64,6 +64,53 @@ describe('POST /admin/coupons', () => {
     })
   })
 
+  it('el "hasta" cierra su día entero y el "desde" lo abre', async () => {
+    const result = await call('POST', '/admin/coupons', {
+      auth: ADMIN,
+      body: {
+        couponCode: 'UNDIA',
+        discountType: 'Percentage',
+        discountValue: 10,
+        validFrom: '2026-10-08',
+        validUntil: '2026-10-08',
+      },
+    })
+
+    // Un cupón de un solo día: la base exige `valid_until > valid_from` y se cumple.
+    expect(result.data.validFrom).toBe('2026-10-08T00:00:00.000Z')
+    expect(result.data.validUntil).toBe('2026-10-08T23:59:59.999Z')
+  })
+
+  it('guarda el tope de usos y lo rechaza en cero', async () => {
+    const created = await call('POST', '/admin/coupons', {
+      auth: ADMIN,
+      body: {
+        couponCode: 'CONTOPE',
+        discountType: 'Percentage',
+        discountValue: 10,
+        maxUses: 3,
+        validFrom: '2026-09-01',
+        validUntil: '2026-12-31',
+      },
+    })
+    expect(created.data.maxUses).toBe(3)
+
+    // La base exige `max_uses > 0`.
+    await expect(
+      call('POST', '/admin/coupons', {
+        auth: ADMIN,
+        body: {
+          couponCode: 'SINTOPE',
+          discountType: 'Percentage',
+          discountValue: 10,
+          maxUses: 0,
+          validFrom: '2026-09-01',
+          validUntil: '2026-12-31',
+        },
+      }),
+    ).rejects.toMatchObject({ status: 422, code: 'VALIDATION_ERROR' })
+  })
+
   it('valida código repetido, descuento y tipos', async () => {
     await expect(
       call('POST', '/admin/coupons', {

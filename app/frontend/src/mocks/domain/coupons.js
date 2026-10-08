@@ -1,47 +1,23 @@
 /*
-  Reglas derivadas de DISCOUNT_COUPON. El checkout ofrece un cupón opcional: al crear la
-  venta se valida, se guarda el descuento aplicado y se incrementa `usageCount`; al
-  cancelar la venta, se decrementa.
+  El cupón sobre la base mock. La semántica vive en las reglas compartidas
+  (`features/admin/coupons/coupon-rules.js`): acá queda lo que toca la base y el error de la API.
 */
 
 import { ApiError } from '@api/client/api-error.js'
-import { round2 } from '@mocks/domain/money.js'
+import {
+  computeDiscount,
+  couponProblem,
+  normalizeCouponCode,
+} from '@features/admin/coupons/coupon-rules.js'
 
 export function findCouponByCode(db, code) {
-  const normalized = String(code ?? '')
-    .trim()
-    .toUpperCase()
+  const normalized = normalizeCouponCode(code)
   if (!normalized) return null
   return (
-    db.discountCoupons.find((coupon) => coupon.couponCode.toUpperCase() === normalized) ??
-    null
+    db.discountCoupons.find(
+      (coupon) => normalizeCouponCode(coupon.couponCode) === normalized,
+    ) ?? null
   )
-}
-
-// Motivo por el que el cupón no sirve para este usuario, o null si sirve.
-export function couponProblem(coupon, { userId, now = new Date() } = {}) {
-  if (!coupon.active) return 'inactive'
-  if (new Date(coupon.validFrom) > now) return 'notStarted'
-  if (new Date(coupon.validUntil) < now) return 'expired'
-  // Los cupones canjeados por puntos tienen dueño; los de campaña no.
-  if (coupon.userId != null && coupon.userId !== userId) return 'notOwner'
-  return null
-}
-
-/*
-  `Percentage` sobre el subtotal con tope en `maxDiscount`; `Fixed` como monto fijo.
-  Nunca descuenta más que el subtotal.
-*/
-export function computeDiscount(coupon, subtotal) {
-  if (!coupon || subtotal <= 0) return 0
-
-  const raw =
-    coupon.discountType === 'Fixed'
-      ? coupon.discountValue
-      : (subtotal * coupon.discountValue) / 100
-  const capped = coupon.maxDiscount != null ? Math.min(raw, coupon.maxDiscount) : raw
-
-  return round2(Math.min(capped, subtotal))
 }
 
 export function assertCouponUsable(coupon, options) {
@@ -53,8 +29,8 @@ export function assertCouponUsable(coupon, options) {
 }
 
 /*
-  Descuento de una venta: snapshot del momento de la compra y, si falta (las ventas
-  sembradas no lo guardan), derivado del cupón asociado.
+  Descuento de una venta: snapshot del momento de la compra y, si falta (las ventas sembradas
+  no lo guardan), derivado del cupón asociado.
 */
 export function saleDiscount(db, sale, subtotal) {
   if (sale.discountAmount != null) return sale.discountAmount
