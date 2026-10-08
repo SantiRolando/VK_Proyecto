@@ -1,8 +1,5 @@
 import { createTheme } from '@mantine/core'
 
-/*
-  Tema apoyado en las paletas base de Mantine, sin colores propios.
-*/
 export const theme = createTheme({
   primaryColor: 'blue',
   autoContrast: true,
@@ -14,19 +11,13 @@ export const theme = createTheme({
 })
 
 /*
-  Azul de acento para las series de `@mantine/charts`: `getThemeColor` acepta `blue.6` pero **no**
-  `primary`, que devuelve la cadena tal cual y termina en un `fill="primary"` inválido que el navegador
-  pinta de negro.
+  Azul de acento para las series de `@mantine/charts`: `getThemeColor` acepta `blue.6` pero no
+  `primary`, que devuelve la cadena tal cual y deja un `fill` inválido.
 */
 export const CHART_ACCENT = 'blue.6'
 
 /*
-  Tokens de la superficie elevada (`SurfaceCard`). El fondo de la app es blanco liso, así que la
-  superficie necesita un gris propio, un degradado corto que la despegue del plano y una sombra
-  suave: con el mismo color y un borde, una tarjeta no se distingue del fondo.
-
-  El degradado va de más claro arriba a más oscuro abajo, que es como la luz trata una pieza
-  elevada. En oscuro se invierte el criterio: la superficie es más clara que el fondo.
+  Tokens de la superficie elevada (`SurfaceCard`), en claro y en oscuro.
 */
 export function cssVariablesResolver() {
   return {

@@ -1,7 +1,7 @@
 /*
-    Sesión de los tests: entra por el login real, el mismo camino que usa la app,
-    con las tres cuentas fijas de la seed (`mocks/db/seed/users.js`), que están
-    documentadas y son estables.
+  Sesión de los tests: entra por el login real, el mismo camino que usa la app,
+  con las tres cuentas fijas de la seed (`mocks/db/seed/users.js`), que están
+  documentadas y son estables.
 */
 import { setSession } from '@api/client/session.js'
 import { authService } from '@api/services/auth-service.js'

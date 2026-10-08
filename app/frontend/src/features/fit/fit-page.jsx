@@ -28,14 +28,9 @@ function resolveSource(searchParams) {
 }
 
 /*
-  Pantalla de medición: acepta `/fit?line=endurance&audience=kids` (alias
-  `linea=`), registra el origen de la consulta y, con sesión, precarga el
-  perfil activo.
-
-  Modo asistente: para un admin, la misma pantalla suma el switch
-  "para terceros" y el vínculo opcional a un cliente. Antes vivía en una ruta
-  aparte (`/admin/assistant`) que era el mismo formulario con esos dos controles;
-  se unificó acá porque no justificaba una pantalla propia.
+  Pantalla de medición: acepta `/fit?line=endurance&audience=kids` (alias `linea=`), registra
+  el origen de la consulta y, con sesión, precarga el perfil activo. Para un admin suma el
+  switch "para terceros" y el vínculo opcional a un cliente.
 */
 export function FitPage() {
   const { t } = useI18n()
@@ -61,8 +56,7 @@ export function FitPage() {
     slugToAudience(searchParams.get('audience')) ??
     (String(lineParam ?? '').toLowerCase() === 'kids' ? Audience.Kids : null)
   const source = resolveSource(searchParams)
-  // Se espera a los perfiles para no mostrar el formulario vacío y precargarlo
-  // un instante después. En modo asistente no aplica: son medidas de un tercero.
+  // Se espera a los perfiles para precargar el formulario.
   const loadingProfile = isAuthenticated && isPending && !onBehalf
 
   // El caso de demo manda sobre el perfil y sobre la URL: es el que fija línea,

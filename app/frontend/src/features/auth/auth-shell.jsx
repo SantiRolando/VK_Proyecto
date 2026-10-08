@@ -2,11 +2,8 @@ import poolImage from '@assets/indoor-swimming-pool.jpg'
 import { Card, Container, Text, Title } from '@mantine/core'
 import '@theme/auth.css'
 
-// Contenedor común de las pantallas de autenticación: fondo con la imagen de
-// pileta, título centrado y card con el formulario. Mobile-first (ancho máx. 420).
-//
-// El velo (`vk-scrim`) y el desenfoque mantienen el contraste del texto sobre la
-// foto sin depender de que la imagen sea clara u oscura en esa zona.
+// Contenedor común de las pantallas de autenticación: fondo con la imagen de pileta,
+// título centrado y card con el formulario.
 export function AuthShell({ title, subtitle, children }) {
   return (
     <div className="relative min-h-screen">

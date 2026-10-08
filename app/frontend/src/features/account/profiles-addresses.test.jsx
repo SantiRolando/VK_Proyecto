@@ -33,11 +33,9 @@ function renderAt(path) {
   )
 }
 
-// Ana arranca con dos perfiles ("Training" predeterminado y "Son"), dos
-// direcciones y generaciones en ambos perfiles; el cliente nuevo arranca sin
-// perfiles ni direcciones.
-// El contenido de la pantalla vive en `<main>`; el header (con el selector de
-// perfil) y los modales (portales) quedan fuera, así el scope no se confunde.
+// Ana arranca con dos perfiles ("Training" predeterminado y "Son"), dos direcciones y
+// generaciones en ambos perfiles; el cliente nuevo arranca sin perfiles ni direcciones.
+// El contenido de la pantalla vive en `<main>`, así el scope no se confunde con el header.
 // El router es perezoso: se espera a que el layout monte antes de acotar.
 async function mainView() {
   return within(await screen.findByRole('main'))
@@ -85,9 +83,8 @@ async function fillAddress(user, dialog, values) {
   await user.click(form.getByRole('button', { name: 'Guardar dirección' }))
 }
 
-// El `Menu` de Mantine monta el dropdown en un portal con una transición. Bajo
-// carga, la detección de visibilidad de Testing Library no siempre lo encuentra,
-// así que se busca en el DOM crudo y se abre con `fireEvent.click`.
+// El `Menu` de Mantine monta el dropdown en un portal con transición: Testing Library no
+// siempre lo encuentra, así que se busca en el DOM crudo y se abre con `fireEvent.click`.
 async function openProfileMenu(trigger, targetName) {
   const findItem = () =>
     [...document.querySelectorAll('[role="menuitem"]')].find(

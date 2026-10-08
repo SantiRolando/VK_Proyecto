@@ -26,14 +26,8 @@ const LOGO_SIZE = 24
 const SIDEBAR_WIDTH = 260
 
 /*
-  Shell único de la app autenticada.
-
-  El menú dejó de vivir en el header: ahora es una barra lateral SIEMPRE visible
-  en desktop, y un drawer colapsable en móvil. Antes había dos layouts distintos
-  (cliente y panel) con navegaciones y estéticas diferentes; con uno solo, todas
-  las opciones están a un clic en cualquier pantalla y no se desincronizan.
-
-  El header queda solo con marca, perfil, tema, cuenta e idioma.
+  Shell único de la app autenticada: barra lateral en desktop y drawer en móvil. El header
+  queda con marca, perfil, tema, cuenta e idioma.
 */
 export function AppShellLayout() {
   const { t } = useI18n()
@@ -43,8 +37,7 @@ export function AppShellLayout() {
 
   const isAdmin = user?.type === 'Admin'
   const location = useLocation()
-  // El Drawer se renderiza en un portal: no siempre hereda
-  // `data-mantine-color-scheme` del root, así que se pasa explícito.
+  // El Drawer se renderiza en un portal: se le pasa el esquema de color explícito.
   const resolvedScheme = colorScheme === 'auto' ? undefined : colorScheme
 
   // Un solo ítem resaltado: entre los que matchean por prefijo gana el más
@@ -73,10 +66,7 @@ export function AppShellLayout() {
 
       {isAdmin && (
         <>
-          {/*
-            El estilo del label va en el nodo y no en un `labelProps`: esa prop no existe en
-            el Divider de esta versión de Mantine, cae al DOM y React la reporta en consola.
-          */}
+          {/* El estilo va en el nodo: el `Divider` de esta versión no tiene `labelProps`. */}
           <Divider
             my="md"
             labelPosition="left"
@@ -104,14 +94,6 @@ export function AppShellLayout() {
       withBorder
     >
       <AppShell.Header>
-        {/*
-          En un teléfono no entra todo: el ancho útil son 320 px y la marca, el selector de
-          tema y el de idioma sumaban más que eso, así que el nombre se partía en dos líneas
-          dentro de un header de 60 px y en las pantallas más angostas la fila desbordaba.
-          Se recorta el padding, el apodo de sección se muestra recién desde `sm` y el tema
-          baja al drawer, donde ya estaba duplicado. La marca trunca en vez de envolverse:
-          si algún día no entra, termina en puntos suspensivos y no rompe el alto.
-        */}
         <Group
           h="100%"
           px={{ base: 'sm', sm: 'md' }}

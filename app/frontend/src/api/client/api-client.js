@@ -1,7 +1,7 @@
 /*
   Cliente de datos único de la app: los services conocen solo paths, métodos y DTOs, y acá se
   decide el transporte según `VITE_API_MODE` (`mock` | `http` | `hybrid`). El import del
-  transporte mock es dinámico para que `src/mocks/` no entre al bundle `http`.
+  transporte mock es dinámico: `src/mocks/` no entra al bundle `http`.
 
   Sesión: el access token se renueva con el refresh token antes de un pedido si ya venció, o
   tras un 401 `UNAUTHENTICATED`; hay una sola renovación en vuelo y un solo reintento. Si el

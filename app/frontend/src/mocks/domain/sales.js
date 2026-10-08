@@ -131,13 +131,9 @@ export function saleLinesWithDetails(db, sale) {
 }
 
 /*
-  Antigüedad de una venta en días, para que el admin vea las que llevan mucho tiempo
-  abiertas. Sin TTL: la decisión de cerrarlas es suya.
-
-  Se redondea y no se aplica `floor`: la seed fija las fechas a las 12:00, así que una
-  venta de "hace 4 días" lleva 3 días y 12 horas transcurridas. Con `floor` el resultado
-  dependía de la hora a la que corriera el proceso y el umbral de antigüedad quedaba a
-  merced del reloj.
+  Antigüedad de una venta en días, para que el admin vea las que llevan mucho tiempo abiertas.
+  Se redondea: la seed fija las fechas a las 12:00, así que con `floor` el resultado dependía
+  de la hora a la que corriera el proceso.
 */
 export function saleAgeDays(sale, now = new Date()) {
   const created = new Date(sale.createdAt).getTime()

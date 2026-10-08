@@ -35,10 +35,6 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
   const { t } = useI18n()
   const { isAuthenticated } = useAuth()
   const submit = useSubmitFeedback()
-  /*
-    En móvil el drawer desde abajo es cómodo (zona del pulgar); en desktop un
-    modal centrado se lee mejor que una hoja pegada al borde inferior
-  */
   const isDesktop = useMediaQuery('(min-width: 48em)', false)
 
   const [rating, setRating] = useState(null)
@@ -86,7 +82,6 @@ export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
     }
   }
 
-  // El cuerpo es el mismo; solo cambia el contenedor según el ancho.
   const body = (
     <>
       {reward ? (

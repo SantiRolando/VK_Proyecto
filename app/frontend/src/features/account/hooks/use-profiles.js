@@ -17,8 +17,7 @@ export function useProfiles() {
   })
 }
 
-// Perfil activo resuelto: el elegido en el selector o, si no hay, el
-// predeterminado. Evita repetir la resolución en cada pantalla.
+// Perfil activo resuelto: el elegido en el selector o el predeterminado.
 export function useResolvedProfile() {
   const { profileId } = useActiveProfile()
   const query = useProfiles()

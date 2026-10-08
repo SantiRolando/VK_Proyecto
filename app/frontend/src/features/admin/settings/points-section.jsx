@@ -131,8 +131,6 @@ export function PointsSection({ values, errors, onChange }) {
               // El nombre accesible va en el thumb: la raíz del Slider no es el control.
               thumbLabel={t('admin.settings.pointsPreset')}
               thumbValueText={t(`admin.settings.pointsGenerosity.${summary.level}`)}
-              // Solo los puntos: las etiquetas de Mantine se centran sobre la marca y las de
-              // los extremos se salen de la tarjeta.
               marks={[...POINTS_PRESETS.keys()].map((index) => ({ value: index }))}
             />
 

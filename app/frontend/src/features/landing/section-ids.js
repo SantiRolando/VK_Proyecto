@@ -1,7 +1,6 @@
 /*
-  Ids de las secciones anclables de la landing. El header arma el `href` con ellos y cada
-  sección los usa como `id`, así que el enlace del menú y su destino no se pueden
-  desincronizar: renombrar una sección es cambiar este archivo.
+  Ids de las secciones anclables de la landing: los usa el header para el `href` y cada
+  sección para su `id`.
 */
 export const SECTION_IDS = {
   how: 'how',

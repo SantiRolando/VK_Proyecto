@@ -6,7 +6,6 @@ import { IconReceipt } from '@tabler/icons-react'
 
 const FIELD = FIELD_BY_NAME.staleSaleDays
 
-// El control chico de Mantine alcanza acá: es un solo número y no se toca seguido.
 export function SalesSection({ values, errors, onChange }) {
   const { t } = useI18n()
 

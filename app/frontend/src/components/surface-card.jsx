@@ -1,12 +1,9 @@
 import { Box, Card, Group, Text } from '@mantine/core'
 
 /*
-  Superficie elevada y reutilizable: sobre el blanco liso del fondo, una tarjeta del mismo color
-  con un borde se lee como un rectángulo dibujado. Los tokens `--vk-surface-*` viven en el tema.
-
-  `titleSectionVariant="top"` pone el encabezado en una franja propia, con icono, descripción y
-  un slot a la derecha; sin la prop queda el título suelto arriba, como estaban las tarjetas.
-  El padding lo maneja el componente: pasar `p` por las props rompe la franja.
+  Superficie elevada y reutilizable. `titleSectionVariant="top"` pone el encabezado en una
+  franja propia, con icono, descripción y un slot a la derecha. El padding lo maneja el
+  componente: pasar `p` por las props rompe la franja.
 */
 
 const SURFACE_STYLE = {
@@ -16,8 +13,8 @@ const SURFACE_STYLE = {
 }
 
 /*
-  La franja va en un `Box` y no en `Card.Section`: la sección de Mantine se sale de la card con
-  un margen negativo igual a su padding y el recorte le come el encabezado al radio de la esquina.
+  La franja va en un `Box`: `Card.Section` se sale de la card y el recorte le come el
+  encabezado al radio de la esquina.
 */
 const HEADER_STYLE = {
   borderBottom: '1px solid var(--vk-surface-border)',
@@ -26,7 +23,6 @@ const HEADER_STYLE = {
 
 const ICON_STYLE = { color: 'var(--vk-accent)', flexShrink: 0 }
 const PLACEHOLDER_ICON_STYLE = { color: 'var(--mantine-color-dimmed)' }
-// Un CTA o una badge conservan su ancho: encogidos no se leen.
 const RIGHT_SECTION_STYLE = { flexShrink: 0 }
 
 export function SurfaceCard({
@@ -45,9 +41,8 @@ export function SurfaceCard({
   )
 
   /*
-    La fila del encabezado wrapea y el slot de la derecha no se encoge. Sin eso, en un teléfono
-    el título y la descripción se quedan con el ancho y empujan la badge por debajo de su
-    contenido: Mantine la recorta y "Equilibrada" queda en "E.".
+    La fila del encabezado wrapea y el slot de la derecha no se encoge: sin eso la badge se
+    recorta a "E." en un teléfono.
   */
   const header = (
     <Group justify="space-between" align="flex-start" gap="md" wrap="wrap">
@@ -107,8 +102,8 @@ export function SurfaceCard({
 }
 
 /*
-  Tarjeta hundida dentro de una superficie: invierte el color de fondo para no apilar sombra
-  sobre sombra, que es lo que pasa cuando se anida otra `SurfaceCard`.
+  Tarjeta hundida dentro de una superficie: invierte el fondo para no apilar sombra sobre
+  sombra.
 */
 export function InsetCard({ children, ...cardProps }) {
   return (

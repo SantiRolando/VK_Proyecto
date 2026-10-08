@@ -2,8 +2,8 @@ import { useI18n } from '@i18n/context.js'
 import { SegmentedControl, useMantineColorScheme } from '@mantine/core'
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react'
 
-// Selector de esquema de color: claro / oscuro / sistema (auto).
-// Mantine persiste la elección y, en `auto`, sigue `prefers-color-scheme`.
+// Selector de esquema de color: claro, oscuro o sistema. Mantine persiste la elección y en
+// `auto` sigue `prefers-color-scheme`.
 export function ThemePicker({ size = 'xs' }) {
   const { t } = useI18n()
   const { colorScheme, setColorScheme } = useMantineColorScheme()

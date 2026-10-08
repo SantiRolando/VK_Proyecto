@@ -27,10 +27,9 @@ export const routes = {
   home: '/',
 
   /*
-    Destino post-login y post-logout del cliente: no puede ser `home`, que es la landing
-    pública, porque mandaría a un cliente logueado a la página de marketing. Apunta al
-    resumen y no a `/account` a secas porque el layout autenticado no tiene `path`: un
-    `index` matchea `/` y no `/account`, así que `/account` caía en el 404.
+    Destino post-login y post-logout del cliente. No apunta a `home` (la landing pública) ni a
+    `/account` a secas: el layout autenticado no tiene `path` y un `index` matchea `/`, así que
+    `/account` caía en el 404.
   */
   account: '/account/overview',
   accountRoot: '/account',

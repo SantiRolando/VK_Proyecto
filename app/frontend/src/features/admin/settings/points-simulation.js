@@ -99,9 +99,7 @@ export function generosityLevel(config) {
 }
 
 /*
-  Posición de la barra: la banda de la escala en la que cae la configuración. Se deriva del
-  nivel y no de comparar los valores contra el preset, así un ajuste a mano deja la barra en la
-  banda que le toca en vez de dejarla sin marcar.
+  Posición de la barra: la banda de la escala en la que cae la configuración.
 */
 export function presetIndex(config) {
   const level = generosityLevel(config)

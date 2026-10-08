@@ -82,7 +82,7 @@ export function AccountAvatarMenu({ size = 'md' }) {
 
         <Menu.Divider />
 
-        {/* Perfil de medidas activo + cambio rápido (antes era un selector aparte). */}
+        {/* Perfil de medidas activo y cambio rápido. */}
         {profile && (
           <>
             <Menu.Label>{t('account.menu.profile')}</Menu.Label>

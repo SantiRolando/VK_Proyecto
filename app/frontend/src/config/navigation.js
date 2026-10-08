@@ -19,8 +19,7 @@ import {
 } from '@tabler/icons-react'
 
 /*
-  Ítems del sitio: los mismos para cualquier rol y en cualquier pantalla. La cuenta no tiene
-  ítem propio porque se llega desde el avatar del header (`Mi cuenta`).
+  Ítems del sitio: los mismos para cualquier rol y en cualquier pantalla.
 */
 export const CUSTOMER_NAV_ITEMS = [
   { to: routes.fit(), labelKey: 'nav.fit', icon: IconRuler },
@@ -29,9 +28,7 @@ export const CUSTOMER_NAV_ITEMS = [
 ]
 
 /*
-  Sub-ítems del panel: visibles para un admin en cuanto está autenticado. El modo asistente
-  no tiene ítem propio porque es el mismo formulario de medición con un switch para
-  terceros: vive dentro de `/fit` y aparece solo para admins.
+  Sub-ítems del panel, visibles para un admin autenticado.
 */
 export const PANEL_NAV_ITEMS = [
   { to: routes.admin, labelKey: 'nav.analytics', icon: IconChartHistogram },

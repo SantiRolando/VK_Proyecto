@@ -5,8 +5,7 @@ import { useI18n } from '@i18n/context.js'
 import { AppShell, Group, Image, Text } from '@mantine/core'
 import { Link, Outlet } from 'react-router'
 
-// Layout público: header mínimo (logo + idioma) para las pantallas de
-// autenticación. La landing (`/` y `/about`) tiene su propio header.
+// Layout público: header mínimo (logo + idioma) para las pantallas de autenticación.
 export function PublicLayout() {
   const { t } = useI18n()
 

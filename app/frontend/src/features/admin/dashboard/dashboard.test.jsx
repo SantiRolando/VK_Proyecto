@@ -11,11 +11,8 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 /*
-  Dashboard del panel sobre el router y los providers reales: los cuatro bloques
-  con datos de la seed y el rango de fechas por defecto. El filtro se elige con
-  `DatePickerInput` de `@mantine/dates` (popover difícil de manejar en jsdom):
-  su efecto sobre los datos está cubierto por los tests de contrato
-  (`date-range` + `admin-analytics`).
+  Dashboard del panel sobre el router y los providers reales: los cuatro bloques con datos
+  de la seed y el rango de fechas por defecto.
 */
 
 function renderAt(path) {
