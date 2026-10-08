@@ -9,11 +9,11 @@ import {
 } from '@features/admin/settings/hooks/use-settings.js'
 import { PointsSection } from '@features/admin/settings/points-section.jsx'
 import { SalesSection } from '@features/admin/settings/sales-section.jsx'
-import { settingsValidation } from '@features/admin/settings/settings-validation.js'
+import { settingsSchema } from '@features/admin/settings/settings-schema.js'
 import { useI18n } from '@i18n/context.js'
 import { Alert, Button, Container, Group, Stack } from '@mantine/core'
-import { useForm } from '@mantine/form'
 import { IconCircleCheck, IconDeviceFloppy } from '@tabler/icons-react'
+import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 
 // Formulario separado de la página para poder inicializarlo con lo que llegó del backend.
@@ -21,52 +21,61 @@ function SettingsForm({ initial }) {
   const { t } = useI18n()
   const update = useUpdateSettings()
 
+  const [values, setValues] = useState(initial)
+  const [errors, setErrors] = useState({})
   const [error, setError] = useState(null)
   const [saved, setSaved] = useState(false)
 
-  const form = useForm({
-    initialValues: initial,
-    validate: settingsValidation,
-    validateInputOnBlur: true,
-  })
-
-  // Una sola puerta de escritura: cada sección manda el parche de sus campos. Va por
-  // `setFieldValue` y no por `setValues` para que el error del campo se limpie al tocarlo.
+  // Una sola puerta de escritura: cada sección manda el parche de sus campos, y tocar un
+  // campo se lleva su error.
   const change = (patch) => {
     setSaved(false)
-    for (const [field, value] of Object.entries(patch)) {
-      form.setFieldValue(field, value)
-    }
+    setValues((current) => ({ ...current, ...patch }))
+    setErrors((current) => {
+      const next = { ...current }
+      for (const field of Object.keys(patch)) delete next[field]
+      return next
+    })
   }
 
-  const handleSubmit = form.onSubmit(async (values) => {
-    setSaved(false)
+  const handleSubmit = async (event) => {
+    event.preventDefault()
     setError(null)
+
+    const parsed = settingsSchema.safeParse(values)
+    if (!parsed.success) {
+      setErrors(collectFieldErrors(parsed.error))
+      return
+    }
+
     try {
+      // Se manda el estado completo y no `parsed.data`: el schema valida solo los canales
+      // de contacto, así que `parsed.data` se comería los campos numéricos.
       await update.mutateAsync(values)
       setSaved(true)
+      setErrors({})
     } catch (saveError) {
       // El 422 del mock nombra los campos que rechazó: se muestran bajo su input.
       const fields = isApiError(saveError) ? saveError.details?.fields : null
       if (fields?.length) {
-        form.setErrors(Object.fromEntries(fields.map((name) => [name, 'invalid'])))
+        setErrors(Object.fromEntries(fields.map((name) => [name, 'invalid'])))
       } else {
         setError(saveError)
       }
     }
-  })
+  }
 
-  // Las reglas devuelven el código y acá se traduce: las secciones reciben el texto listo.
-  const errors = Object.fromEntries(
-    Object.entries(form.errors).map(([field, code]) => [field, t(`validation.${code}`)]),
+  // Los códigos de la validación se traducen acá: las secciones reciben el texto listo.
+  const messages = Object.fromEntries(
+    Object.entries(errors).map(([field, code]) => [field, t(`validation.${code}`)]),
   )
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Stack gap="lg">
-        <PointsSection values={form.values} errors={errors} onChange={change} />
-        <ContactSection values={form.values} errors={errors} onChange={change} />
-        <SalesSection values={form.values} errors={errors} onChange={change} />
+        <PointsSection values={values} errors={messages} onChange={change} />
+        <ContactSection values={values} errors={messages} onChange={change} />
+        <SalesSection values={values} errors={messages} onChange={change} />
 
         {saved && (
           <Alert variant="light" color="teal" icon={<IconCircleCheck size={18} />}>

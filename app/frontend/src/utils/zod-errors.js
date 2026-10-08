@@ -1,8 +1,8 @@
 // Colecta los errores de formato de una validación zod en un mapa
 // `{ [campo]: <código> }`, listo para los formularios. Los códigos se
-// resuelven con `validation.<código>` (required / invalid / password / phone / code).
+// resuelven con `validation.<código>` (required / invalid / email / password / phone / code).
 
-const KNOWN_CODES = new Set(['required', 'invalid', 'password', 'phone', 'code'])
+const KNOWN_CODES = new Set(['required', 'invalid', 'email', 'password', 'phone', 'code'])
 
 export function collectFieldErrors(error) {
   const next = {}
