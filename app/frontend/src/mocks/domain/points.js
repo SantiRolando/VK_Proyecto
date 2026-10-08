@@ -1,13 +1,11 @@
 /*
-  Reglas derivadas de POINTS_MOVEMENT y DISCOUNT_COUPON. Viven en el mock: el FE solo
-  muestra el resultado.
+  Reglas derivadas de POINTS_MOVEMENT y DISCOUNT_COUPON: el FE solo muestra el resultado.
 
-  Feedback: una sola vez por generación. Si el cliente está autenticado, no agotó el tope
-  diario y el sorteo acierta, suma puntos. El azar se inyecta (`random`) para poder
-  testear sin depender de `Math.random`.
+  Feedback: una sola vez por generación. Si el cliente está autenticado, no agotó el tope diario
+  y el sorteo acierta, suma puntos. El azar se inyecta (`random`) para poder testear.
 
-  Canje: requiere `pointsBalance >= pointsCost`; crea una copia del cupón plantilla con
-  dueño y código único, y registra el movimiento negativo.
+  Canje: requiere `pointsBalance >= pointsCost`; crea una copia del cupón plantilla con dueño y
+  código único, y registra el movimiento negativo.
 */
 
 import { ApiError } from '@api/client/api-error.js'

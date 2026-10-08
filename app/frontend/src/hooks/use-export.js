@@ -2,10 +2,8 @@ import { downloadCsv } from '@utils/download.js'
 import { useCallback, useState } from 'react'
 
 /*
-  Exportación de los reportes del panel: el Excel se carga con `import()` la primera vez
-  que se usa, así el chunk del exportador no viaja en el bundle inicial.
-
-  `columns` es `[{ label, value(row) }]`, con los encabezados ya traducidos.
+  Exportación de los reportes del panel. El Excel se carga con `import()` la primera vez que se
+  usa. `columns` es `[{ label, value(row) }]`, con los encabezados ya traducidos.
 */
 export function useExport() {
   const [isExporting, setIsExporting] = useState(false)

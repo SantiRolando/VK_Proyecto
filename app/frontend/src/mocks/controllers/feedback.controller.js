@@ -1,9 +1,7 @@
 /*
-  Feedback de una generación: calificación Chico/Correcto/Grande con comentario opcional,
-  sin exigir compra, y una sola vez por generación (`ALREADY_RATED`).
-
-  El invitado puede calificar pero no suma puntos: `POINTS_MOVEMENT` exige usuario. El
-  cálculo de puntos vive en `domain/points.js`.
+  Feedback de una generación: calificación Chico/Correcto/Grande con comentario opcional, sin
+  exigir compra y una sola vez por generación (`ALREADY_RATED`). El invitado puede calificar
+  pero no suma puntos: `POINTS_MOVEMENT` exige usuario.
 */
 
 import { ApiError } from '@api/client/api-error.js'

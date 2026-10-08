@@ -1,8 +1,6 @@
 /*
-  Catálogo: lista solo lo que hay disponible en el talle consultado y expone el detalle de
-  un producto con la disponibilidad por color.
-
-  La demanda no satisfecha no se registra acá: el ER la deriva de
+  Catálogo: lista solo lo que hay disponible en el talle consultado y expone el detalle de un
+  producto con la disponibilidad por color. La demanda no satisfecha se deriva de
   `SIZE_GENERATION.stock_available_at_query = false`.
 */
 

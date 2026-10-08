@@ -7,17 +7,9 @@ import {
 } from '@constants/enums.js'
 
 /*
-  Casos de demostración del generador. Andamiaje, no producto: existen
-  para mostrar el motor sin tipear medidas en vivo y se retiran cuando el
-  cliente valide esta versión.
-
-  Viven en el código y no en la base a propósito: la demo no puede depender de
-  que alguien haya corrido un seed antes.
-
-  El talle esperado sale de correr el motor contra las tablas cargadas (mismos
-  rangos en el mock y en el backend), así que sirve para verificar en el momento
-  que el motor devolvió lo que se esperaba. `demo-cases.test.jsx` lo comprueba
-  caso por caso: si una tabla cambia, el test cae.
+  Casos de demostración del generador: andamiaje para mostrar el motor sin tipear medidas en
+  vivo. El talle esperado sale de correr el motor contra las tablas cargadas y
+  `demo-cases.test.jsx` lo comprueba caso por caso: si una tabla cambia, el test cae.
 */
 export const DEMO_CASES = [
   {

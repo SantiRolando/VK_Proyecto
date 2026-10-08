@@ -27,12 +27,8 @@ function initialsOf(name) {
 }
 
 /*
-  Avatar de cuenta. Reemplaza los dos controles que había
-  antes en el header —el menú de cuenta y el selector de perfil, que se pisaban
-  entre sí— por uno solo, al estilo del botón de cuenta de Google: quién sos,
-  qué perfil está activo, y desde ahí la cuenta y el logout.
-
-  Para invitados muestra un botón de ingreso.
+  Avatar de cuenta: quién sos, qué perfil está activo, y desde ahí la cuenta y el logout. Para
+  invitados muestra un botón de ingreso.
 */
 export function AccountAvatarMenu({ size = 'md' }) {
   const { t } = useI18n()

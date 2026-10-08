@@ -1,16 +1,7 @@
 import { Card, Group, Stack, Table, Text } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 
-// Listado responsive genérico (Table en desktop, Cards en móvil).
-//
-// `columns` es un array de { key, header, render, hideInCard }:
-//   - `header` se usa tanto en la cabecera de la tabla como de label en la card.
-//   - `render(item)` devuelve el contenido de la celda / valor de la card.
-//   - `hideInCard` (opcional) omite la columna del listado de la card.
-//
-// `cardTitle(item)` y `cardActions(item)` son renders opcionales para la
-// cabecera de la card en pantallas chicas. `cardActions` se ubica en la
-// esquina superior derecha (típicamente un `ActionsMenu`).
+// Listado responsive genérico: `Table` en desktop y cards en móvil.
 
 export function ResponsiveList({
   data,

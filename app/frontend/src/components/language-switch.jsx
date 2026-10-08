@@ -7,10 +7,8 @@ const LANGUAGES = [
 ]
 
 /*
-  Los idiomas van en un `SegmentedControl` y no en un `Select`: el control se lee igual sobre
-  el header negro de la landing y sobre los headers claros de la app, y aporta el rol de
-  radiogroup y el idioma seleccionado para los lectores de pantalla. Las etiquetas no se
-  traducen: el nombre de un idioma se escribe en ese idioma.
+  Los idiomas van en un `SegmentedControl`: se lee igual sobre el header negro de la landing y
+  sobre los claros de la app, y aporta el rol de radiogroup a los lectores de pantalla.
 */
 export function LanguageSwitch() {
   const { language, setLanguage, t } = useI18n()

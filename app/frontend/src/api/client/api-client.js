@@ -1,11 +1,10 @@
 /*
   Cliente de datos único de la app: los services conocen solo paths, métodos y DTOs, y acá se
-  decide el transporte según `VITE_API_MODE` (`mock` | `http` | `hybrid`). El import del
-  transporte mock es dinámico: `src/mocks/` no entra al bundle `http`.
+  decide el transporte según `VITE_API_MODE` (`mock` | `http` | `hybrid`). El transporte mock
+  se importa dinámico.
 
   Sesión: el access token se renueva con el refresh token antes de un pedido si ya venció, o
-  tras un 401 `UNAUTHENTICATED`; hay una sola renovación en vuelo y un solo reintento. Si el
-  refresh token ya no sirve se cierra la sesión (el handler lo registra el AuthProvider).
+  tras un 401 `UNAUTHENTICATED`; hay una sola renovación en vuelo y un solo reintento.
 */
 
 import { isApiError } from '@api/client/api-error.js'
@@ -50,9 +49,8 @@ let refreshing = null
 
 /*
   Un solo refresh en vuelo: el backend invalida el refresh token usado y toma un segundo uso
-  como robo, así que va siempre por el transporte dueño de `/auth/refresh` (en híbrido, el
-  backend) y no por el del pedido que falló. Devuelve true si hay sesión nueva; solo un rechazo
-  del refresh token cierra la sesión, un corte de red la deja como está.
+  como robo, así que va por el transporte dueño de `/auth/refresh`. Devuelve true si hay sesión
+  nueva; un corte de red no la cierra.
 */
 function refreshSession() {
   if (!refreshing) {

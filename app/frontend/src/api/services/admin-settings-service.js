@@ -1,8 +1,7 @@
 /*
-  Configuración: lectura y edición en bloque.
-
-  El catálogo de campos vive acá: el rango, el paso y el valor por defecto son parte del
-  contrato y el mock los aplica al validar. `fallback` es lo que se lee si la clave falta.
+  Configuración: lectura y edición en bloque. El catálogo de campos vive acá: el rango, el paso
+  y el valor por defecto son parte del contrato y el mock los aplica al validar. `fallback` es
+  lo que se lee si la clave falta.
 */
 
 import { apiClient } from '@api/client/api-client.js'

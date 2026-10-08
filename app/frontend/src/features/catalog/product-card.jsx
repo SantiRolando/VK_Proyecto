@@ -6,12 +6,9 @@ import { Button, Card, ColorSwatch, Group, Stack, Text } from '@mantine/core'
 import { useNavigate } from 'react-router'
 
 /*
-  Tarjeta de producto del catálogo.
-
-  Con `sizeId`, solo se listan los colores con unidades disponibles en el talle
-  consultado. Sin `sizeId` (catálogo exploratorio) el producto no trae variantes,
-  así que **no** se muestra "0 unidades disponibles": la disponibilidad es
-  desconocida, no cero, y decir cero sería mentir sobre el stock.
+  Tarjeta de producto del catálogo. Con `sizeId` solo se listan los colores con unidades en ese
+  talle; sin `sizeId` el producto no trae variantes y no se muestra "0 unidades": la
+  disponibilidad es desconocida, no cero.
 */
 export function ProductCard({ product, sizeId, generationId }) {
   const { t } = useI18n()

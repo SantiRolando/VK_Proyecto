@@ -40,12 +40,11 @@ const INITIAL_VALUES = {
 }
 
 /*
-  Formulario de medición: línea + público, las cinco medidas y la edad
-  (para niños). Qué medidas son obligatorias lo dice la tabla de talles de la
-  API; el cálculo lo hace la API y devuelve talle, avisos o una derivación.
+  Formulario de medición: línea + público, las cinco medidas y la edad (para niños). Qué medidas
+  son obligatorias lo dice la tabla de talles de la API.
 
-  En modo asistente se agrega `onBehalf` (+ `customerId` opcional): el
-  personal genera la medición para un tercero.
+  En modo asistente se agrega `onBehalf` (+ `customerId` opcional): el personal genera la
+  medición para un tercero.
 */
 export function FitForm({
   initialLine,

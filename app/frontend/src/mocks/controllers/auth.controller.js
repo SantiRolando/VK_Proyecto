@@ -1,11 +1,9 @@
 /*
-  Autenticación con el contrato del backend (`/auth/**`): registro, login, refresh, logout,
-  OTP (ingreso y cambio de clave) y `me`. Un solo formulario para clientes y admins (el rol
-  del usuario decide el lado).
+  Autenticación con el contrato del backend (`/auth/**`): registro, login, refresh, logout, OTP
+  (ingreso y cambio de clave) y `me`. Un solo formulario para clientes y admins (el rol decide).
 
-  Migración de invitado: al registrarse o iniciar sesión con un `guestSessionId`, las
-  generaciones de ese invitado pasan al usuario y, si no tiene perfiles, la última con
-  medidas se guarda como perfil "Mis medidas".
+  Migración de invitado: con un `guestSessionId`, las generaciones de ese invitado pasan al
+  usuario y, si no tiene perfiles, la última con medidas se guarda como perfil "Mis medidas".
 */
 
 import { ApiError } from '@api/client/api-error.js'

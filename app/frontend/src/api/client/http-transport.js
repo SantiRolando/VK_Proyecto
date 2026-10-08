@@ -1,8 +1,7 @@
 /*
-  Transporte HTTP real (`http` / `hybrid`): `fetch` contra la API REST. El backend responde el
-  cuerpo pelado (sin envelope) y los errores con `{ status, error, code, message, fields? }`
-  (`error` es el nombre del código HTTP y `code` el estable); acá se adaptan a la forma que
-  consume el resto del FE: `{ status, data, meta }` y `ApiError(status, code, details)`.
+  Transporte HTTP real (`http` / `hybrid`): `fetch` contra la API REST. Adapta el cuerpo pelado
+  del backend a `{ status, data, meta }` y sus errores (`{ status, error, code, message }`) a
+  `ApiError(status, code, details)`.
 */
 
 import { ApiError } from '@api/client/api-error.js'

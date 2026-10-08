@@ -1,10 +1,6 @@
 /*
-  Excel del panel. Este módulo se importa con `import()` desde
-  `use-export`: queda en su propio chunk y no engorda el bundle inicial.
-
-  Genera SpreadsheetML 2003 (`.xls`), que Excel/LibreOffice abren sin depender
-  de una librería. Si más adelante el prototipo quiere `.xlsx` real, se cambia
-  solo este archivo (o se delega al backend con `?format=xlsx`).
+  Excel del panel, importado con `import()` desde `use-export`. Genera SpreadsheetML 2003
+  (`.xls`), que Excel y LibreOffice abren sin librería.
 */
 
 import { downloadText } from '@utils/download.js'

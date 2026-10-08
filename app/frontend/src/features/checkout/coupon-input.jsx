@@ -4,10 +4,9 @@ import { Badge, Button, Group, Stack, Text, TextInput } from '@mantine/core'
 import { useState } from 'react'
 
 /*
-  Cupón opcional del checkout. El descuento lo calcula el mock
-  (`/coupons/validate`): acá solo se pide el código y se muestra el
-  resultado, que viene formateado por el idioma activo. Los cupones propios
-  se ofrecen como atajo.
+  Cupón opcional del checkout: se pide el código y se muestra el resultado que calcula
+  `/coupons/validate`, formateado por el idioma activo. Los cupones propios se ofrecen como
+  atajo.
 */
 export function CouponInput({ applied, invalid, isLoading, onApply, onRemove }) {
   const { t, formatCurrency } = useI18n()

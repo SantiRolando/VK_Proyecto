@@ -1,8 +1,7 @@
 /*
-  Provider de i18n: idioma por defecto `es` (Uruguay), detección inicial por navegador y
-  persistencia en localStorage. Expone `t` con interpolación `{{var}}` y plurales
-  (`key.one` / `key.other` según `Intl.PluralRules`), más los formateadores
-  `formatNumber` / `formatDate` / `formatCurrency`.
+  Provider de i18n: idioma por defecto `es` (Uruguay), detección por navegador y persistencia en
+  localStorage. Expone `t` con interpolación `{{var}}` y plurales (`key.one` / `key.other`),
+  más `formatNumber` / `formatDate` / `formatCurrency`.
 */
 
 import { I18nContext } from '@i18n/context.js'

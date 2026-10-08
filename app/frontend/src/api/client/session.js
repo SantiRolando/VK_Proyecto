@@ -1,10 +1,8 @@
 /*
   Estado de sesión a nivel transporte: access token (con su vencimiento), refresh token,
-  snapshot del usuario y `guestSessionId` del dispositivo. Vive fuera de React para que
-  `api-client` adjunte las cabeceras sin depender del árbol de componentes.
-
-  Los tokens se guardan en localStorage y el refresh token es de un solo uso: se reemplaza en
-  cada renovación.
+  snapshot del usuario y `guestSessionId` del dispositivo. Vive fuera de React: `api-client`
+  adjunta las cabeceras sin depender del árbol de componentes. El refresh token es de un solo
+  uso: se reemplaza en cada renovación.
 */
 
 const SESSION_KEY = 'vkfit.session'

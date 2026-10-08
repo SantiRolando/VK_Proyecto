@@ -15,12 +15,9 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 /*
-  Flujo completo de compra sobre el router y los providers reales: la app habla
-  con el transporte mock (modo mock del `api-client`), así que se navega y se
-  confirma la compra igual que un cliente, y después se verifican los efectos
-  en el contrato (`/me/sales`).
-
-  El idioma se fija en español para que las aserciones sean texto visible real.
+  Flujo completo de compra sobre el router, los providers reales y el transporte mock: se navega
+  y se confirma igual que un cliente y después se verifican los efectos en el contrato
+  (`/me/sales`). El idioma se fija en español para que las aserciones sean texto visible real.
 */
 
 function renderAt(path) {

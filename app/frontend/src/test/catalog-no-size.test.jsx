@@ -11,11 +11,9 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 /*
-  El catálogo lista productos aunque el cliente todavía no tenga talle: el hook tenía
-  `enabled: Boolean(sizeId)`, así que sin talle la consulta quedaba pendiente para
-  siempre y la pantalla mostraba esqueletos. El test afirma las tarjetas de producto
-  y no la presencia de enlaces: con el catálogo vacío, los de la navegación
-  alcanzaban para pasarlo.
+  El catálogo lista productos aunque el cliente todavía no tenga talle. El test afirma las
+  tarjetas de producto y no la presencia de enlaces: con el catálogo vacío, los de la
+  navegación alcanzaban para pasarlo.
 */
 describe('catálogo sin talle', () => {
   beforeEach(async () => {

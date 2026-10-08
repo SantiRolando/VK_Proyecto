@@ -1,9 +1,7 @@
 /*
-  Ventas: crea la venta con reserva atómica y expone las compras del usuario con el mensaje
-  de coordinación ya armado.
-
-  La reserva es derivada de las ventas abiertas (`domain/stock.js`): crear la venta no
-  descuenta `quantity`. El movimiento de stock se crea recién al confirmar.
+  Ventas: crea la venta con reserva atómica y expone las compras del usuario con el mensaje de
+  coordinación ya armado. La reserva se deriva de las ventas abiertas (`domain/stock.js`):
+  crear la venta no descuenta `quantity`, el movimiento se crea al confirmar.
 */
 
 import { ApiError } from '@api/client/api-error.js'

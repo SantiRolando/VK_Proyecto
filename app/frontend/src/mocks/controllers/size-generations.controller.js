@@ -1,11 +1,9 @@
 /*
   Generaciones de talle con el contrato del backend: `POST /public/fit/recommend`,
-  `GET /public/fit/generations/:id` (resultado) y `GET /fit/generations[/:id]` (historial
-  del usuario).
+  `GET /public/fit/generations/:id` (resultado) y `GET /fit/generations[/:id]` (historial).
 
   Regla del ER: una generación pertenece a un cliente (`customerId`) o a un invitado
-  (`guestSessionId`). En modo asistente el admin la genera (`adminId`) para un tercero,
-  opcionalmente vinculada a un cliente.
+  (`guestSessionId`); en modo asistente la genera un admin (`adminId`) para un tercero.
 */
 
 import { ApiError } from '@api/client/api-error.js'

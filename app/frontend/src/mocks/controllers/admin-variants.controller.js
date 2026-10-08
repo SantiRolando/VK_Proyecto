@@ -1,9 +1,6 @@
 /*
   Inventario por variante: físico, reservado, disponible y crítico, con granularidad
-  Producto + Color + Talle.
-
-  El alta y la edición de variantes viven en `admin-catalog.controller.js` (contrato del
-  backend). Este listado queda pendiente en el backend (módulo de stock).
+  Producto + Color + Talle. El alta y la edición viven en `admin-catalog.controller.js`.
 */
 
 import { getDb } from '@mocks/db/database.js'

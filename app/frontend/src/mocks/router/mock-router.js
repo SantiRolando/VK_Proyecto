@@ -1,12 +1,8 @@
 /*
-  Router REST simulado del modo `mock`: permite desarrollar y probar el FE sin backend.
-  Los controllers se registran con `register(method, pattern, handler, { auth })` y
-  `handle(request)` se comporta como el servidor: match de método y path con `:params`,
-  auth por rol, latencia y tasa de fallos, y `ApiError` propagado tal cual.
-
-  Request: `{ method, url, query, body, auth: { token }, guestSessionId }`. Response:
-  `{ status, data, meta }`, con `meta` opcional para lo que no es el payload (paginación,
-  totales, ejes); un status >= 400 se lanza como `ApiError`, no se devuelve.
+  Router REST simulado del modo `mock`. Los controllers se registran con
+  `register(method, pattern, handler, { auth })` y `handle(request)` se comporta como el
+  servidor: match de método y path con `:params`, auth por rol, latencia y tasa de fallos. Un
+  status >= 400 se lanza como `ApiError`, no se devuelve.
 */
 
 import { ApiError } from '@api/client/api-error.js'

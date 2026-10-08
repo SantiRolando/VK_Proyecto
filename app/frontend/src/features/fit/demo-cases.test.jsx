@@ -13,13 +13,10 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 /*
-  Precarga de casos de demostración en el generador de talles. La
-  sección es andamiaje visible solo para un admin, llena el formulario sin
-  generar y declara el talle esperado de cada caso.
+  Precarga de casos de demostración en el generador: la sección es andamiaje visible solo para
+  un admin, llena el formulario sin generar y declara el talle esperado de cada caso.
 
-  El último bloque corre **todos** los casos contra el motor: es lo que
-  garantiza que el "esperado" que muestra la pantalla siga siendo el que la
-  tabla devuelve. Si una tabla cambia, el test cae.
+  El último bloque corre todos los casos contra el motor: si una tabla cambia, el test cae.
 */
 
 const caseName = (demoCase) => es[`fit.demo.case.${demoCase.id}`]

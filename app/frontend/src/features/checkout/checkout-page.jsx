@@ -19,10 +19,8 @@ import { useNavigate, useSearchParams } from 'react-router'
 const LAST_STEP = 2
 
 /*
-  Coordinar la compra: entrega, canal y resumen con cupón
-  opcional. La selección (variante, talle, generación) llega por query desde
-  el detalle de producto; el estado es local porque el carrito completo es
-  posterior.
+  Coordinar la compra: entrega, canal y resumen con cupón opcional. La selección (variante,
+  talle, generación) llega por query desde el detalle de producto.
 */
 export function CheckoutPage() {
   const { t, language } = useI18n()

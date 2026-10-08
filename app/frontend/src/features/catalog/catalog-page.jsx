@@ -10,10 +10,8 @@ import { IconInfoCircle, IconRuler } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router'
 
 /*
-  Catálogo. Sin talle recomendado se puede explorar igual: se listan los
-  productos de la línea y se avisa que la experiencia mejora eligiendo un talle,
-  porque el catálogo filtrado solo muestra lo disponible en ese talle
-  (antes esta pantalla quedaba bloqueada).
+  Catálogo. Sin talle recomendado se puede explorar igual: se listan los productos de la línea y
+  se avisa que la experiencia mejora eligiendo un talle.
 */
 export function CatalogPage() {
   const { t } = useI18n()

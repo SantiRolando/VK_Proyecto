@@ -15,10 +15,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 /*
   Flujo completo de perfiles y direcciones sobre el router y los providers reales, contra el
-  transporte mock: se crean y administran perfiles de medidas y direcciones
-  como lo haría el cliente, se alterna el perfil activo desde el selector global
-  (el formulario de medición se precarga) y se comprueba en el contrato que el
-  historial queda separado por perfil.
+  transporte mock: alta y administración, cambio de perfil activo desde el selector global (el
+  formulario de medición se precarga) y el historial separado por perfil.
 
   El idioma se fija en español para que las aserciones sean texto visible real.
 */

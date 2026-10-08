@@ -1,9 +1,7 @@
 /*
-  Validación de formato de las medidas del cuerpo con los mismos
-  rangos que el backend. Cuáles son obligatorias depende de la tabla de talles
-  (línea + público): eso lo decide cada formulario con `requiredMeasures`.
-
-  Compartido por el formulario de medición y el de perfiles de medidas.
+  Validación de formato de las medidas del cuerpo, con los mismos rangos que el backend.
+  Cuáles son obligatorias depende de la tabla de talles (línea + público) y lo decide cada
+  formulario con `requiredMeasures`.
 */
 
 import { z } from 'zod'

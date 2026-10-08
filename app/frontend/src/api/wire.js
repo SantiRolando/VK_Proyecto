@@ -1,8 +1,7 @@
 /*
-  Contrato de red entre el backend y el modelo del FE. La API escribe los enums en
-  UPPER_SNAKE (`ENDURANCE`, `WITH_WARNING`) y el FE los maneja en PascalCase (`Endurance`,
-  `WithWarning`, ver `constants/enums.js`); los codecs convierten en ambos sentidos y los
-  controllers mock los usan para hablar el mismo contrato.
+  Contrato de red entre el backend y el modelo del FE: la API escribe los enums en UPPER_SNAKE
+  (`ENDURANCE`) y el FE los maneja en PascalCase (`Endurance`, ver `constants/enums.js`); los
+  codecs convierten en ambos sentidos.
 */
 
 import {

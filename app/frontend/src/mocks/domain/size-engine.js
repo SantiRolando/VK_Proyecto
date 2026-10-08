@@ -1,15 +1,12 @@
 /*
-  Motor de talle del mock: réplica simplificada del motor del backend para que el modo
-  mock responda con la misma forma (`outcome`, `warnings`, `referralReason`). El motor
-  real vive en el backend; este solo sostiene la demo sin servidor.
+  Motor de talle del mock: réplica simplificada del motor del backend, con la misma forma de
+  respuesta (`outcome`, `warnings`, `referralReason`).
 
-  - Las medidas activas se derivan de la tabla: participa toda medida con algún `*Min` no
-    nulo. Si la tabla solo tiene edad, la edad es la medida.
-  - Por medida: la fila que la contiene (en superposición, la mayor); fuera de la tabla,
-    derivación (`MeasureBelowTable` / `MeasureAboveTable`); en un hueco, la primera fila
-    por encima.
-  - Diferencia entre índices: 0–1 talle directo (el mayor), 2 talle con aviso
-    `AdjacentSizeMayFit`, 3 o más derivación `ProportionMismatch`.
+  - Las medidas activas se derivan de la tabla: participa toda medida con algún `*Min` no nulo.
+  - Por medida gana la fila que la contiene (en superposición, la mayor); fuera de la tabla hay
+    derivación (`MeasureBelowTable` / `MeasureAboveTable`) y en un hueco, la primera por encima.
+  - Diferencia entre índices: 0–1 talle directo (el mayor), 2 con aviso `AdjacentSizeMayFit`, 3 o
+    más derivación `ProportionMismatch`.
   - En niños con medidas, la edad es orientativa: fuera del talle elegido agrega
     `AgeOutsideSizeRange`.
 */

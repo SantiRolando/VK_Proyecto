@@ -1,9 +1,7 @@
 /*
-  Configuración de la aplicación. La tabla SETTING es clave-valor con claves snake_case del ERD;
-  acá se expone un DTO en camelCase y se valida la edición en bloque (`PATCH`). Los valores los
-  leen los controllers de negocio.
-
-  El catálogo de campos, sus rangos y sus valores por defecto vienen del contrato del service.
+  Configuración de la aplicación: la tabla SETTING es clave-valor con claves snake_case del ERD
+  y acá se expone un DTO en camelCase con edición en bloque (`PATCH`), que leen los controllers
+  de negocio. El catálogo de campos, sus rangos y sus valores por defecto vienen del service.
 */
 
 import { ApiError } from '@api/client/api-error.js'

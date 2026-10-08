@@ -1,9 +1,7 @@
 /*
   Talles y generaciones contra el contrato del backend: recomendación pública, detalle,
-  historial y tablas de talles.
-
-  La respuesta de `recommend` y la del historial son DTOs distintos en el backend; acá se
-  llevan a una misma forma de "generación" para las pantallas.
+  historial y tablas de talles. La respuesta de `recommend` y la del historial son DTOs
+  distintos; acá se llevan a una misma forma de "generación" para las pantallas.
 */
 
 import { apiClient } from '@api/client/api-client.js'

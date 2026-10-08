@@ -1,10 +1,7 @@
 /*
-  Perfiles de medidas con el contrato del backend (`/profiles`): listado, alta, edición
-  completa (PUT), baja y default. Un solo perfil predeterminado por usuario; borrar el
-  default deja al usuario sin default, igual que el backend.
-
-  La baja es lógica (`active`) para no romper el historial, que referencia `profileId`; el
-  backend en cambio pone `profileId` en null.
+  Perfiles de medidas con el contrato del backend (`/profiles`): listado, alta, edición completa
+  (PUT), baja y default. Un solo perfil predeterminado por usuario y la baja es lógica (`active`)
+  para no romper el historial, que referencia `profileId`; el backend lo pone en null.
 */
 
 import { ApiError } from '@api/client/api-error.js'

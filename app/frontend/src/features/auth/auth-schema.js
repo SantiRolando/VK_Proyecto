@@ -1,10 +1,9 @@
 import { z } from 'zod'
 
 /*
-  Schemas de formato de las pantallas de autenticación.
-  La validación de negocio (email tomado, credenciales, OTP) la hace la API;
-  acá solo se valida formato con las mismas reglas que el backend: clave de 8 a
-  64 caracteres, teléfono de 8 a 15 dígitos, código OTP de 6 dígitos.
+  Schemas de formato de las pantallas de autenticación, con las mismas reglas que el backend:
+  clave de 8 a 64 caracteres, teléfono de 8 a 15 dígitos y código OTP de 6 dígitos. La
+  validación de negocio (email tomado, credenciales, OTP) la hace la API.
 */
 const email = z.string().trim().email({ message: 'invalid' })
 const required = z.string().trim().min(1, { message: 'required' })

@@ -19,10 +19,9 @@ import { useState } from 'react'
 const NEW_ADDRESS = 'new'
 
 /*
-  Agenda de direcciones: alta, edición, baja y predeterminada. El
-  `AddressesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
-  exporta aparte para poder embeberlo en una pestaña de la información de cuenta
-  sin anidar contenedores ni repetir el encabezado.
+  Agenda de direcciones: alta, edición, baja y predeterminada. `AddressesPage` es el envoltorio
+  de ruta (Container + PageHeader) y el cuerpo se exporta aparte para embeberlo en una pestaña
+  de la información de cuenta.
 */
 export function AddressesPage() {
   const { t } = useI18n()
