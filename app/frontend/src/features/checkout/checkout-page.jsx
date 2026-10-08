@@ -18,10 +18,12 @@ import { useNavigate, useSearchParams } from 'react-router'
 
 const LAST_STEP = 2
 
-// Coordinar la compra (US4/T062): entrega, canal y resumen con cupón
-// opcional. La selección (variante, talle, generación) llega por query desde
-// el detalle de producto; el estado es local porque el carrito completo es
-// posterior (T061).
+/*
+  Coordinar la compra: entrega, canal y resumen con cupón
+  opcional. La selección (variante, talle, generación) llega por query desde
+  el detalle de producto; el estado es local porque el carrito completo es
+  posterior.
+*/
 export function CheckoutPage() {
   const { t, language } = useI18n()
   const navigate = useNavigate()
@@ -42,7 +44,7 @@ export function CheckoutPage() {
   const [active, setActive] = useState(0)
   const [method, setMethod] = useState('StorePickup')
   const [addressChoice, setAddressChoice] = useState(null)
-  const [channel, setChannel] = useState('Email') // Email por defecto (US4)
+  const [channel, setChannel] = useState('Email') // Email por defecto
   const [quantity, setQuantity] = useState(1)
   const [couponCode, setCouponCode] = useState(null)
   const [coupon, setCoupon] = useState(null)
@@ -114,8 +116,10 @@ export function CheckoutPage() {
       navigate(routes.checkoutConfirmation(sale.id))
     } catch (error) {
       if (error?.code === 'STOCK_INSUFFICIENT') {
-        // T064: se informa el conflicto sin perder la selección y se refresca
-        // la disponibilidad para que pueda ajustar la cantidad.
+        /*
+          El conflicto de stock se informa sin perder la selección y se refresca
+          la disponibilidad para que pueda ajustar la cantidad.
+        */
         setConflict(error)
         productQuery.refetch()
       } else {

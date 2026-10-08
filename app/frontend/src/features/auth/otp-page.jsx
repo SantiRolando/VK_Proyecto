@@ -12,9 +12,11 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
-// Ingreso por código de un solo uso (FR-010): pedir código al email y canjearlo
-// por una sesión. En modo mock el código es siempre 123456; contra el backend
-// (fuera de producción) el código queda en el log del servidor.
+/*
+  Ingreso por código de un solo uso: pedir código al email y canjearlo
+  por una sesión. En modo mock el código es siempre 123456; contra el backend
+  (fuera de producción) el código queda en el log del servidor.
+*/
 export function OtpPage() {
   const { t } = useI18n()
   const { adoptSession } = useAuth()

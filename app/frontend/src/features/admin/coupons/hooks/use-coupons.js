@@ -1,8 +1,10 @@
 import { adminCouponsService } from '@api/services/admin-coupons-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Cupones del panel (US11/T098). Editar una plantilla cambia lo que ofrece el
-// cliente, así que se invalida su lista de canje.
+/*
+  Cupones del panel. Editar una plantilla cambia lo que ofrece el
+  cliente, así que se invalida su lista de canje.
+*/
 
 function useCouponMutation(mutationFn) {
   const queryClient = useQueryClient()

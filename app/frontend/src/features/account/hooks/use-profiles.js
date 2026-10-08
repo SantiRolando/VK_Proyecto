@@ -3,8 +3,10 @@ import { useActiveProfile } from '@features/account/active-profile-context.js'
 import { useAuth } from '@features/auth/auth-context.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Perfiles de medidas del cliente (US5/T072). Solo consulta con sesión, así el
-// selector global y el formulario de medición pueden usarlo sin preguntar.
+/*
+  Perfiles de medidas del cliente. Solo consulta con sesión, así el
+  selector global y el formulario de medición pueden usarlo sin preguntar.
+*/
 export function useProfiles() {
   const { isAuthenticated } = useAuth()
 

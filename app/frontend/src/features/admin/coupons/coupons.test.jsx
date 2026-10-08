@@ -11,8 +11,10 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Cupones del panel (US11/T098) sobre el router y los providers reales. El
-// efecto en el cliente se comprueba contra `GET /rewards`.
+/*
+  Cupones del panel sobre el router y los providers reales. El
+  efecto en el cliente se comprueba contra `GET /rewards`.
+*/
 
 function renderAt(path) {
   return render(
@@ -30,7 +32,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('cupones (US11)', () => {
+describe('cupones', () => {
   it('lista plantillas y cupones asignados', async () => {
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminCoupons)

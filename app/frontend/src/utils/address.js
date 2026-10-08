@@ -1,5 +1,7 @@
-// Etiquetas de dirección y su validación de formato. Los datos de la dirección
-// son *dato*, no UI: no se traducen (§4.7).
+/*
+  Etiquetas de dirección y su validación de formato. Los datos de la dirección
+  son *dato*, no UI: no se traducen.
+*/
 
 import { z } from 'zod'
 

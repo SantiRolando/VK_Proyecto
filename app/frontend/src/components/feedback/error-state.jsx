@@ -2,8 +2,10 @@ import { useI18n } from '@i18n/context.js'
 import { Alert, Button, Text } from '@mantine/core'
 import { IconAlertCircle } from '@tabler/icons-react'
 
-// Estado de error consistente (FR-029): traduce el código del contrato
-// (`errors.<CODE>`) y ofrece reintento si se pasa `onRetry`.
+/*
+  Estado de error consistente: traduce el código del contrato
+  (`errors.<CODE>`) y ofrece reintento si se pasa `onRetry`.
+*/
 export function ErrorState({ error, onRetry }) {
   const { t } = useI18n()
   const code = error?.code

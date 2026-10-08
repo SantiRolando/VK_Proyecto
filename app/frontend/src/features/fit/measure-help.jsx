@@ -14,8 +14,10 @@ const MEASURES = [
   { field: 'torso', image: torsoImage },
 ]
 
-// Guía visual "cómo me mido" (T040): drawer con imagen e instrucción por
-// medida. Mobile-first: drawer inferior.
+/*
+  Guía visual "cómo me mido": drawer con imagen e instrucción por
+  medida. Mobile-first: drawer inferior.
+*/
 export function MeasureHelp({ opened, onClose }) {
   const { t } = useI18n()
 

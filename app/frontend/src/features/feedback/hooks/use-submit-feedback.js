@@ -1,9 +1,11 @@
 import { sizeService } from '@api/services/size-service.js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// Califica una generación (US6/T080). La respuesta trae la recompensa, así que
-// además del historial se refrescan puntos y cupones. El resultado público no
-// trae la calificación: se copia a la caché desde la respuesta.
+/*
+  Califica una generación. La respuesta trae la recompensa, así que
+  además del historial se refrescan puntos y cupones. El resultado público no
+  trae la calificación: se copia a la caché desde la respuesta.
+*/
 export function useSubmitFeedback() {
   const queryClient = useQueryClient()
 

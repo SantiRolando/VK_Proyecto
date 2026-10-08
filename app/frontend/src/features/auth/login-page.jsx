@@ -34,8 +34,10 @@ const DEMO_CREDENTIALS = env.isMock
       { email: 'ana.perez@vkfit.demo', password: 'Demo12345' },
     ]
 
-// Login unificado de clientes y admins (FR-010): según el rol se redirige a
-// `/admin` o al `returnTo`/home.
+/*
+  Login unificado de clientes y admins: según el rol se redirige a
+  `/admin` o al `returnTo`/home.
+*/
 export function LoginPage() {
   const { t } = useI18n()
   const { login } = useAuth()
@@ -105,7 +107,7 @@ export function LoginPage() {
             <ErrorState error={serverError} onRetry={() => setServerError(null)} />
           )}
 
-          <Button type="submit" loading={busy} leftSection={<IconLogin size={18} />}>
+          <Button type="submit" loading={busy} rightSection={<IconLogin size={18} />}>
             {t('auth.login.submit')}
           </Button>
         </Stack>

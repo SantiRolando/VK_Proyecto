@@ -13,8 +13,10 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// US9 sobre el router y los providers reales: ajuste de stock con motivo
-// (auditado) y CRUD del catálogo del panel.
+/*
+  Inventario y catálogo sobre el router y los providers reales: ajuste de stock con motivo
+  (auditado) y CRUD del catálogo del panel.
+*/
 
 // Endurance talle M no tiene stock en ningún color en la seed.
 const EMPTY_SKU = 'ENDURANCE-CLASSIC-NAVY-M'
@@ -39,7 +41,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('inventario (US9)', () => {
+describe('inventario', () => {
   it('ajusta el stock con motivo, deja el movimiento auditado y el catálogo lo refleja', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
@@ -110,7 +112,7 @@ describe('inventario (US9)', () => {
   })
 })
 
-describe('catálogo del panel (US9)', () => {
+describe('catálogo del panel', () => {
   it('crea un producto y lo da de baja sin borrarlo', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)

@@ -9,10 +9,12 @@ import { Alert, Button, Container, SimpleGrid, Stack } from '@mantine/core'
 import { IconInfoCircle, IconRuler } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router'
 
-// Catálogo (US3). Sin talle recomendado se puede explorar igual: se listan los
-// productos de la línea y se avisa que la experiencia mejora eligiendo un talle,
-// porque el catálogo filtrado solo muestra lo disponible en ese talle
-// (bug squash sesión #1: antes esta pantalla quedaba bloqueada).
+/*
+  Catálogo. Sin talle recomendado se puede explorar igual: se listan los
+  productos de la línea y se avisa que la experiencia mejora eligiendo un talle,
+  porque el catálogo filtrado solo muestra lo disponible en ese talle
+  (antes esta pantalla quedaba bloqueada).
+*/
 export function CatalogPage() {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -47,7 +49,7 @@ export function CatalogPage() {
               <Button
                 size="xs"
                 variant="light"
-                leftSection={<IconRuler size={14} />}
+                rightSection={<IconRuler size={14} />}
                 onClick={() => navigate(routes.fit())}
               >
                 {t('catalog.noSize.cta')}

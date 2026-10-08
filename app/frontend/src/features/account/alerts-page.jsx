@@ -7,7 +7,7 @@ import { useI18n } from '@i18n/context.js'
 import { Badge, Button, Card, Container, Group, Stack, Text } from '@mantine/core'
 import { IconBell } from '@tabler/icons-react'
 
-// Mis avisos de reposición (US3): suscripciones agrupadas por línea × talle.
+// Mis avisos de reposición: suscripciones agrupadas por línea × talle.
 export function AlertsPage() {
   const { t } = useI18n()
   const query = useRestockAlerts()

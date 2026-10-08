@@ -103,7 +103,7 @@ export function getGuestSessionId() {
     try {
       window.localStorage.setItem(GUEST_KEY, id)
     } catch {
-      // ignorar: se regenerará en la próxima lectura.
+      // Si no se puede guardar, el id se regenera en la próxima lectura.
     }
   }
   return id

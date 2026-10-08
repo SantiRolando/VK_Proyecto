@@ -34,8 +34,10 @@ function cellStyle(theme, count, maxCount) {
   }
 }
 
-// Demanda no satisfecha (US10/T095, FR-025): mapa de calor de consultas sin
-// stock por línea × talle, con exportación a CSV y Excel.
+/*
+  Demanda no satisfecha: mapa de calor de consultas sin
+  stock por línea × talle, con exportación a CSV y Excel.
+*/
 export function MissingSizesPage() {
   const { t } = useI18n()
   const theme = useMantineTheme()
@@ -85,7 +87,7 @@ export function MissingSizesPage() {
               variant="light"
               size="compact-sm"
               color="teal"
-              leftSection={<IconFileSpreadsheet size={14} />}
+              rightSection={<IconFileSpreadsheet size={14} />}
               disabled={cells.length === 0 || isExporting}
               onClick={() =>
                 exportExcel(

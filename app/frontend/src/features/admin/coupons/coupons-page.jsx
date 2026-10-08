@@ -204,8 +204,10 @@ function DiscountCell({ coupon }) {
   return <Text size="sm">-{coupon.discountValue}%</Text>
 }
 
-// Cupones del panel (US11/T098, FR-026): plantillas canjeables y cupones
-// asignados. Editar el costo de canje se refleja al instante en el cliente.
+/*
+  Cupones del panel: plantillas canjeables y cupones
+  asignados. Editar el costo de canje se refleja al instante en el cliente.
+*/
 export function CouponsPage() {
   const { t } = useI18n()
   const query = useAdminCoupons()
@@ -221,7 +223,7 @@ export function CouponsPage() {
         title={t('admin.coupons.title')}
         subtitle={t('admin.coupons.subtitle')}
         actions={
-          <Button leftSection={<IconPlus size={16} />} onClick={() => setCreating(true)}>
+          <Button rightSection={<IconPlus size={16} />} onClick={() => setCreating(true)}>
             {t('admin.coupons.new')}
           </Button>
         }

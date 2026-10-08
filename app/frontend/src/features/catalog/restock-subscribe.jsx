@@ -8,8 +8,10 @@ import { Alert, Button, Stack, Text } from '@mantine/core'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-// Suscripción al aviso de reposición (US3). Requiere cuenta: un invitado ve
-// la invitación a ingresar/registrarse y vuelve a este punto.
+/*
+  Suscripción al aviso de reposición. Requiere cuenta: un invitado ve
+  la invitación a ingresar/registrarse y vuelve a este punto.
+*/
 export function RestockSubscribe({ line, sizeId }) {
   const { t } = useI18n()
   const { isAuthenticated } = useAuth()

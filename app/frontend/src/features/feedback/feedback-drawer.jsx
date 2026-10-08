@@ -18,7 +18,7 @@ import { useState } from 'react'
 
 const RATINGS = ['Small', 'Correct', 'Large']
 
-// Mensaje del resultado según el tipo de recompensa (FR-018).
+// Mensaje del resultado según el tipo de recompensa.
 function outcomeKey(reward, isAuthenticated) {
   if (!isAuthenticated) return 'feedback.reward.guest'
   if (reward.dailyLimitReached) return 'feedback.reward.dailyLimit'
@@ -26,16 +26,19 @@ function outcomeKey(reward, isAuthenticated) {
   return 'feedback.reward.noPoints'
 }
 
-// Feedback de una medición (US6/T080): Chico/Correcto/Grande + comentario
-// opcional. Lo abren el resultado y el historial; el cálculo de puntos vive en
-// el mock y vuelve como `reward`.
+/*
+  Feedback de una medición: Chico/Correcto/Grande + comentario
+  opcional. Lo abren el resultado y el historial; el cálculo de puntos vive en
+  el mock y vuelve como `reward`.
+*/
 export function FeedbackDrawer({ opened, onClose, generation, onRated }) {
   const { t } = useI18n()
   const { isAuthenticated } = useAuth()
   const submit = useSubmitFeedback()
-  // En móvil el drawer desde abajo es cómodo (zona del pulgar); en desktop un
-  // modal centrado se lee mejor que una hoja pegada al borde inferior
-  // (bug squash sesión #1).
+  /*
+    En móvil el drawer desde abajo es cómodo (zona del pulgar); en desktop un
+    modal centrado se lee mejor que una hoja pegada al borde inferior
+  */
   const isDesktop = useMediaQuery('(min-width: 48em)', false)
 
   const [rating, setRating] = useState(null)

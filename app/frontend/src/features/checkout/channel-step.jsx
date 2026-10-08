@@ -2,9 +2,11 @@ import { useI18n } from '@i18n/context.js'
 import { Alert, SegmentedControl, Stack, Text } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
 
-// Paso 2 del checkout (T062): Email (por defecto) o WhatsApp. El canal no
-// muta después de crear la venta (§5.4), así que se elige acá y no en el
-// seguimiento.
+/*
+  Paso 2 del checkout: Email (por defecto) o WhatsApp. El canal no
+  muta después de crear la venta, así que se elige acá y no en el
+  seguimiento.
+*/
 export function ChannelStep({ channel, onChannelChange }) {
   const { t } = useI18n()
 

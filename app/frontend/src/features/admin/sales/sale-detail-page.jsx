@@ -61,8 +61,10 @@ function DatedRow({ label, value }) {
   )
 }
 
-// Detalle de una venta (US7/T069): cliente, logística, canal y acciones con
-// confirmación. Confirmar descuenta stock; cancelar libera la reserva.
+/*
+  Detalle de una venta: cliente, logística, canal y acciones con
+  confirmación. Confirmar descuenta stock; cancelar libera la reserva.
+*/
 export function AdminSaleDetailPage() {
   const { t } = useI18n()
   const { saleId } = useParams()

@@ -11,9 +11,11 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Panel de ventas (US7/T068-T069) sobre el router y los providers reales:
-// el admin ve el listado, entra al detalle y mueve la venta de estado con la
-// confirmación de por medio. El idioma se fija en español.
+/*
+  Panel de ventas sobre el router y los providers reales:
+  el admin ve el listado, entra al detalle y mueve la venta de estado con la
+  confirmación de por medio. El idioma se fija en español.
+*/
 
 function renderAt(path) {
   return render(

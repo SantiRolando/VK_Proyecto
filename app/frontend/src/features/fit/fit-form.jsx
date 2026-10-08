@@ -39,12 +39,14 @@ const INITIAL_VALUES = {
   age: '',
 }
 
-// Formulario de medición (T039): línea + público, las cinco medidas y la edad
-// (para niños). Qué medidas son obligatorias lo dice la tabla de talles de la
-// API; el cálculo lo hace la API y devuelve talle, avisos o una derivación.
-//
-// En modo asistente (US12) se agrega `onBehalf` (+ `customerId` opcional): el
-// personal genera la medición para un tercero.
+/*
+  Formulario de medición: línea + público, las cinco medidas y la edad
+  (para niños). Qué medidas son obligatorias lo dice la tabla de talles de la
+  API; el cálculo lo hace la API y devuelve talle, avisos o una derivación.
+
+  En modo asistente se agrega `onBehalf` (+ `customerId` opcional): el
+  personal genera la medición para un tercero.
+*/
 export function FitForm({
   initialLine,
   initialAudience,
@@ -63,7 +65,7 @@ export function FitForm({
     ...INITIAL_VALUES,
     line: initialLine ?? '',
     audience: initialAudience ?? Audience.Adult,
-    // Con perfil activo, el formulario arranca precargado (US5/T073).
+    // Con perfil activo, el formulario arranca precargado.
     ...(initialMeasures ?? {}),
   })
   const [errors, setErrors] = useState({})
@@ -127,7 +129,7 @@ export function FitForm({
             variant="subtle"
             size="xs"
             type="button"
-            leftSection={<IconHelp size={14} />}
+            rightSection={<IconHelp size={14} />}
             onClick={openHelp}
           >
             {t('fit.form.help')}

@@ -1,8 +1,10 @@
 import { rewardsService } from '@api/services/rewards-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Recompensas del cliente (US6/T079): saldo y movimientos, plantillas
-// canjeables, canje y cupones propios.
+/*
+  Recompensas del cliente: saldo y movimientos, plantillas
+  canjeables, canje y cupones propios.
+*/
 
 export function usePoints() {
   return useQuery({ queryKey: ['points'], queryFn: rewardsService.getPoints })

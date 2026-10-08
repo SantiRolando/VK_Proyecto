@@ -14,12 +14,14 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// Flujo completo de US4 sobre el router y los providers reales: la app habla
-// con el transporte mock (modo mock del `api-client`), así que se navega y se
-// confirma la compra igual que un cliente, y después se verifican los efectos
-// en el contrato (`/me/sales`).
-//
-// El idioma se fija en español para que las aserciones sean texto visible real.
+/*
+  Flujo completo de compra sobre el router y los providers reales: la app habla
+  con el transporte mock (modo mock del `api-client`), así que se navega y se
+  confirma la compra igual que un cliente, y después se verifican los efectos
+  en el contrato (`/me/sales`).
+
+  El idioma se fija en español para que las aserciones sean texto visible real.
+*/
 
 function renderAt(path) {
   return render(
@@ -105,7 +107,7 @@ describe('checkout (flujo completo)', () => {
     // Paso 3 — resumen: cupón aplicado por el mock (10% de 1290, tope 500).
     await user.click(screen.getByRole('button', { name: 'Continuar' }))
 
-    // Los cupones propios del cliente (US6) quedan a un clic.
+    // Los cupones propios del cliente quedan a un clic.
     expect(await screen.findByRole('button', { name: 'ANA15' })).toBeInTheDocument()
 
     await user.type(screen.getByPlaceholderText('Código del cupón'), 'VIKI10')

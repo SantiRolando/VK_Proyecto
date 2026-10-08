@@ -29,8 +29,10 @@ function linesLabel(lines) {
     .join(' · ')
 }
 
-// Auditoría de movimientos de stock (US9/T091): quién, cuándo, por qué y sobre
-// qué variante. `SaleConfirmed` se registra solo al confirmar una venta.
+/*
+  Auditoría de movimientos de stock: quién, cuándo, por qué y sobre
+  qué variante. `SaleConfirmed` se registra solo al confirmar una venta.
+*/
 export function MovementsPage() {
   const { t } = useI18n()
   const [reason, setReason] = useState(ALL)

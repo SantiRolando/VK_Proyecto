@@ -6,8 +6,10 @@ import { Alert, Group, Stack, Text, UnstyledButton } from '@mantine/core'
 import { IconCircleOff } from '@tabler/icons-react'
 import { useNavigate } from 'react-router'
 
-// Estado sin stock (US3): mensaje explícito + aviso de reposición + talles
-// adyacentes rotulados como NO recomendados.
+/*
+  Estado sin stock: mensaje explícito + aviso de reposición + talles
+  adyacentes rotulados como NO recomendados.
+*/
 export function NoStockState({ meta, line, generationId }) {
   const { t } = useI18n()
   const navigate = useNavigate()

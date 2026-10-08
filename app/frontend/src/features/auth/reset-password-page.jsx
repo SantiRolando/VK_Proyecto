@@ -11,8 +11,10 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 
-// Nueva contraseña (FR-010): email, código recibido por mail y clave nueva.
-// En modo mock el código es siempre 123456.
+/*
+  Nueva contraseña: email, código recibido por mail y clave nueva.
+  En modo mock el código es siempre 123456.
+*/
 export function ResetPasswordPage() {
   const { t } = useI18n()
   const [searchParams] = useSearchParams()

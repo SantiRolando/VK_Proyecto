@@ -42,10 +42,12 @@ function Field({ icon: Icon, label, value }) {
   )
 }
 
-// Información de cuenta (bug squash sesión #1): antes no existía ninguna pantalla
-// que mostrara los datos del usuario. Reúne los datos de `/auth/me` y, en la
-// segunda pestaña, la agenda de perfiles y direcciones — que antes vivía en rutas
-// separadas (`/account/profiles`, `/account/addresses`).
+/*
+  Información de cuenta: antes no existía ninguna pantalla
+  que mostrara los datos del usuario. Reúne los datos de `/auth/me` y, en la
+  segunda pestaña, la agenda de perfiles y direcciones — que antes vivía en rutas
+  separadas (`/account/profiles`, `/account/addresses`).
+*/
 export function AccountInfoPage() {
   const { t } = useI18n()
   const { user } = useAuth()

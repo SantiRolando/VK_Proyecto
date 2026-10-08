@@ -21,9 +21,11 @@ const EMPTY_PROFILE = {
   age: '',
 }
 
-// Formulario de perfil de medidas (US5/T074), compartido por la pantalla de
-// perfiles y el modal "guardar como perfil" del resultado. Las medidas son
-// opcionales: qué necesita cada tabla lo pide el formulario de medición.
+/*
+  Formulario de perfil de medidas, compartido por la pantalla de
+  perfiles y el modal "guardar como perfil" del resultado. Las medidas son
+  opcionales: qué necesita cada tabla lo pide el formulario de medición.
+*/
 export function ProfileForm({
   initialValues,
   onSubmit,

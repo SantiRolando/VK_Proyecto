@@ -13,13 +13,15 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Flujo completo de US5 sobre el router y los providers reales, contra el
-// transporte mock: se crean y administran perfiles de medidas y direcciones
-// como lo haría el cliente, se alterna el perfil activo desde el selector global
-// (el formulario de medición se precarga) y se comprueba en el contrato que el
-// historial queda separado por perfil.
-//
-// El idioma se fija en español para que las aserciones sean texto visible real.
+/*
+  Flujo completo de perfiles y direcciones sobre el router y los providers reales, contra el
+  transporte mock: se crean y administran perfiles de medidas y direcciones
+  como lo haría el cliente, se alterna el perfil activo desde el selector global
+  (el formulario de medición se precarga) y se comprueba en el contrato que el
+  historial queda separado por perfil.
+
+  El idioma se fija en español para que las aserciones sean texto visible real.
+*/
 
 function renderAt(path) {
   return render(
@@ -117,7 +119,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('perfiles de medidas (US5)', () => {
+describe('perfiles de medidas', () => {
   it('crea dos perfiles y administra la agenda: edición, predeterminado y baja', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.EmptyCustomer)
@@ -202,8 +204,10 @@ describe('perfiles de medidas (US5)', () => {
     expect(await screen.findByLabelText(/Altura/)).toHaveValue('168 cm')
     expect(screen.getByLabelText(/Cadera/)).toHaveValue('98 cm')
 
-    // El perfil activo se cambia desde el menú del avatar de cuenta, que ahora
-    // reúne el menú de cuenta y el selector de perfil (bug squash sesión #1).
+    /*
+      El perfil activo se cambia desde el menú del avatar de cuenta, que ahora
+      reúne el menú de cuenta y el selector de perfil.
+    */
     const trigger = await screen.findByRole('button', { name: 'Cuenta' })
     fireEvent.click(await openProfileMenu(trigger, 'Son'))
 
@@ -245,7 +249,7 @@ describe('perfiles de medidas (US5)', () => {
   })
 })
 
-describe('agenda de direcciones (US5)', () => {
+describe('agenda de direcciones', () => {
   it('crea, edita, marca como predeterminada y elimina direcciones', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.EmptyCustomer)

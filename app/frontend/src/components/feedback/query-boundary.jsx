@@ -1,10 +1,15 @@
 import { ErrorState } from '@components/feedback/error-state.jsx'
 import { ListSkeleton } from '@components/feedback/skeletons.jsx'
 
-// Unifica Skeleton / Error / contenido para cualquier pantalla con datos
-// de TanStack Query (FR-029). Ejemplo:
-//   <QueryBoundary isLoading={q.isPending} isError={q.isError} error={q.error}
-//                  onRetry={q.refetch}>{/* contenido */}</QueryBoundary>
+/*
+  Unifica Skeleton / Error / contenido para cualquier pantalla con datos de TanStack Query.
+  Ejemplo de uso:
+
+    <QueryBoundary isLoading={q.isPending} isError={q.isError} error={q.error}
+                   onRetry={q.refetch}>
+      contenido
+    </QueryBoundary>
+*/
 export function QueryBoundary({
   isLoading,
   isError,

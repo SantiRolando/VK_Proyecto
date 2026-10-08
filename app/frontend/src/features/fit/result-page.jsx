@@ -134,7 +134,7 @@ function StockState({ generation }) {
             </Text>
           </>
         )}
-        {/* Suscripción a reposición: llega en US3. */}
+        {/* Acá falta la suscripción a reposición: hoy está solo en el catálogo. */}
       </Stack>
     </Alert>
   )
@@ -165,7 +165,7 @@ function RegisterCard() {
   )
 }
 
-// Con sesión, el resultado se puede guardar como perfil de medidas (US5/T074).
+// Con sesión, el resultado se puede guardar como perfil de medidas.
 function SaveProfileCard({ generation }) {
   const { t } = useI18n()
   const { isAuthenticated } = useAuth()
@@ -193,8 +193,10 @@ function SaveProfileCard({ generation }) {
   )
 }
 
-// Feedback del talle (US6): Chico/Correcto/Grande + comentario. Disponible
-// también para invitados (sin puntos, Q-15).
+/*
+  Feedback del talle: Chico/Correcto/Grande + comentario. Disponible
+  también para invitados (sin puntos).
+*/
 function FeedbackCard({ generation, onRated }) {
   const { t } = useI18n()
   const [opened, { open, close }] = useDisclosure(false)
@@ -244,9 +246,11 @@ function FeedbackCard({ generation, onRated }) {
   )
 }
 
-// Resultado de la generación (US1): talle, línea, avisos, stock, CTA de
-// registro para invitados y feedback (US6). Una generación derivada
-// (`Referred`) muestra el contacto de VK en lugar del talle.
+/*
+  Resultado de la generación: talle, línea, avisos, stock, CTA de
+  registro para invitados y feedback. Una generación derivada
+  (`Referred`) muestra el contacto de VK en lugar del talle.
+*/
 export function ResultPage() {
   const { t } = useI18n()
   const { generationId } = useParams()

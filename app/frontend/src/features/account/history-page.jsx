@@ -17,8 +17,10 @@ import { useNavigate } from 'react-router'
 
 const ALL = 'all'
 
-// Historial de mediciones (US6/T081, FR-020): cronológico, por perfil, con
-// acceso a calificar las que quedaron pendientes.
+/*
+  Historial de mediciones: cronológico, por perfil, con
+  acceso a calificar las que quedaron pendientes.
+*/
 export function HistoryPage() {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -116,7 +118,7 @@ export function HistoryPage() {
                       <Button
                         variant="light"
                         size="compact-md"
-                        leftSection={<IconRulerMeasure size={14} />}
+                        rightSection={<IconRulerMeasure size={14} />}
                         onClick={() => setRating(generation)}
                       >
                         {t('feedback.rate')}

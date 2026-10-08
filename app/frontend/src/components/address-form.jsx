@@ -14,9 +14,11 @@ const EMPTY_ADDRESS = {
   reference: '',
 }
 
-// Formulario de dirección (US4/US5), compartido por el checkout y la agenda de
-// la cuenta: alta o edición según `initialValues`. Quien lo usa aporta la
-// mutación (`onSubmit`) y reacciona al guardado (`onSaved`).
+/*
+  Formulario de dirección, compartido por el checkout y la agenda de
+  la cuenta: alta o edición según `initialValues`. Quien lo usa aporta la
+  mutación (`onSubmit`) y reacciona al guardado (`onSaved`).
+*/
 export function AddressForm({
   initialValues,
   onSubmit,

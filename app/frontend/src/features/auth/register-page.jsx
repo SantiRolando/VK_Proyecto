@@ -10,9 +10,11 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
-// Registro (FR-009): nombre, email, contraseña y WhatsApp obligatorio.
-// Si el invitado trae generaciones previas, el controller las migra y crea
-// el perfil por defecto (US2).
+/*
+  Registro: nombre, email, contraseña y WhatsApp obligatorio.
+  Si el invitado trae generaciones previas, el controller las migra y crea
+  el perfil por defecto.
+*/
 export function RegisterPage() {
   const { t } = useI18n()
   const { register } = useAuth()

@@ -16,8 +16,10 @@ import {
 } from '@mantine/core'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
-// Paso 3 del checkout (T062): línea elegida, cupón opcional y totales. El
-// conflicto de stock (T064) se muestra acá sin perder la selección.
+/*
+  Paso 3 del checkout: línea elegida, cupón opcional y totales. El
+  conflicto de stock se muestra acá sin perder la selección.
+*/
 export function SummaryStep({
   line,
   totals,

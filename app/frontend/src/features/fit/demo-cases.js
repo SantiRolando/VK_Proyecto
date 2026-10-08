@@ -6,17 +6,19 @@ import {
   ReferralReason,
 } from '@constants/enums.js'
 
-// Casos de demostración del generador (VK-82). Andamiaje, no producto: existen
-// para mostrar el motor sin tipear medidas en vivo y se retiran cuando el
-// cliente valide esta versión.
-//
-// Viven en el código y no en la base a propósito: la demo no puede depender de
-// que alguien haya corrido un seed antes.
-//
-// El talle esperado sale de correr el motor contra las tablas cargadas (mismos
-// rangos en el mock y en el backend), así que sirve para verificar en el momento
-// que el motor devolvió lo que se esperaba. `demo-cases.test.jsx` lo comprueba
-// caso por caso: si una tabla cambia, el test cae.
+/*
+  Casos de demostración del generador. Andamiaje, no producto: existen
+  para mostrar el motor sin tipear medidas en vivo y se retiran cuando el
+  cliente valide esta versión.
+
+  Viven en el código y no en la base a propósito: la demo no puede depender de
+  que alguien haya corrido un seed antes.
+
+  El talle esperado sale de correr el motor contra las tablas cargadas (mismos
+  rangos en el mock y en el backend), así que sirve para verificar en el momento
+  que el motor devolvió lo que se esperaba. `demo-cases.test.jsx` lo comprueba
+  caso por caso: si una tabla cambia, el test cae.
+*/
 export const DEMO_CASES = [
   {
     id: 'directEndurance',
@@ -86,8 +88,10 @@ export const DEMO_CASES = [
     },
   },
   {
-    // Endurance infantil se resuelve solo por edad: las medidas de contorno no
-    // participan. Por eso el caso fuerza el público a infantil (ticket VK-82).
+    /*
+      Endurance infantil se resuelve solo por edad: las medidas de contorno no
+      participan. Por eso el caso fuerza el público a infantil.
+    */
     id: 'kidsAge',
     line: Line.Endurance,
     audience: Audience.Kids,

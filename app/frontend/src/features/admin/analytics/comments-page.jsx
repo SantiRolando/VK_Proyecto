@@ -16,8 +16,10 @@ const RATINGS = ['Small', 'Correct', 'Large']
 
 const RATING_COLORS = { Small: 'orange', Correct: 'teal', Large: 'red' }
 
-// Comentarios del feedback (US10/T095, FR-025): filtros por calificación y
-// línea, con exportación a CSV y Excel.
+/*
+  Comentarios del feedback: filtros por calificación y
+  línea, con exportación a CSV y Excel.
+*/
 export function CommentsPage() {
   const { t } = useI18n()
   const [rating, setRating] = useState(ALL)
@@ -67,7 +69,7 @@ export function CommentsPage() {
               variant="light"
               size="compact-sm"
               color="teal"
-              leftSection={<IconFileSpreadsheet size={14} />}
+              rightSection={<IconFileSpreadsheet size={14} />}
               disabled={items.length === 0 || isExporting}
               onClick={() =>
                 exportExcel('comentarios', t('admin.comments.title'), columns, items)

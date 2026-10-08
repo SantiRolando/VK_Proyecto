@@ -204,8 +204,10 @@ function Movements() {
   )
 }
 
-// Puntos y cupones (US6/T082, FR-018/FR-019): saldo, canje, cupones propios y
-// movimientos.
+/*
+  Puntos y cupones: saldo, canje, cupones propios y
+  movimientos.
+*/
 export function RewardsPage() {
   const { t } = useI18n()
   const points = usePoints()

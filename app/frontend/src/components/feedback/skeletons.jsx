@@ -1,8 +1,10 @@
 import { useI18n } from '@i18n/context.js'
 import { SimpleGrid, Skeleton, Stack } from '@mantine/core'
 
-// Esqueletos de carga reutilizables (estados de carga consistentes, FR-029).
-// `role="status"` + `aria-busy` anuncian la carga a lectores de pantalla (T103).
+/*
+  Esqueletos de carga reutilizables (estados de carga consistentes).
+  `role="status"` + `aria-busy` anuncian la carga a lectores de pantalla.
+*/
 
 export function ListSkeleton({ rows = 4 }) {
   const { t } = useI18n()

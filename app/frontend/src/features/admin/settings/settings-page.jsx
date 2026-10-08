@@ -88,7 +88,7 @@ function SettingsForm({ initial }) {
           <Button
             type="submit"
             loading={update.isPending}
-            leftSection={<IconDeviceFloppy size={18} />}
+            rightSection={<IconDeviceFloppy size={18} />}
           >
             {t('common.save')}
           </Button>

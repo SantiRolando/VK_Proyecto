@@ -1,8 +1,10 @@
 import { adminCatalogService } from '@api/services/admin-catalog-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Catálogo del panel (US9): productos y las variantes de cada uno, contra
-// `/admin/catalog/products` de la API.
+/*
+  Catálogo del panel: productos y las variantes de cada uno, contra
+  `/admin/catalog/products` de la API.
+*/
 
 function useCatalogMutation(mutationFn) {
   const queryClient = useQueryClient()

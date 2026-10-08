@@ -21,8 +21,10 @@ import { IconArrowLeft, IconShoppingCart } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 
-// Detalle de producto (US3): colores del talle seleccionado con su
-// disponibilidad; los agotados no son seleccionables.
+/*
+  Detalle de producto: colores del talle seleccionado con su
+  disponibilidad; los agotados no son seleccionables.
+*/
 export function ProductDetailPage() {
   const { t } = useI18n()
   const { productId } = useParams()
@@ -171,7 +173,7 @@ export function ProductDetailPage() {
             <Button
               size="lg"
               disabled={!selected}
-              leftSection={<IconShoppingCart size={18} />}
+              rightSection={<IconShoppingCart size={18} />}
               onClick={() =>
                 navigate(
                   routes.checkout({

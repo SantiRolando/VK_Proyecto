@@ -3,9 +3,11 @@ import { colorLabel } from '@constants/colors.js'
 import { useI18n } from '@i18n/context.js'
 import { Divider, Group, Stack, Table, Text } from '@mantine/core'
 
-// Resumen del pedido (§4.6: "resumen con Table"). Lo comparten el checkout
-// (selección local), la confirmación y el detalle de venta del admin: todas
-// usan la misma forma de línea.
+/*
+  Resumen del pedido: una `Table` con el detalle de líneas. Lo comparten el checkout
+  (selección local), la confirmación y el detalle de venta del admin: todas
+  usan la misma forma de línea.
+*/
 
 function lineSubtitle(line, t) {
   const size = line.size?.code

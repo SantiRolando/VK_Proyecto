@@ -15,8 +15,10 @@ import { measuresFormValues } from '@utils/measures.js'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 
-// Origen de la consulta (FR-003): `?src=` explícito o, si la ruta trae línea
-// preseleccionada (QR), `QR`; por defecto `Direct`.
+/*
+  Origen de la consulta: `?src=` explícito o, si la ruta trae línea
+  preseleccionada (QR), `QR`; por defecto `Direct`.
+*/
 function resolveSource(searchParams) {
   const src = searchParams.get('src')
   if (src === 'landing') return GenerationSource.Landing
@@ -25,15 +27,16 @@ function resolveSource(searchParams) {
   return GenerationSource.Direct
 }
 
-// Pantalla de medición (US1): acepta `/fit?line=endurance&audience=kids` (alias
-// `linea=`, Q-10), registra el origen de la consulta y, con sesión, precarga el
-// perfil activo (US5/T073).
-//
-// Modo asistente (US12, FR-027): para un admin, la misma pantalla suma el switch
-// "para terceros" y el vínculo opcional a un cliente. Antes vivía en una ruta
-// aparte (`/admin/assistant`) que era el mismo formulario con esos dos controles;
-// se unificó acá porque no justificaba una pantalla propia
-// (bug squash sesión #1).
+/*
+  Pantalla de medición: acepta `/fit?line=endurance&audience=kids` (alias
+  `linea=`), registra el origen de la consulta y, con sesión, precarga el
+  perfil activo.
+
+  Modo asistente: para un admin, la misma pantalla suma el switch
+  "para terceros" y el vínculo opcional a un cliente. Antes vivía en una ruta
+  aparte (`/admin/assistant`) que era el mismo formulario con esos dos controles;
+  se unificó acá porque no justificaba una pantalla propia.
+*/
 export function FitPage() {
   const { t } = useI18n()
   const [searchParams] = useSearchParams()
@@ -43,8 +46,10 @@ export function FitPage() {
   const isAdmin = user?.type === 'Admin'
   const [onBehalf, setOnBehalf] = useState(false)
   const [customerId, setCustomerId] = useState(null)
-  // Caso de demo elegido (VK-82): andamiaje solo para admin. Elegirlo cambia
-  // los valores iniciales del formulario, no dispara la generación.
+  /*
+    Caso de demo elegido: andamiaje solo para admin. Elegirlo cambia
+    los valores iniciales del formulario, no dispara la generación.
+  */
   const [demoCase, setDemoCase] = useState(null)
   // Solo se piden clientes cuando el modo asistente está activo.
   const customers = useCustomers({ enabled: isAdmin && onBehalf })

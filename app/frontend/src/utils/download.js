@@ -1,8 +1,10 @@
-// Exportación de reportes del panel (US10/T096).
-//
-// El CSV se arma acá; el Excel vive en `excel.js` (se importa en forma dinámica
-// desde `use-export`). Las columnas son `{ label, value(row) }`, con el label ya
-// traducido por la pantalla: los datos no se traducen, los encabezados sí.
+/*
+  Exportación de reportes del panel.
+
+  El CSV se arma acá; el Excel vive en `excel.js` (se importa en forma dinámica
+  desde `use-export`). Las columnas son `{ label, value(row) }`, con el label ya
+  traducido por la pantalla: los datos no se traducen, los encabezados sí.
+*/
 
 function escapeCell(value) {
   const text = value == null ? '' : String(value)

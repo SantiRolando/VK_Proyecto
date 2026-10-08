@@ -8,8 +8,10 @@ import { IconMapPin, IconShoppingBag } from '@tabler/icons-react'
 import { addressFullLine, addressLine } from '@utils/address.js'
 import { useState } from 'react'
 
-// Paso 1 del checkout (T062): retiro en local o envío a una dirección de la
-// agenda (con alta rápida si todavía no hay ninguna).
+/*
+  Paso 1 del checkout: retiro en local o envío a una dirección de la
+  agenda (con alta rápida si todavía no hay ninguna).
+*/
 export function DeliveryStep({
   method,
   onMethodChange,
@@ -85,7 +87,7 @@ export function DeliveryStep({
                 <Button
                   variant="light"
                   size="sm"
-                  leftSection={<IconMapPin size={14} />}
+                  rightSection={<IconMapPin size={14} />}
                   onClick={() => setAdding(true)}
                 >
                   {t('checkout.delivery.newAddress')}

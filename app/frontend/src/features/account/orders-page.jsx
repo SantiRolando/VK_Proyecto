@@ -24,7 +24,7 @@ function lineLabel(line, t) {
     .join(' · ')
 }
 
-// Mis compras (US6/T081): las ventas coordinadas, con su estado y detalle.
+// Mis compras: las ventas coordinadas, con su estado y detalle.
 export function OrdersPage() {
   const { t } = useI18n()
   const navigate = useNavigate()

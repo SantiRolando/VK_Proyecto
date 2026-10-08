@@ -12,9 +12,11 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// US6 de punta a punta sobre el router y los providers reales, contra el
-// transporte mock: historial por perfil con feedback, canje de puntos y "mis
-// compras". El idioma se fija en español para asertar texto visible real.
+/*
+  Recompensas de punta a punta sobre el router y los providers reales, contra el
+  transporte mock: historial por perfil con feedback, canje de puntos y "mis
+  compras". El idioma se fija en español para asertar texto visible real.
+*/
 
 function renderAt(path) {
   return render(
@@ -38,7 +40,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('historial y feedback (US6)', () => {
+describe('historial y feedback', () => {
   it('arranca con todos los perfiles y permite calificar una medición pendiente', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Ana)
@@ -83,7 +85,7 @@ describe('historial y feedback (US6)', () => {
   })
 })
 
-describe('puntos y cupones (US6)', () => {
+describe('puntos y cupones', () => {
   it('canjea puntos por un cupón y lo muestra en mis cupones', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Ana)
@@ -110,7 +112,7 @@ describe('puntos y cupones (US6)', () => {
   })
 })
 
-describe('mis compras (US6)', () => {
+describe('mis compras', () => {
   it('lista las compras coordinadas con su estado', async () => {
     await signInAs(SeedUser.Ana)
 

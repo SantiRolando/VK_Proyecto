@@ -12,13 +12,15 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// VK-82: precarga de casos de demostración en el generador de talles. La
-// sección es andamiaje visible solo para un admin, llena el formulario sin
-// generar y declara el talle esperado de cada caso.
-//
-// El último bloque corre **todos** los casos contra el motor: es lo que
-// garantiza que el "esperado" que muestra la pantalla siga siendo el que la
-// tabla devuelve. Si una tabla cambia, el test cae.
+/*
+  Precarga de casos de demostración en el generador de talles. La
+  sección es andamiaje visible solo para un admin, llena el formulario sin
+  generar y declara el talle esperado de cada caso.
+
+  El último bloque corre **todos** los casos contra el motor: es lo que
+  garantiza que el "esperado" que muestra la pantalla siga siendo el que la
+  tabla devuelve. Si una tabla cambia, el test cae.
+*/
 
 const caseName = (demoCase) => es[`fit.demo.case.${demoCase.id}`]
 const loadCaseName = (demoCase) => `Cargar caso: ${caseName(demoCase)}`
@@ -47,7 +49,7 @@ function renderAt(path) {
   )
 }
 
-describe('VK-82 · precarga de casos para demo', () => {
+describe('precarga de casos para demo', () => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()
@@ -138,7 +140,7 @@ describe('VK-82 · precarga de casos para demo', () => {
   })
 })
 
-describe.each(DEMO_CASES)('VK-82 · caso $id contra el motor', (demoCase) => {
+describe.each(DEMO_CASES)('caso $id contra el motor', (demoCase) => {
   beforeEach(async () => {
     window.localStorage.setItem('vkfit.language', 'es')
     queryClient.clear()

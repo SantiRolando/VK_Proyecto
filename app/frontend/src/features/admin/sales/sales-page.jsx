@@ -27,13 +27,17 @@ import { useNavigate } from 'react-router'
 const ALL = 'all'
 const STATUSES = ['PendingCoordination', 'Contacted', 'Confirmed', 'Cancelled']
 
-// El prototipo trae todas las ventas de una: el endpoint ya pagina, así que
-// pedir páginas es un cambio de esta pantalla (US8/US10).
+/*
+  El prototipo trae todas las ventas de una: el endpoint ya pagina, así que
+  pedir páginas es un cambio de esta pantalla.
+*/
 const PAGE_SIZE = 50
 
-// Ventas en curso (US7/T068): pestañas por estado, filtro de canal, canal y
-// antigüedad visibles. La antigüedad se resalta cuando la reserva lleva
-// demasiado tiempo sin respuesta (Q-11: sin TTL, decide el admin).
+/*
+  Ventas en curso: pestañas por estado, filtro de canal, canal y
+  antigüedad visibles. La antigüedad se resalta cuando la reserva lleva
+  demasiado tiempo sin respuesta (sin TTL, decide el admin).
+*/
 export function AdminSalesPage() {
   const { t } = useI18n()
   const navigate = useNavigate()

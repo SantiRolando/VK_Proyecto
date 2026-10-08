@@ -3,9 +3,11 @@ import { useI18n } from '@i18n/context.js'
 import { Button, Text } from '@mantine/core'
 import { IconBrandWhatsapp, IconMail } from '@tabler/icons-react'
 
-// Estado "derivado a atención personalizada" (T042): la API no encontró un
-// talle estándar (`outcome = Referred`) y explica por qué en `reason`. Se
-// ofrece contacto por mail/WhatsApp de VK (SETTING).
+/*
+  Estado "derivado a atención personalizada": la API no encontró un
+  talle estándar (`outcome = Referred`) y explica por qué en `reason`. Se
+  ofrece contacto por mail/WhatsApp de VK.
+*/
 export function OutOfRange({ reason, onReset }) {
   const { t } = useI18n()
   const { data: contact } = usePublicContact()
@@ -29,7 +31,7 @@ export function OutOfRange({ reason, onReset }) {
 
       <div className="flex flex-wrap justify-center gap-2">
         {emailHref && (
-          <Button component="a" href={emailHref} leftSection={<IconMail size={16} />}>
+          <Button component="a" href={emailHref} rightSection={<IconMail size={16} />}>
             {t('fit.outOfRange.contact')}
           </Button>
         )}
@@ -41,7 +43,7 @@ export function OutOfRange({ reason, onReset }) {
             rel="noreferrer"
             variant="light"
             color="teal"
-            leftSection={<IconBrandWhatsapp size={16} />}
+            rightSection={<IconBrandWhatsapp size={16} />}
           >
             {t('enums.channel.Whatsapp')}
           </Button>

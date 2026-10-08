@@ -25,14 +25,16 @@ const LOGO = '/favicon.svg'
 const LOGO_SIZE = 24
 const SIDEBAR_WIDTH = 260
 
-// Shell único de la app autenticada (bug squash sesión #1).
-//
-// El menú dejó de vivir en el header: ahora es una barra lateral SIEMPRE visible
-// en desktop, y un drawer colapsable en móvil. Antes había dos layouts distintos
-// (cliente y panel) con navegaciones y estéticas diferentes; con uno solo, todas
-// las opciones están a un clic en cualquier pantalla y no se desincronizan.
-//
-// El header queda solo con marca, perfil, tema, cuenta e idioma.
+/*
+  Shell único de la app autenticada.
+
+  El menú dejó de vivir en el header: ahora es una barra lateral SIEMPRE visible
+  en desktop, y un drawer colapsable en móvil. Antes había dos layouts distintos
+  (cliente y panel) con navegaciones y estéticas diferentes; con uno solo, todas
+  las opciones están a un clic en cualquier pantalla y no se desincronizan.
+
+  El header queda solo con marca, perfil, tema, cuenta e idioma.
+*/
 export function AppShellLayout() {
   const { t } = useI18n()
   const { user } = useAuth()

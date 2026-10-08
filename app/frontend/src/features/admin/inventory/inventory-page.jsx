@@ -47,9 +47,11 @@ function ColorDot({ color }) {
   )
 }
 
-// Modal de ajuste (T090): motivo obligatorio; la dirección la impone el motivo
-// para los motivos que la fijan (el mock lo informa) y el resto la elige el
-// admin. El físico cambia solo por acá, así todo ajuste queda auditado.
+/*
+  Modal de ajuste: motivo obligatorio; la dirección la impone el motivo
+  para los motivos que la fijan (el mock lo informa) y el resto la elige el
+  admin. El físico cambia solo por acá, así todo ajuste queda auditado.
+*/
 function AdjustModal({ variant, opened, onClose }) {
   const { t } = useI18n()
   const reasons = useStockReasons()
@@ -170,8 +172,10 @@ function AdjustModal({ variant, opened, onClose }) {
   )
 }
 
-// Inventario por variante (US9/T090): físico / reservado / disponible, alerta
-// de stock crítico y ajuste auditado con motivo obligatorio.
+/*
+  Inventario por variante: físico / reservado / disponible, alerta
+  de stock crítico y ajuste auditado con motivo obligatorio.
+*/
 export function InventoryPage() {
   const { t } = useI18n()
   const [line, setLine] = useState(ALL)
@@ -263,7 +267,7 @@ export function InventoryPage() {
         <Button
           variant="light"
           size="compact-sm"
-          leftSection={<IconPlus size={14} />}
+          rightSection={<IconPlus size={14} />}
           onClick={() => setAdjusting(item)}
         >
           {t('admin.inventory.adjust')}

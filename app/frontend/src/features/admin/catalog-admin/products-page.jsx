@@ -379,7 +379,7 @@ function VariantsModal({ product, opened, onClose }) {
         <Group justify="flex-end">
           <Button
             size="compact-sm"
-            leftSection={<IconPlus size={14} />}
+            rightSection={<IconPlus size={14} />}
             onClick={() => setFormTarget(null)}
           >
             {t('admin.products.variant.new')}
@@ -468,8 +468,10 @@ function VariantsModal({ product, opened, onClose }) {
   )
 }
 
-// Catálogo del panel (US9/T092): CRUD de productos con baja lógica y sus
-// variantes (Producto + Color + Talle, con SKU único).
+/*
+  Catálogo del panel: CRUD de productos con baja lógica y sus
+  variantes (Producto + Color + Talle, con SKU único).
+*/
 export function ProductsPage() {
   const { t } = useI18n()
   const query = useProducts()
@@ -501,7 +503,7 @@ export function ProductsPage() {
         title={t('admin.products.title')}
         subtitle={t('admin.products.subtitle')}
         actions={
-          <Button leftSection={<IconPlus size={16} />} onClick={() => setCreating(true)}>
+          <Button rightSection={<IconPlus size={16} />} onClick={() => setCreating(true)}>
             {t('admin.products.new')}
           </Button>
         }
@@ -567,7 +569,7 @@ export function ProductsPage() {
                         variant="subtle"
                         color="red"
                         size="compact-sm"
-                        leftSection={<IconTrash size={14} />}
+                        rightSection={<IconTrash size={14} />}
                         onClick={() => {
                           setRemoveError(null)
                           setRemoving(product)

@@ -1,8 +1,10 @@
 import { adminInventoryService } from '@api/services/admin-inventory-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Inventario y movimientos del panel (US9). Las variantes se administran en
-// `catalog-admin/hooks/use-products.js`.
+/*
+  Inventario y movimientos del panel. Las variantes se administran en
+  `catalog-admin/hooks/use-products.js`.
+*/
 
 export function useInventory(filters) {
   return useQuery({

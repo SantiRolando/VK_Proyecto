@@ -1,9 +1,11 @@
 import { adminSalesService } from '@api/services/admin-sales-service.js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// Mueve la venta de estado (US7/T067). Confirmar descuenta stock y cancelar
-// libera la reserva, así que además del panel se refresca el catálogo y el
-// inventario (US9).
+/*
+  Mueve la venta de estado. Confirmar descuenta stock y cancelar
+  libera la reserva, así que además del panel se refresca el catálogo y el
+  inventario.
+*/
 export function useUpdateSaleStatus() {
   const queryClient = useQueryClient()
 

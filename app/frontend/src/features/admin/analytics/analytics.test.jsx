@@ -9,8 +9,10 @@ import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Reportes de US10 sobre el router y los providers reales: demanda no
-// satisfecha y comentarios del feedback.
+/*
+  Reportes del panel sobre el router y los providers reales: demanda no
+  satisfecha y comentarios del feedback.
+*/
 
 function renderAt(path) {
   return render(
@@ -32,7 +34,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('demanda no satisfecha (US10)', () => {
+describe('demanda no satisfecha', () => {
   it('dibuja el mapa por línea × talle y ofrece exportar', async () => {
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminMissingSizes)
@@ -47,7 +49,7 @@ describe('demanda no satisfecha (US10)', () => {
   })
 })
 
-describe('comentarios (US10)', () => {
+describe('comentarios', () => {
   it('lista los comentarios del feedback con su calificación', async () => {
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminComments)

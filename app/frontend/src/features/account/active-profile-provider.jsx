@@ -1,5 +1,7 @@
-// Selector global de perfil activo (US5, R-15). Por ahora solo persiste el
-// id seleccionado; el vínculo con la API de perfiles llega en US5.
+/*
+  Selector global de perfil activo: solo persiste el id seleccionado, el vínculo con la API de
+  perfiles lo resuelven las pantallas que lo consumen.
+*/
 
 import { ActiveProfileContext } from '@features/account/active-profile-context.js'
 import { useCallback, useMemo, useState } from 'react'
@@ -24,7 +26,7 @@ export function ActiveProfileProvider({ children }) {
       if (id == null) window.localStorage.removeItem(STORAGE_KEY)
       else window.localStorage.setItem(STORAGE_KEY, String(id))
     } catch {
-      // ignorar
+      // Si el almacenamiento no está disponible, la selección queda solo en memoria.
     }
   }, [])
 

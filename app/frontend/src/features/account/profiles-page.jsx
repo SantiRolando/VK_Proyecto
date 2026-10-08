@@ -32,9 +32,11 @@ function toFormValues(profile) {
   return { name: profile.name, ...measuresFormValues(profile) }
 }
 
-// `ProfilesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
-// exporta aparte para poder embeberlo en una pestaña de la información de cuenta
-// sin anidar contenedores ni repetir el encabezado (bug squash sesión #1).
+/*
+  `ProfilesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
+  exporta aparte para poder embeberlo en una pestaña de la información de cuenta
+  sin anidar contenedores ni repetir el encabezado.
+*/
 export function ProfilesPage() {
   const { t } = useI18n()
 
@@ -83,7 +85,7 @@ export function ProfilesBody() {
     <>
       <Group justify="flex-end" mb="md">
         <Button
-          leftSection={<IconPlus size={16} />}
+          rightSection={<IconPlus size={16} />}
           onClick={() => setEditing(NEW_PROFILE)}
         >
           {t('account.profiles.new')}
@@ -122,7 +124,7 @@ export function ProfilesBody() {
                         <Button
                           variant="subtle"
                           size="compact-sm"
-                          leftSection={<IconUserCheck size={14} />}
+                          rightSection={<IconUserCheck size={14} />}
                           loading={setDefaultProfile.isPending}
                           onClick={() => setDefaultProfile.mutate(profile.id)}
                         >
@@ -140,7 +142,7 @@ export function ProfilesBody() {
                         variant="subtle"
                         color="red"
                         size="compact-sm"
-                        leftSection={<IconTrash size={14} />}
+                        rightSection={<IconTrash size={14} />}
                         onClick={() => {
                           setRemoveError(null)
                           setRemoving(profile)

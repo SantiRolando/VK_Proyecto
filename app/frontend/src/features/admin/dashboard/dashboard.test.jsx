@@ -10,11 +10,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// Dashboard de US8 sobre el router y los providers reales: los cuatro bloques
-// con datos de la seed y el rango de fechas por defecto. El filtro se elige con
-// `DatePickerInput` de `@mantine/dates` (popover difícil de manejar en jsdom):
-// su efecto sobre los datos está cubierto por los tests de contrato
-// (`date-range` + `admin-analytics`).
+/*
+  Dashboard del panel sobre el router y los providers reales: los cuatro bloques
+  con datos de la seed y el rango de fechas por defecto. El filtro se elige con
+  `DatePickerInput` de `@mantine/dates` (popover difícil de manejar en jsdom):
+  su efecto sobre los datos está cubierto por los tests de contrato
+  (`date-range` + `admin-analytics`).
+*/
 
 function renderAt(path) {
   return render(
@@ -35,7 +37,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('dashboard (US8)', () => {
+describe('dashboard', () => {
   it('muestra los cuatro bloques con datos de la seed', async () => {
     await signInAs(SeedUser.Admin)
     renderAt(routes.admin)

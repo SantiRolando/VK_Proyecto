@@ -1,9 +1,11 @@
 import { salesService } from '@api/services/sales-service.js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// Crea la venta y reserva el stock (T060). La reserva cambia el disponible
-// que muestra el catálogo, así que además de invalidar las otras compras se
-// refresca el catálogo y el detalle de producto.
+/*
+  Crea la venta y reserva el stock. La reserva cambia el disponible
+  que muestra el catálogo, así que además de invalidar las otras compras se
+  refresca el catálogo y el detalle de producto.
+*/
 export function useCreateSale() {
   const queryClient = useQueryClient()
 

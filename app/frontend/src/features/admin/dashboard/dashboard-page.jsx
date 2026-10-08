@@ -38,7 +38,7 @@ import 'dayjs/locale/es'
 import { lazy, Suspense, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-// Los gráficos entran en un chunk aparte (§4.6): no pesan en el arranque.
+// Los gráficos entran en un chunk aparte: no pesan en el arranque.
 const BarChart = lazy(() =>
   import('@mantine/charts').then((module) => ({ default: module.BarChart })),
 )
@@ -283,8 +283,10 @@ function InFlightBlock({ query }) {
   )
 }
 
-// Dashboard de control (US8/T086, FR-021): conversión, precisión, stock crítico
-// y ventas en vuelo, con rango de fechas.
+/*
+  Dashboard de control: conversión, precisión, stock crítico
+  y ventas en vuelo, con rango de fechas.
+*/
 export function DashboardPage() {
   const { t, language } = useI18n()
   const [range, setRange] = useState(() => [

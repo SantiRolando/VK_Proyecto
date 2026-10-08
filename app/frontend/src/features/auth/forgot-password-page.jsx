@@ -10,8 +10,10 @@ import { collectFieldErrors } from '@utils/zod-errors.js'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-// Recuperación de contraseña (FR-010): se pide un código por mail y se
-// completa en `/reset-password` con el código y la clave nueva.
+/*
+  Recuperación de contraseña: se pide un código por mail y se
+  completa en `/reset-password` con el código y la clave nueva.
+*/
 export function ForgotPasswordPage() {
   const { t } = useI18n()
   const [email, setEmail] = useState('')

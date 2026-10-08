@@ -1,7 +1,9 @@
-// Estado de sesión a nivel React (R-15 del plan): usuario, tokens y rol.
-// La persistencia vive en `api/client/session.js`; el `api-client` renueva el
-// access token con el refresh token y registra acá el handler que limpia la
-// sesión cuando la renovación ya no es posible (código UNAUTHENTICATED).
+/*
+  Estado de sesión a nivel React: usuario, tokens y rol.
+  La persistencia vive en `api/client/session.js`; el `api-client` renueva el
+  access token con el refresh token y registra acá el handler que limpia la
+  sesión cuando la renovación ya no es posible (código UNAUTHENTICATED).
+*/
 
 import {
   clearSession,

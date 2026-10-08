@@ -27,8 +27,10 @@ import { addressFullLine } from '@utils/address.js'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
-// Confirmación de la compra (T063): estado de la venta, resumen y el mensaje
-// de coordinación listo para enviar por el canal elegido.
+/*
+  Confirmación de la compra: estado de la venta, resumen y el mensaje
+  de coordinación listo para enviar por el canal elegido.
+*/
 export function ConfirmationPage() {
   const { t, formatDate } = useI18n()
   const { saleId } = useParams()
@@ -132,7 +134,7 @@ export function ConfirmationPage() {
                         href={contact.url}
                         target="_blank"
                         rel="noreferrer"
-                        leftSection={<IconExternalLink size={16} />}
+                        rightSection={<IconExternalLink size={16} />}
                       >
                         {t('checkout.confirmation.open', {
                           channel: t(`enums.channel.${contact.channel}`),
@@ -141,7 +143,7 @@ export function ConfirmationPage() {
                     )}
                     <Button
                       variant="light"
-                      leftSection={<IconCopy size={16} />}
+                      rightSection={<IconCopy size={16} />}
                       onClick={handleCopy}
                       aria-live="polite"
                     >

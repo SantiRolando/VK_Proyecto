@@ -1,8 +1,10 @@
 import { addressesService } from '@api/services/addresses-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Agenda de direcciones del cliente (US4/US5): la usa el checkout para elegir
-// el destino y la pantalla de cuenta para administrarla.
+/*
+  Agenda de direcciones del cliente: la usa el checkout para elegir
+  el destino y la pantalla de cuenta para administrarla.
+*/
 export function useAddresses() {
   return useQuery({
     queryKey: ['addresses'],

@@ -3,8 +3,10 @@ import { Affix, Notification } from '@mantine/core'
 import { IconSparkles } from '@tabler/icons-react'
 import { useEffect } from 'react'
 
-// Aviso flotante del premio por feedback (US6/T080). Se cierra solo a los
-// pocos segundos; el detalle del resultado queda en el drawer.
+/*
+  Aviso flotante del premio por feedback. Se cierra solo a los
+  pocos segundos; el detalle del resultado queda en el drawer.
+*/
 export function PointsToast({ points, onClose, autoHideMs = 5000 }) {
   const { t } = useI18n()
 

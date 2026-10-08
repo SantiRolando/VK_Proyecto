@@ -67,8 +67,10 @@ function Stat({ icon: Icon, label, value, hint, tone = 'blue' }) {
   )
 }
 
-// Usuarios de la plataforma: directorio completo, alta/revocación de administrador y
-// los indicadores de uso (bug squash sesión #1).
+/*
+  Usuarios de la plataforma: directorio completo, alta/revocación de administrador y
+  los indicadores de uso.
+*/
 export function UsersPage() {
   const { t, formatDate } = useI18n()
   const { user: currentUser } = useAuth()

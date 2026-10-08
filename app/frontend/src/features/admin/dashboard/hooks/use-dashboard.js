@@ -1,8 +1,10 @@
 import { adminAnalyticsService } from '@api/services/admin-analytics-service.js'
 import { useQuery } from '@tanstack/react-query'
 
-// KPIs del dashboard (US8). El rango de fechas entra en la query key, así que
-// cambiar el filtro vuelve a pedir los datos.
+/*
+  KPIs del dashboard. El rango de fechas entra en la query key, así que
+  cambiar el filtro vuelve a pedir los datos.
+*/
 
 export function useConversion(range) {
   return useQuery({

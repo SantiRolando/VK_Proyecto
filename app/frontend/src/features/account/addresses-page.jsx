@@ -18,10 +18,12 @@ import { useState } from 'react'
 
 const NEW_ADDRESS = 'new'
 
-// Agenda de direcciones (US5/T075): alta, edición, baja y predeterminada. El
-// `AddressesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
-// exporta aparte para poder embeberlo en una pestaña de la información de cuenta
-// sin anidar contenedores ni repetir el encabezado (bug squash sesión #1).
+/*
+  Agenda de direcciones: alta, edición, baja y predeterminada. El
+  `AddressesPage` es el envoltorio de ruta (Container + PageHeader). El cuerpo se
+  exporta aparte para poder embeberlo en una pestaña de la información de cuenta
+  sin anidar contenedores ni repetir el encabezado.
+*/
 export function AddressesPage() {
   const { t } = useI18n()
 
@@ -70,7 +72,7 @@ export function AddressesBody() {
     <>
       <Group justify="flex-end" mb="md">
         <Button
-          leftSection={<IconPlus size={16} />}
+          rightSection={<IconPlus size={16} />}
           onClick={() => setEditing(NEW_ADDRESS)}
         >
           {t('account.addresses.new')}
@@ -125,7 +127,7 @@ export function AddressesBody() {
                       variant="subtle"
                       color="red"
                       size="compact-sm"
-                      leftSection={<IconTrash size={14} />}
+                      rightSection={<IconTrash size={14} />}
                       onClick={() => {
                         setRemoveError(null)
                         setRemoving(address)

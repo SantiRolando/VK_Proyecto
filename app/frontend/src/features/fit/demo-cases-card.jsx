@@ -19,10 +19,12 @@ function expectedText(t, expected) {
   return `${size} · ${t(`enums.outcome.${expected.outcome}`)}`
 }
 
-// Precarga de casos para demo y desarrollo (VK-82): sección visible solo para
-// un admin y declarada temporal en pantalla. Elegir un caso llena el formulario
-// —sube el estado a `FitPage`, que remonta `FitForm` con valores nuevos— y
-// nunca genera: el click en el generador sigue siendo manual.
+/*
+  Precarga de casos para demo y desarrollo: sección visible solo para
+  un admin y declarada temporal en pantalla. Elegir un caso llena el formulario
+  —sube el estado a `FitPage`, que remonta `FitForm` con valores nuevos— y
+  nunca genera: el click en el generador sigue siendo manual.
+*/
 export function DemoCasesCard({ onSelect }) {
   const { t } = useI18n()
 

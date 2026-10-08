@@ -1,7 +1,9 @@
 import { Center, Stack, Text, ThemeIcon } from '@mantine/core'
 
-// Estado vacío consistente (FR-029): ícono, título, descripción y acción
-// opcional (p. ej. un botón para crear el primer registro).
+/*
+  Estado vacío consistente: ícono, título, descripción y acción
+  opcional (p. ej. un botón para crear el primer registro).
+*/
 export function EmptyState({ icon: Icon, title, description, action }) {
   return (
     <Center py="xl">
