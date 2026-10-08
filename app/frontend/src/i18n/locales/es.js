@@ -632,7 +632,7 @@ export default {
   'admin.settings.form.successProbability': 'Probabilidad de acierto',
   'admin.settings.form.successProbabilityHint':
     '¿Qué chance tiene el usuario de recibir puntos al dar feedback?',
-  'admin.settings.form.pointsPerFeedback': 'Puntos por feedback',
+  'admin.settings.form.pointsPerFeedback': 'Puntos por acierto',
   'admin.settings.form.pointsPerFeedbackHint': 'Puntos que suma cada feedback premiado.',
   'admin.settings.form.maxDailyFeedback': 'Tope diario',
   'admin.settings.form.maxDailyFeedbackHint':
@@ -644,7 +644,7 @@ export default {
     'A partir de estos días, el panel resalta la venta como vieja.',
   'admin.settings.form.increase': 'Aumentar',
   'admin.settings.form.decrease': 'Reducir',
-  'admin.settings.saved': 'Reglas guardadas. El cliente ya ve los cambios.',
+  'admin.settings.saved': 'Configuración guardada.',
   'admin.assistant.forThirdParties': 'Para terceros',
   'admin.assistant.linkCustomer': 'Vincular a un cliente',
   'admin.assistant.linkCustomerHint':

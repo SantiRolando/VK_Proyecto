@@ -1,21 +1,12 @@
 import { Box, Card, Group, Text } from '@mantine/core'
 
 /*
-  Superficie elevada y reutilizable. Existe porque el fondo de la app es blanco liso: una
-  tarjeta del mismo color con un borde se lee como un rectángulo dibujado, no como una pieza
-  apoyada arriba. Los tokens (`--vk-surface-*`) viven en el tema y cambian con el esquema de
-  color, así que el componente no ramifica por tema.
+  Superficie elevada y reutilizable: sobre el blanco liso del fondo, una tarjeta del mismo color
+  con un borde se lee como un rectángulo dibujado. Los tokens `--vk-surface-*` viven en el tema.
 
-  `titleSectionVariant="top"` mueve el encabezado a una franja propia, separada por un borde:
-  icono y título a la izquierda, descripción debajo del título, y un slot a la derecha para un
-  CTA o una badge. Sin la prop, el encabezado queda como texto suelto arriba del contenido, que
-  es como ya estaban las tarjetas de la app.
-
-  El icono se recibe plano y se pinta con el acento de la app: sin caja detrás, que era lo que
-  lo hacía parecer un botón. `placeholderIcon` ocupa el lugar de la media en las pantallas sin
-  imágenes, apagado para no competir con el contenido.
-
-  El padding lo maneja el componente. Pasar `p` por las props rompe la franja superior.
+  `titleSectionVariant="top"` pone el encabezado en una franja propia, con icono, descripción y
+  un slot a la derecha; sin la prop queda el título suelto arriba, como estaban las tarjetas.
+  El padding lo maneja el componente: pasar `p` por las props rompe la franja.
 */
 
 const SURFACE_STYLE = {
@@ -26,9 +17,7 @@ const SURFACE_STYLE = {
 
 /*
   La franja va en un `Box` y no en `Card.Section`: la sección de Mantine se sale de la card con
-  un margen negativo igual a su padding, y como la card recorta (`overflow: hidden`), el
-  encabezado quedaba comido por el radio de la esquina. Con el `Box`, la franja ocupa el ancho
-  real de la card y el recorte la redondea sola.
+  un margen negativo igual a su padding y el recorte le come el encabezado al radio de la esquina.
 */
 const HEADER_STYLE = {
   borderBottom: '1px solid var(--vk-surface-border)',

@@ -1,16 +1,6 @@
 /*
-  Lectura de la configuración de puntos: cuánto premia de verdad lo que el admin acaba de
-  cargar. Es pura para poder testearla sin montar la pantalla.
-
-  Las reglas que replica están en `src/mocks/domain/points.js`: el sorteo se hace por feedback
-  y el tope diario cuenta **premios**, no calificaciones (un feedback que no acierta no consume
-  cupo). Por eso los premios de un día son una binomial truncada en el tope, y no el mínimo
-  entre feedbacks y tope.
-*/
-
-/*
-  Feedbacks de la simulación. Tres y no diez: con diez la chance se pega al 97 % y la frase deja
-  de explicar nada, porque cualquier configuración parece premiar casi siempre.
+  Feedbacks de la simulación. Con un número «alto» ej: diez, es más difícil de evaluar el
+  resultado porque cualquier configuración parece premiar casi siempre.
 */
 export const SAMPLE_FEEDBACKS = 3
 
@@ -34,9 +24,7 @@ export const POINTS_PRESETS = [
 ]
 
 /*
-  Anclas de la escala, en puntos por cliente y por día como techo: los cupones del seed cuestan
-  60 y 100 puntos, así que "equilibrada" es un cupón cada varios días y "muy generosa" es más de
-  un cupón por día. El último tramo no tiene ancla porque no hay nada por encima.
+  Steps de la escala, en puntos por cliente y por día como techo
 */
 const GENEROSITY_STEPS = [
   { upTo: 0, level: 'none' },

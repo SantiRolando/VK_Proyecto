@@ -1,7 +1,7 @@
 import { adminSettingsService } from '@api/services/admin-settings-service.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Reglas del juego: lectura en bloque y guardado.
+// Configuración: lectura en bloque y guardado.
 
 export function useSettings() {
   return useQuery({ queryKey: ['admin', 'settings'], queryFn: adminSettingsService.get })

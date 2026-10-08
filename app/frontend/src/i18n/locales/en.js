@@ -629,7 +629,7 @@ export default {
   'admin.settings.form.successProbability': 'Success probability',
   'admin.settings.form.successProbabilityHint':
     'What chance does the user have of earning points for giving feedback?',
-  'admin.settings.form.pointsPerFeedback': 'Points per feedback',
+  'admin.settings.form.pointsPerFeedback': 'Points per win',
   'admin.settings.form.pointsPerFeedbackHint': 'Points awarded by each winning feedback.',
   'admin.settings.form.maxDailyFeedback': 'Daily cap',
   'admin.settings.form.maxDailyFeedbackHint': 'Rewarded feedbacks per customer per day.',
@@ -640,7 +640,7 @@ export default {
     'From these days on, the panel flags the sale as stale.',
   'admin.settings.form.increase': 'Increase',
   'admin.settings.form.decrease': 'Decrease',
-  'admin.settings.saved': 'Rules saved. The customer already sees the changes.',
+  'admin.settings.saved': 'Settings saved.',
   'admin.assistant.forThirdParties': 'For third parties',
   'admin.assistant.linkCustomer': 'Link to a customer',
   'admin.assistant.linkCustomerHint':

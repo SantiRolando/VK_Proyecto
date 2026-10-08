@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-// Reglas del juego sobre el router y los providers reales.
+// Configuración sobre el router y los providers reales.
 
 function renderAt(path) {
   return render(
@@ -29,7 +29,7 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('reglas del juego', () => {
+describe('configuración', () => {
   it('edita la probabilidad de puntos y confirma el guardado', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
@@ -44,11 +44,9 @@ describe('reglas del juego', () => {
     await user.type(probability, '100')
     await user.click(screen.getByRole('button', { name: 'Guardar' }))
 
-    expect(
-      await screen.findByText('Reglas guardadas. El cliente ya ve los cambios.'),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Configuración guardada.')).toBeInTheDocument()
 
-    // Persistió en las reglas del backend.
+    // Persistió en la configuración del backend.
     const settings = await adminSettingsService.get()
     expect(settings.successProbability).toBe(100)
   })
