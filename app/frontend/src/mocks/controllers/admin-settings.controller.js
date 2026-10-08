@@ -2,45 +2,36 @@
   Reglas del juego. La tabla SETTING es clave-valor con claves snake_case del ERD; acá se
   expone un DTO en camelCase y se valida la edición en bloque (`PATCH`). Los valores los
   leen los controllers de negocio.
+
+  El catálogo de campos, sus rangos y sus valores por defecto vienen del contrato del
+  service: una copia local se desincroniza de la pantalla sin que nada avise.
 */
 
 import { ApiError } from '@api/client/api-error.js'
+import { isIntegerField, SETTINGS_FIELDS } from '@api/services/admin-settings-service.js'
 import { getDb, mutate } from '@mocks/db/database.js'
 import { settingNumber, settingValue } from '@mocks/domain/settings.js'
 import { register } from '@mocks/router/mock-router.js'
 
-// DTO ↔ SETTING: el FE nunca ve las claves del ERD.
-const FIELDS = {
-  successProbability: 'success_probability',
-  pointsPerFeedback: 'points_per_feedback',
-  maxDailyFeedback: 'max_daily_feedback',
-  coordinationEmail: 'coordination_email',
-  coordinationWhatsapp: 'coordination_whatsapp',
-  staleSaleDays: 'stale_sale_days',
-}
-
-const INTEGER_FIELDS = {
-  successProbability: { min: 0, max: 100 },
-  pointsPerFeedback: { min: 0, max: 1000 },
-  maxDailyFeedback: { min: 0, max: 100 },
-  staleSaleDays: { min: 0, max: 365 },
-}
+const FIELD_BY_NAME = Object.fromEntries(
+  SETTINGS_FIELDS.map((field) => [field.name, field]),
+)
 
 function serializeSettings(db) {
   return Object.fromEntries(
-    Object.entries(FIELDS).map(([field, key]) =>
-      INTEGER_FIELDS[field]
-        ? [field, settingNumber(db.settings, key, 0)]
-        : [field, settingValue(db.settings, key, '')],
-    ),
+    SETTINGS_FIELDS.map((field) => [
+      field.name,
+      isIntegerField(field)
+        ? settingNumber(db.settings, field.key, field.fallback)
+        : settingValue(db.settings, field.key, field.fallback),
+    ]),
   )
 }
 
 function validateInteger(field, value) {
-  const { min, max } = INTEGER_FIELDS[field]
   const number = Number(value)
-  if (!Number.isInteger(number) || number < min || number > max) {
-    throw new ApiError(422, 'VALIDATION_ERROR', { fields: [field] })
+  if (!Number.isInteger(number) || number < field.min || number > field.max) {
+    throw new ApiError(422, 'VALIDATION_ERROR', { fields: [field.name] })
   }
   return number
 }
@@ -50,19 +41,7 @@ register(
   '/admin/settings',
   () => {
     const db = getDb()
-    return {
-      status: 200,
-      data: serializeSettings(db),
-      meta: {
-        updatedAt: db.settings.reduce(
-          (latest, setting) =>
-            !latest || new Date(setting.updatedAt) > new Date(latest)
-              ? setting.updatedAt
-              : latest,
-          null,
-        ),
-      },
-    }
+    return { status: 200, data: serializeSettings(db) }
   },
   { auth: 'admin' },
 )
@@ -71,7 +50,7 @@ register(
   'PATCH',
   '/admin/settings',
   (req) => {
-    const unknown = Object.keys(req.body).filter((field) => !FIELDS[field])
+    const unknown = Object.keys(req.body).filter((name) => !FIELD_BY_NAME[name])
     if (unknown.length > 0) {
       throw new ApiError(422, 'VALIDATION_ERROR', { fields: unknown })
     }
@@ -82,22 +61,23 @@ register(
     return mutate((db) => {
       const now = new Date().toISOString()
 
-      for (const [field, rawValue] of Object.entries(req.body)) {
-        const key = FIELDS[field]
-        const value = INTEGER_FIELDS[field]
+      for (const [name, rawValue] of Object.entries(req.body)) {
+        const field = FIELD_BY_NAME[name]
+        const value = isIntegerField(field)
           ? String(validateInteger(field, rawValue))
           : String(rawValue).trim()
 
-        if (!INTEGER_FIELDS[field] && !value) {
-          throw new ApiError(422, 'VALIDATION_ERROR', { fields: [field] })
+        // Un canal de contacto vacío dejaría la derivación sin destino.
+        if (!isIntegerField(field) && !value) {
+          throw new ApiError(422, 'VALIDATION_ERROR', { fields: [name] })
         }
 
-        const setting = db.settings.find((item) => item.key === key)
+        const setting = db.settings.find((item) => item.key === field.key)
         if (setting) {
           setting.value = value
           setting.updatedAt = now
         } else {
-          db.settings.push({ key, value, updatedAt: now })
+          db.settings.push({ key: field.key, value, updatedAt: now })
         }
       }
 

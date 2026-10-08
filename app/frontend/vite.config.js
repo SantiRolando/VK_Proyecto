@@ -20,6 +20,14 @@ function apiProxy(env) {
   }
 }
 /*
+  Los editores que guardan de forma atómica escriben el archivo en un `.tmpdir` y después
+  lo renombran. En Windows ese temporal queda bloqueado un instante, y el watcher de Vite
+  muere con `EBUSY` al intentar observarlo. Se ignora el directorio temporal: el archivo
+  final se sigue viendo cuando el renombre termina.
+*/
+const WATCH = { ignored: ['**/*.tmpdir/**'] }
+
+/*
   Todas las rutas son chunks propios, así que la app queda navegable sin conexión una vez visitada. El SW se auto-actualiza
   (`registerType: 'autoUpdate'`) y, contra el backend, solo los GET públicos de `/api/public/` usan NetworkFirst para poder
   mostrarse sin conexión: lo que lleva sesión (perfiles, historial, panel) nunca se cachea, así otro usuario del mismo dispositivo
@@ -31,7 +39,7 @@ function apiProxy(env) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
   return {
-    server: { proxy: apiProxy(env) },
+    server: { proxy: apiProxy(env), watch: WATCH },
     preview: { proxy: apiProxy(env) },
     plugins: [
       react(),
