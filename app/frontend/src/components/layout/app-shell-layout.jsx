@@ -71,11 +71,18 @@ export function AppShellLayout() {
 
       {isAdmin && (
         <>
+          {/*
+            El estilo del label va en el nodo y no en un `labelProps`: esa prop no existe en
+            el Divider de esta versión de Mantine, cae al DOM y React la reporta en consola.
+          */}
           <Divider
             my="md"
-            label={t('nav.panelSection')}
             labelPosition="left"
-            labelProps={{ size: 'xs', fw: 600 }}
+            label={
+              <Text component="span" size="xs" fw={600}>
+                {t('nav.panelSection')}
+              </Text>
+            }
           />
           <Stack gap={2}>{PANEL_NAV_ITEMS.map(renderNavLink)}</Stack>
         </>
