@@ -26,7 +26,10 @@ import {
 } from '@tabler/icons-react'
 import { useSearchParams } from 'react-router'
 
-const BASE_TABS = ['cuenta', 'agenda']
+// Los valores de `?tab=` son el slug en inglés de la etiqueta de cada pestaña.
+const ACCOUNT_TAB = 'account'
+const AGENDA_TAB = 'profiles-addresses'
+const BASE_TABS = [ACCOUNT_TAB, AGENDA_TAB]
 
 /*
   Los avisos de reposición son de las cuentas de cliente: un admin no tiene suscripciones y el
@@ -66,7 +69,7 @@ export function AccountInfoPage() {
   const tabs = withAlerts ? [...BASE_TABS, ALERTS_TAB] : BASE_TABS
 
   const requested = searchParams.get('tab')
-  const tab = tabs.includes(requested) ? requested : BASE_TABS[0]
+  const tab = tabs.includes(requested) ? requested : ACCOUNT_TAB
 
   return (
     <Container size="md" py="xl">
@@ -74,14 +77,14 @@ export function AccountInfoPage() {
 
       <Tabs
         value={tab}
-        onChange={(next) => setSearchParams(next === 'cuenta' ? {} : { tab: next })}
+        onChange={(next) => setSearchParams(next === ACCOUNT_TAB ? {} : { tab: next })}
         keepMounted={false}
       >
         <Tabs.List mb="md">
-          <Tabs.Tab value="cuenta" leftSection={<IconId size={16} />}>
+          <Tabs.Tab value={ACCOUNT_TAB} leftSection={<IconId size={16} />}>
             {t('account.info.tabAccount')}
           </Tabs.Tab>
-          <Tabs.Tab value="agenda" leftSection={<IconRuler size={16} />}>
+          <Tabs.Tab value={AGENDA_TAB} leftSection={<IconRuler size={16} />}>
             {t('account.info.tabAgenda')}
           </Tabs.Tab>
           {withAlerts && (
@@ -91,7 +94,7 @@ export function AccountInfoPage() {
           )}
         </Tabs.List>
 
-        <Tabs.Panel value="cuenta">
+        <Tabs.Panel value={ACCOUNT_TAB}>
           <Stack gap="md">
             <Card withBorder radius="md" padding="lg">
               <Group gap="md" mb="md" wrap="nowrap">
@@ -128,7 +131,7 @@ export function AccountInfoPage() {
           </Stack>
         </Tabs.Panel>
 
-        <Tabs.Panel value="agenda">
+        <Tabs.Panel value={AGENDA_TAB}>
           <Stack gap="xl">
             <section>
               <Title order={3} size="h4" mb="sm">

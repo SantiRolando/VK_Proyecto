@@ -171,11 +171,15 @@ export function AppRouter() {
               información de cuenta para no romper enlaces existentes. */}
           <Route
             path={routes.accountProfiles}
-            element={<Navigate to={`${routes.accountInfo}?tab=agenda`} replace />}
+            element={
+              <Navigate to={`${routes.accountInfo}?tab=profiles-addresses`} replace />
+            }
           />
           <Route
             path={routes.accountAddresses}
-            element={<Navigate to={`${routes.accountInfo}?tab=agenda`} replace />}
+            element={
+              <Navigate to={`${routes.accountInfo}?tab=profiles-addresses`} replace />
+            }
           />
           <Route
             path={routes.accountAlerts}

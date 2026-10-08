@@ -50,7 +50,7 @@ describe('información de cuenta', () => {
 
   it('la pestaña de agenda muestra perfiles y direcciones de la seed', async () => {
     await signInAs(SeedUser.Ana)
-    renderAt(`${routes.accountInfo}?tab=agenda`)
+    renderAt(`${routes.accountInfo}?tab=profiles-addresses`)
 
     const view = await main()
     // Perfiles de Ana en la seed: Training (predeterminado) y Son.
