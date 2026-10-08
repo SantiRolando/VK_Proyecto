@@ -49,6 +49,13 @@ describe('landing pública', () => {
     }
   })
 
+  it('el header ofrece el idioma y el esquema de color', () => {
+    renderLanding()
+
+    expect(screen.getByLabelText('Idioma')).toBeInTheDocument()
+    expect(screen.getByLabelText('Tema')).toBeInTheDocument()
+  })
+
   it('las tres secciones del medio tienen la misma estructura de tres tarjetas', () => {
     const { container } = renderLanding()
 
@@ -63,9 +70,11 @@ describe('landing pública', () => {
       const cards = [...section.querySelectorAll('.grid > div')]
       expect(cards, `#${id} sin tres tarjetas`).toHaveLength(3)
       for (const card of cards) {
-        expect(card.querySelector('svg')).not.toBeNull()
-        expect(card.querySelector('h3').textContent.length).toBeGreaterThan(0)
-        expect(card.querySelector('p').textContent.length).toBeGreaterThan(0)
+        expect(card.querySelector('svg'), 'tarjeta sin icono').not.toBeNull()
+        // El encabezado de la `SurfaceCard` aporta el título y la descripción.
+        const textos = [...card.querySelectorAll('p')].map((p) => p.textContent.trim())
+        expect(textos, 'la tarjeta no muestra título y descripción').toHaveLength(2)
+        expect(textos.every((texto) => texto.length > 0)).toBe(true)
       }
     }
   })

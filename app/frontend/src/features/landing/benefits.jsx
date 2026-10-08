@@ -1,4 +1,5 @@
 import { FeatureSection } from '@features/landing/section.jsx'
+import { SECTION_IDS } from '@features/landing/section-ids.js'
 import { IconShieldCheck, IconSwimming, IconTarget } from '@tabler/icons-react'
 
 const BENEFITS = [
@@ -22,11 +23,10 @@ const BENEFITS = [
 export function Benefits() {
   return (
     <FeatureSection
-      id="benefits"
+      id={SECTION_IDS.benefits}
       titleKey="benefits.title"
       subtitleKey="benefits.subtitle"
       items={BENEFITS}
-      alt
     />
   )
 }

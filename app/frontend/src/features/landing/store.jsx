@@ -1,4 +1,5 @@
 import { FeatureSection } from '@features/landing/section.jsx'
+import { SECTION_IDS } from '@features/landing/section-ids.js'
 import { IconBell, IconChartLine, IconPackage } from '@tabler/icons-react'
 
 const STORE_FEATURES = [
@@ -22,7 +23,7 @@ const STORE_FEATURES = [
 export function Store() {
   return (
     <FeatureSection
-      id="store"
+      id={SECTION_IDS.store}
       titleKey="store.title"
       subtitleKey="store.subtitle"
       items={STORE_FEATURES}

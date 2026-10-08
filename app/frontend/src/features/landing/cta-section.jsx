@@ -18,19 +18,25 @@ export function CtaSection() {
       </Text>
 
       <div className="mt-4 flex flex-col gap-4 sm:flex-row">
+        {/*
+          La variante `white` de Mantine oscurece su fondo un 1 % en hover, que sobre la
+          franja negra no se ve. El `!` no es decorativo: Mantine declara sus estilos en una
+          capa que gana sobre `utilities` de Tailwind, así que sin el modificador el color de
+          hover no aplica. La alternativa era una variante propia en el tema, y eso toca los
+          botones de toda la app.
+        */}
         <Button
-          variant="outline"
-          color="white"
+          variant="white"
           size="lg"
-          leftSection={<IconPlayerPlay size={18} />}
+          className="transition-colors hover:bg-gray-200!"
+          rightSection={<IconPlayerPlay size={18} />}
           onClick={() => navigate(routes.fit({ src: 'landing' }))}
         >
           {t('cta.guest')}
         </Button>
         <Button
-          variant="white"
           size="lg"
-          leftSection={<IconLogin size={18} />}
+          rightSection={<IconLogin size={18} />}
           onClick={() => navigate(routes.login)}
         >
           {t('cta.login')}

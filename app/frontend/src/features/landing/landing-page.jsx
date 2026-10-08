@@ -6,14 +6,13 @@ import { SiteHeader } from '@features/landing/site-header.jsx'
 import { Store } from '@features/landing/store.jsx'
 
 /*
-  El `bg-white` de `<main>` es lo que mantiene la landing en claro con el tema oscuro
-  puesto: las secciones declaran su propio fondo, pero el marco no. El armazón de la app
-  ya envuelve sus pantallas en `<main>`, así que el punto de entrada del cliente tiene el
-  mismo landmark.
+  La landing sigue el esquema de color de la app: el fondo lo pone el tema y las secciones no
+  lo pisan, así que el claro y el oscuro salen de los tokens. El armazón de la app ya envuelve
+  sus pantallas en `<main>`, así que el punto de entrada del cliente tiene el mismo landmark.
 */
 export function LandingPage() {
   return (
-    <main className="bg-white">
+    <main>
       <SiteHeader />
       <Hero />
       <HowItWorks />

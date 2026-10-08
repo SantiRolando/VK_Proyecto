@@ -1,14 +1,17 @@
 import { useI18n } from '@i18n/context.js'
 import { SegmentedControl } from '@mantine/core'
 
-// Mismo ancho y contraste en cualquier superficie (header oscuro de la landing
-// y headers claros de la app); `SegmentedControl` aporta el rol de radiogroup y
-// el estado seleccionado para lectores de pantalla (T103).
 const LANGUAGES = [
   { value: 'es', label: 'ES' },
   { value: 'en', label: 'EN' },
 ]
 
+/*
+  Los idiomas van en un `SegmentedControl` y no en un `Select`: el control se lee igual sobre
+  el header negro de la landing y sobre los headers claros de la app, y aporta el rol de
+  radiogroup y el idioma seleccionado para los lectores de pantalla. Las etiquetas no se
+  traducen: el nombre de un idioma se escribe en ese idioma.
+*/
 export function LanguageSwitch() {
   const { language, setLanguage, t } = useI18n()
 

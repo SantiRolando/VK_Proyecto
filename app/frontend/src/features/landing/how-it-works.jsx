@@ -1,4 +1,5 @@
 import { FeatureSection } from '@features/landing/section.jsx'
+import { SECTION_IDS } from '@features/landing/section-ids.js'
 import { IconCheck, IconRuler, IconSwimming } from '@tabler/icons-react'
 
 const STEPS = [
@@ -10,7 +11,7 @@ const STEPS = [
 export function HowItWorks() {
   return (
     <FeatureSection
-      id="how"
+      id={SECTION_IDS.how}
       titleKey="how.title"
       subtitleKey="how.subtitle"
       items={STEPS}
