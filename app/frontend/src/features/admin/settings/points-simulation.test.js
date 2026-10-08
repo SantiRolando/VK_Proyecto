@@ -2,7 +2,9 @@ import {
   awardChance,
   expectedPoints,
   generosityLevel,
+  POINTS_PRESETS,
   potentialPointsPerDay,
+  presetIndex,
   summarizePointsConfig,
 } from '@features/admin/settings/points-simulation.js'
 import { describe, expect, it } from 'vitest'
@@ -19,13 +21,15 @@ describe('lectura de la configuración de puntos', () => {
     expect(potentialPointsPerDay(SEED)).toBeCloseTo(15)
   })
 
-  it('calcula la chance de premiar al menos una vez en diez intentos', () => {
-    // 1 - 0,7^10
+  it('calcula la chance de premiar al menos una vez', () => {
+    // 1 - 0,7^10 y 1 - 0,7^3
     expect(awardChance(SEED, 10)).toBeCloseTo(0.97175, 4)
+    expect(awardChance(SEED, 3)).toBeCloseTo(0.657)
   })
 
   it('calcula los puntos esperados con el tope aplicado', () => {
-    // El tope recorta la cola de la binomial: da menos que los 30 puntos de 10 aciertos esperados.
+    // Con tres intentos el tope no recorta: 0,9 premios esperados por 10 puntos cada uno.
+    expect(expectedPoints(SEED, 3)).toBeCloseTo(9)
     expect(expectedPoints(SEED, 10)).toBeCloseTo(29.4, 1)
     expect(expectedPoints(SEED, 10)).toBeLessThan(10 * 0.3 * 10)
   })
@@ -57,13 +61,41 @@ describe('lectura de la configuración de puntos', () => {
     expect(generosityLevel(desmedida)).toBe('extreme')
   })
 
+  it('cada preset cae en la banda que declara', () => {
+    for (const preset of POINTS_PRESETS) {
+      expect(generosityLevel(preset.values)).toBe(preset.level)
+    }
+  })
+
+  it('la barra marca la banda de la configuración actual', () => {
+    const sinRecompensa = {
+      successProbability: 0,
+      pointsPerFeedback: 0,
+      maxDailyFeedback: 0,
+    }
+
+    expect(presetIndex(sinRecompensa)).toBe(0)
+    expect(presetIndex(POINTS_PRESETS[0].values)).toBe(0)
+    expect(presetIndex(SEED)).toBe(1)
+    expect(presetIndex(POINTS_PRESETS[2].values)).toBe(2)
+    // Sin ancla por encima: "muy generosa" comparte la última banda.
+    expect(
+      presetIndex({
+        successProbability: 100,
+        pointsPerFeedback: 1000,
+        maxDailyFeedback: 100,
+      }),
+    ).toBe(2)
+  })
+
   it('resume la lectura en los números que muestra la pantalla', () => {
     expect(summarizePointsConfig(SEED)).toEqual({
-      feedbacks: 10,
+      feedbacks: 3,
       level: 'balanced',
+      presetIndex: 1,
       potentialPointsPerDay: 15,
-      chance: 97.2,
-      expectedPoints: 29,
+      chance: 65.7,
+      expectedPoints: 9,
     })
   })
 })

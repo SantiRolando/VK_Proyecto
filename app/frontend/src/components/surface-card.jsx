@@ -1,4 +1,4 @@
-import { Box, Card, Group, Text, ThemeIcon } from '@mantine/core'
+import { Box, Card, Group, Text } from '@mantine/core'
 
 /*
   Superficie elevada y reutilizable. Existe porque el fondo de la app es blanco liso: una
@@ -11,8 +11,9 @@ import { Box, Card, Group, Text, ThemeIcon } from '@mantine/core'
   CTA o una badge. Sin la prop, el encabezado queda como texto suelto arriba del contenido, que
   es como ya estaban las tarjetas de la app.
 
-  `placeholderIcon` es para las pantallas sin imágenes: ocupa el lugar de la media con un icono
-  apagado, en vez de dejar el hueco vacío.
+  El icono se recibe plano y se pinta con el acento de la app: sin caja detrás, que era lo que
+  lo hacía parecer un botón. `placeholderIcon` ocupa el lugar de la media en las pantallas sin
+  imágenes, apagado para no competir con el contenido.
 
   El padding lo maneja el componente. Pasar `p` por las props rompe la franja superior.
 */
@@ -23,10 +24,19 @@ const SURFACE_STYLE = {
   boxShadow: 'var(--vk-surface-shadow)',
 }
 
+/*
+  La franja va en un `Box` y no en `Card.Section`: la sección de Mantine se sale de la card con
+  un margen negativo igual a su padding, y como la card recorta (`overflow: hidden`), el
+  encabezado quedaba comido por el radio de la esquina. Con el `Box`, la franja ocupa el ancho
+  real de la card y el recorte la redondea sola.
+*/
 const HEADER_STYLE = {
   borderBottom: '1px solid var(--vk-surface-border)',
   background: 'var(--vk-surface-header-background)',
 }
+
+const ICON_STYLE = { color: 'var(--vk-accent)', flexShrink: 0 }
+const PLACEHOLDER_ICON_STYLE = { color: 'var(--mantine-color-dimmed)' }
 
 export function SurfaceCard({
   title,
@@ -47,9 +57,9 @@ export function SurfaceCard({
     <Group justify="space-between" align="flex-start" gap="md" wrap="nowrap">
       <Group gap="sm" align="flex-start" wrap="nowrap">
         {Icon && (
-          <ThemeIcon variant="light" size={40} radius="md">
-            <Icon size={22} stroke={1.6} />
-          </ThemeIcon>
+          <Box style={ICON_STYLE} mt={2}>
+            <Icon size={22} stroke={1.7} />
+          </Box>
         )}
         <div>
           {title && (
@@ -69,9 +79,9 @@ export function SurfaceCard({
         <Group gap="sm" align="center" wrap="nowrap">
           {rightSection}
           {PlaceholderIcon && (
-            <ThemeIcon variant="light" color="gray" size={44} radius="md">
+            <Box style={PLACEHOLDER_ICON_STYLE} mt={2}>
               <PlaceholderIcon size={26} stroke={1.4} />
-            </ThemeIcon>
+            </Box>
           )}
         </Group>
       )}
@@ -81,9 +91,9 @@ export function SurfaceCard({
   return (
     <Card withBorder radius="lg" p={0} style={SURFACE_STYLE} {...cardProps}>
       {isTop && hasHeader && (
-        <Card.Section px="lg" py="md" style={HEADER_STYLE}>
+        <Box p="lg" style={HEADER_STYLE}>
           {header}
-        </Card.Section>
+        </Box>
       )}
 
       <Box p="lg">

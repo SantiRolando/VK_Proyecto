@@ -5,6 +5,7 @@ import {
   formatNumberValue,
   interpolate,
   selectPluralForm,
+  splitTemplate,
   translateKey,
 } from '@i18n/i18n-utils.js'
 import { describe, expect, it } from 'vitest'
@@ -27,6 +28,21 @@ describe('i18n utils', () => {
   it('interpola variables {{var}}', () => {
     expect(interpolate('Hola {{name}}', { name: 'Ana' })).toBe('Hola Ana')
     expect(interpolate('Hola {{name}}', {})).toBe('Hola {{name}}')
+  })
+
+  it('parte la plantilla en texto y parámetros, en orden', () => {
+    expect(splitTemplate('Deja {{feedbacks}} y suma {{points}} puntos.')).toEqual([
+      { text: 'Deja ' },
+      { name: 'feedbacks' },
+      { text: ' y suma ' },
+      { name: 'points' },
+      { text: ' puntos.' },
+    ])
+
+    // Sin parámetros queda un solo tramo de texto; con uno al borde, sin tramos vacíos.
+    expect(splitTemplate('Sin parámetros')).toEqual([{ text: 'Sin parámetros' }])
+    expect(splitTemplate('{{a}}{{b}}')).toEqual([{ name: 'a' }, { name: 'b' }])
+    expect(splitTemplate('')).toEqual([])
   })
 
   it('selecciona la forma plural con Intl.PluralRules', () => {

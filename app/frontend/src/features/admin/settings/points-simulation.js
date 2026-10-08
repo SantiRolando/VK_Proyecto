@@ -8,9 +8,30 @@
   entre feedbacks y tope.
 */
 
-// Feedbacks de la simulación: diez es un día cargado para un cliente, y hace visible el efecto
-// del tope sin que el número quede en el aire.
-export const SAMPLE_FEEDBACKS = 10
+/*
+  Feedbacks de la simulación. Tres y no diez: con diez la chance se pega al 97 % y la frase deja
+  de explicar nada, porque cualquier configuración parece premiar casi siempre.
+*/
+export const SAMPLE_FEEDBACKS = 3
+
+/*
+  Presets de la barra. Cada uno cae en una banda distinta de la escala, así que mover la barra
+  cambia las tres reglas y la badge lo confirma.
+*/
+export const POINTS_PRESETS = [
+  {
+    level: 'low',
+    values: { successProbability: 10, pointsPerFeedback: 5, maxDailyFeedback: 3 },
+  },
+  {
+    level: 'balanced',
+    values: { successProbability: 30, pointsPerFeedback: 10, maxDailyFeedback: 5 },
+  },
+  {
+    level: 'high',
+    values: { successProbability: 50, pointsPerFeedback: 20, maxDailyFeedback: 8 },
+  },
+]
 
 /*
   Anclas de la escala, en puntos por cliente y por día como techo: los cupones del seed cuestan
@@ -89,11 +110,24 @@ export function generosityLevel(config) {
   return step ? step.level : TOP_GENEROSITY_LEVEL
 }
 
+/*
+  Posición de la barra: la banda de la escala en la que cae la configuración. Se deriva del
+  nivel y no de comparar los valores contra el preset, así un ajuste a mano deja la barra en la
+  banda que le toca en vez de dejarla sin marcar.
+*/
+export function presetIndex(config) {
+  const level = generosityLevel(config)
+  if (level === 'balanced') return 1
+  if (level === 'high' || level === 'extreme') return 2
+  return 0
+}
+
 // Todo lo que la pantalla muestra de una sola pasada, para no recalcular por campo.
 export function summarizePointsConfig(config, feedbacks = SAMPLE_FEEDBACKS) {
   return {
     feedbacks,
     level: generosityLevel(config),
+    presetIndex: presetIndex(config),
     potentialPointsPerDay: Math.round(potentialPointsPerDay(config)),
     chance: Math.round(awardChance(config, feedbacks) * 1000) / 10,
     expectedPoints: Math.round(expectedPoints(config, feedbacks)),

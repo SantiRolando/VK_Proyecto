@@ -69,21 +69,39 @@ describe('reglas del juego', () => {
     expect(probability).toHaveValue('35 %')
   })
 
-  it('muestra la lectura de la configuración y la recalcula al editarla', async () => {
+  it('muestra la lectura de la configuración con los números en su lugar', async () => {
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminSettings)
+
+    // Seed: 30 % de acierto, 10 puntos por premio y tope de 5, sobre tres feedbacks.
+    const phrase = await screen.findByText(/Si un cliente deja/)
+    expect(phrase.textContent).toBe(
+      'Si un cliente deja 3 feedbacks el mismo día, tiene un 65,7 % de recibir puntos y suma unos 9 puntos.',
+    )
+    // Un tramo dinámico por número: es lo que permite marcarlos con negrita y color.
+    expect(phrase.querySelectorAll('span')).toHaveLength(3)
+
+    // La badge del encabezado y la marca de la barra dicen lo mismo, a propósito.
+    expect(screen.getAllByText('Equilibrada')).toHaveLength(2)
+  })
+
+  it('la barra ofrece los tres puntos de partida', async () => {
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminSettings)
+
+    expect(
+      await screen.findByRole('slider', { name: 'Punto de partida' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Ajustada')).toBeInTheDocument()
+    expect(screen.getByText('Generosa')).toBeInTheDocument()
+  })
+
+  it('sin sorteo no hay recompensa', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminSettings)
 
-    // Seed: 30 % de acierto, 10 puntos por premio y tope de 5 sobre 10 feedbacks.
-    expect(
-      await screen.findByText(
-        'Si un cliente deja 10 feedbacks el mismo día, tiene un 97.2 % de recibir puntos y suma unos 29 puntos.',
-      ),
-    ).toBeInTheDocument()
-    expect(screen.getByText('Equilibrada')).toBeInTheDocument()
-
-    // Sin sorteo no hay recompensa: la badge y la frase siguen el valor nuevo.
-    const probability = screen.getByRole('textbox', {
+    const probability = await screen.findByRole('textbox', {
       name: 'Probabilidad de acierto',
     })
     await user.clear(probability)

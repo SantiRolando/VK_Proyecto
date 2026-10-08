@@ -608,11 +608,13 @@ export default {
   'admin.coupons.form.validUntil': 'Hasta',
   'admin.coupons.form.active': 'Activo',
   'admin.settings.title': 'Configuración',
-  'admin.settings.subtitle':
-    'Reglas de negocio que el resto de la aplicación da por ciertas.',
+  'admin.settings.subtitle': 'Configura el comportamiento de la aplicación.',
   'admin.settings.points': 'Puntos por feedback',
   'admin.settings.pointsDescription':
     'Necesitamos el feedback de los clientes para saber si el talle que generamos fue el correcto, y lo recompensamos con puntos canjeables por cupones. En cada feedback hay un sorteo: si acierta, suma puntos, hasta el tope diario.',
+  'admin.settings.pointsPreset': 'Punto de partida',
+  'admin.settings.pointsPresetHint':
+    'Mueve las tres reglas a la vez. Después podés afinarlas una por una.',
   'admin.settings.pointsSimulation':
     'Si un cliente deja {{feedbacks}} feedbacks el mismo día, tiene un {{chance}} % de recibir puntos y suma unos {{points}} puntos.',
   'admin.settings.pointsScale': 'Techo de {{points}} puntos por cliente y por día.',

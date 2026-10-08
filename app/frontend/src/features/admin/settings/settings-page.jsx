@@ -7,8 +7,12 @@ import {
   useSettings,
   useUpdateSettings,
 } from '@features/admin/settings/hooks/use-settings.js'
-import { summarizePointsConfig } from '@features/admin/settings/points-simulation.js'
+import {
+  POINTS_PRESETS,
+  summarizePointsConfig,
+} from '@features/admin/settings/points-simulation.js'
 import { useI18n } from '@i18n/context.js'
+import { splitTemplate } from '@i18n/i18n-utils.js'
 import {
   ActionIcon,
   Alert,
@@ -18,6 +22,7 @@ import {
   Group,
   NumberInput,
   SimpleGrid,
+  Slider,
   Stack,
   Text,
   TextInput,
@@ -28,12 +33,13 @@ import {
   IconAddressBook,
   IconCalculator,
   IconCircleCheck,
+  IconDeviceFloppy,
   IconGift,
   IconMinus,
   IconPlus,
   IconReceipt,
 } from '@tabler/icons-react'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 
 const FIELD_BY_NAME = Object.fromEntries(
   SETTINGS_FIELDS.map((field) => [field.name, field]),
@@ -48,6 +54,16 @@ const GENEROSITY_COLORS = {
   balanced: 'teal',
   high: 'yellow',
   extreme: 'red',
+}
+
+/*
+  Color de cada número de la frase. Son tres datos distintos y el texto solo no alcanza para
+  ver cuál se movió al tocar un campo.
+*/
+const SIMULATION_COLORS = {
+  feedbacks: 'blue.7',
+  chance: 'teal.7',
+  points: 'grape.7',
 }
 
 /*
@@ -118,6 +134,39 @@ function SettingStepper({ field, value, onChange }) {
   )
 }
 
+/*
+  La lectura de la configuración en una frase: los números van en negrita y con color propio,
+  así se ve cuál se movió. Se parte la plantilla traducida para no armar la oración con pedazos
+  sueltos en cada idioma.
+*/
+function SimulationPhrase({ summary }) {
+  const { t, formatNumber } = useI18n()
+  const values = {
+    feedbacks: formatNumber(summary.feedbacks),
+    chance: formatNumber(summary.chance, { maximumFractionDigits: 1 }),
+    points: formatNumber(summary.expectedPoints),
+  }
+
+  return (
+    <Text size="sm">
+      {splitTemplate(t('admin.settings.pointsSimulation')).map((segment) =>
+        segment.text !== undefined ? (
+          <Fragment key={`texto:${segment.text}`}>{segment.text}</Fragment>
+        ) : (
+          <Text
+            key={`dato:${segment.name}`}
+            component="span"
+            fw={700}
+            c={SIMULATION_COLORS[segment.name]}
+          >
+            {values[segment.name]}
+          </Text>
+        ),
+      )}
+    </Text>
+  )
+}
+
 // Formulario separado para poder inicializarlo con lo que llegó del backend.
 function SettingsForm({ initial }) {
   const { t } = useI18n()
@@ -130,6 +179,11 @@ function SettingsForm({ initial }) {
   const setField = (field) => (value) => {
     setSaved(false)
     setValues((current) => ({ ...current, [field]: value }))
+  }
+
+  const applyPreset = (index) => {
+    setSaved(false)
+    setValues((current) => ({ ...current, ...POINTS_PRESETS[index].values }))
   }
 
   const handleSubmit = async (event) => {
@@ -178,14 +232,44 @@ function SettingsForm({ initial }) {
                 <ThemeIcon variant="light" size={30} radius="sm">
                   <IconCalculator size={18} stroke={1.6} />
                 </ThemeIcon>
-                <Text size="sm">
-                  {t('admin.settings.pointsSimulation', {
-                    feedbacks: summary.feedbacks,
-                    chance: summary.chance,
-                    points: summary.expectedPoints,
-                  })}
-                </Text>
+                <SimulationPhrase summary={summary} />
               </Group>
+            </InsetCard>
+
+            <InsetCard>
+              <Stack gap="md">
+                <div>
+                  <Text fw={600}>{t('admin.settings.pointsPreset')}</Text>
+                  <Text c="dimmed" size="sm" mt={4}>
+                    {t('admin.settings.pointsPresetHint')}
+                  </Text>
+                </div>
+
+                <Slider
+                  min={0}
+                  max={POINTS_PRESETS.length - 1}
+                  step={1}
+                  value={summary.presetIndex}
+                  onChange={applyPreset}
+                  label={(index) =>
+                    t(`admin.settings.pointsGenerosity.${POINTS_PRESETS[index].level}`)
+                  }
+                  // El nombre accesible va en el thumb: la raíz del Slider no es el control.
+                  thumbLabel={t('admin.settings.pointsPreset')}
+                  thumbValueText={t(`admin.settings.pointsGenerosity.${summary.level}`)}
+                  // Solo los puntos: las etiquetas de Mantine se centran sobre la marca y las
+                  // de los extremos se salen de la tarjeta.
+                  marks={[...POINTS_PRESETS.keys()].map((index) => ({ value: index }))}
+                />
+
+                <Group justify="space-between" gap="xs" mt={4}>
+                  {POINTS_PRESETS.map((preset) => (
+                    <Text key={preset.level} size="xs" c="dimmed">
+                      {t(`admin.settings.pointsGenerosity.${preset.level}`)}
+                    </Text>
+                  ))}
+                </Group>
+              </Stack>
             </InsetCard>
 
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
@@ -251,9 +335,15 @@ function SettingsForm({ initial }) {
         )}
         {error && <ErrorState error={error} onRetry={() => setError(null)} />}
 
-        <Button type="submit" loading={update.isPending} w={220}>
-          {t('common.save')}
-        </Button>
+        <Group justify="flex-end">
+          <Button
+            type="submit"
+            loading={update.isPending}
+            leftSection={<IconDeviceFloppy size={18} />}
+          >
+            {t('common.save')}
+          </Button>
+        </Group>
       </Stack>
     </form>
   )

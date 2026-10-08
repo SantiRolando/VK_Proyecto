@@ -605,11 +605,13 @@ export default {
   'admin.coupons.form.validUntil': 'Until',
   'admin.coupons.form.active': 'Active',
   'admin.settings.title': 'Settings',
-  'admin.settings.subtitle':
-    'Business rules the rest of the application takes for granted.',
+  'admin.settings.subtitle': 'Sets how the application behaves.',
   'admin.settings.points': 'Feedback points',
   'admin.settings.pointsDescription':
     'We need customer feedback to know whether the size we recommended was right, and we reward it with points redeemable for coupons. Every feedback runs a draw: when it hits, the customer earns points, up to the daily cap.',
+  'admin.settings.pointsPreset': 'Starting point',
+  'admin.settings.pointsPresetHint':
+    'Moves all three rules at once. You can fine-tune them one by one afterwards.',
   'admin.settings.pointsSimulation':
     'If a customer leaves {{feedbacks}} feedbacks on the same day, there is a {{chance}} % chance of earning points, for about {{points}} points.',
   'admin.settings.pointsScale': 'Ceiling of {{points}} points per customer per day.',
