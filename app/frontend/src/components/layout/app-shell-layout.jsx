@@ -95,8 +95,22 @@ export function AppShellLayout() {
       withBorder
     >
       <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-          <Group gap="sm" wrap="nowrap">
+        {/*
+          En un teléfono no entra todo: el ancho útil son 320 px y la marca, el selector de
+          tema y el de idioma sumaban más que eso, así que el nombre se partía en dos líneas
+          dentro de un header de 60 px y en las pantallas más angostas la fila desbordaba.
+          Se recorta el padding, el apodo de sección se muestra recién desde `sm` y el tema
+          baja al drawer, donde ya estaba duplicado. La marca trunca en vez de envolverse:
+          si algún día no entra, termina en puntos suspensivos y no rompe el alto.
+        */}
+        <Group
+          h="100%"
+          px={{ base: 'sm', sm: 'md' }}
+          gap="sm"
+          justify="space-between"
+          wrap="nowrap"
+        >
+          <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
             <Burger
               opened={opened}
               onClick={open}
@@ -104,16 +118,23 @@ export function AppShellLayout() {
               size="sm"
               aria-label={t('nav.menu')}
             />
-            <Group gap="xs" wrap="nowrap">
+            <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
               <Image src={LOGO} alt="" w={LOGO_SIZE} h={LOGO_SIZE} radius="sm" />
-              <Text component={Link} to={routes.home} fw={700}>
+              <Text component={Link} to={routes.home} fw={700} truncate>
                 {t('app.name')}
-                {isAdmin && ` · ${t('app.admin')}`}
+                {isAdmin && (
+                  <Box component="span" visibleFrom="sm">
+                    {` · ${t('app.admin')}`}
+                  </Box>
+                )}
               </Text>
             </Group>
           </Group>
-          <Group gap="sm" wrap="nowrap">
-            <ThemePicker />
+          <Group gap="sm" wrap="nowrap" style={{ flexShrink: 0 }}>
+            {/* El tema también se elige desde el drawer en móvil. */}
+            <Box visibleFrom="sm">
+              <ThemePicker />
+            </Box>
             <LanguageSwitch />
             {/* En desktop la cuenta vive en el header, como el botón de cuenta de
                 Google. En móvil baja al drawer (ver más abajo). */}
