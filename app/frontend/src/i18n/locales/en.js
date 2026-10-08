@@ -36,8 +36,6 @@ export default {
   'common.cancel': 'Cancel',
   'common.save': 'Save',
   'common.close': 'Close',
-  'common.empty': 'Nothing here yet.',
-  'common.comingSoon': 'This screen will be available soon.',
   'common.error': 'Something went wrong.',
   'common.actions': 'Actions',
   'address.street': 'Street',
@@ -61,7 +59,7 @@ export default {
   'how.title': 'How it works',
   'how.subtitle': 'Three steps to find your size.',
   'how.step1.title': 'Enter your measurements',
-  'how.step1.body': 'Age, sex and nationality to know you better.',
+  'how.step1.body': 'Height, bust, waist, hip and torso, in centimeters.',
   'how.step2.title': 'Pick the use',
   'how.step2.body': 'Training or competition, depending on your goal.',
   'how.step3.title': 'Get your size',
@@ -242,10 +240,6 @@ export default {
     'You are browsing the whole catalog. If you measure your size, we will show you only what is available in your measurement.',
   'catalog.noSize.cta': 'Measure my size',
   'catalog.pickSizeHint': 'Pick a size to see availability',
-  'catalog.needSize.title': 'First we need your size',
-  'catalog.needSize.body':
-    'Measure your five measurements and we will show you only what is available in your size.',
-  'catalog.needSize.cta': 'Measure my size',
   'catalog.noStock.title': 'No stock in your size',
   'catalog.noStock.body':
     'There are no units available in any color of this line for size {{size}}. You can ask us for a notice or check nearby sizes.',
@@ -255,7 +249,6 @@ export default {
   'catalog.subscribe': 'Notify me when it is back',
   'catalog.subscribeDone': 'Done, we will let you know when it is back.',
   'catalog.subscribeLogin': 'You need an account to get the notification.',
-  'catalog.detail.title': 'Product detail',
   'catalog.detail.back': 'Back to catalog',
   'catalog.detail.colors': 'Available colors',
   'catalog.detail.sizes': 'Other sizes',
@@ -333,7 +326,6 @@ export default {
   'account.profiles.edit': 'Edit profile',
   'account.profiles.default': 'Default',
   'account.profiles.setDefault': 'Use as default',
-  'account.profiles.manage': 'Manage profiles',
   'account.profiles.removeTitle': 'Delete profile',
   'account.profiles.removeBody':
     'Delete the {{name}} profile? Measurement history is kept.',
@@ -535,7 +527,6 @@ export default {
   'admin.products.inactive': 'Discontinued',
   'admin.products.empty': 'No products yet.',
   'admin.products.variants': 'Variants',
-  'admin.products.variantCount': '{{count}} active variants',
   'admin.products.reactivate': 'Reactivate',
   'admin.products.removeTitle': 'Discontinue product',
   'admin.products.removeBody':
@@ -678,8 +669,6 @@ export default {
     'The measurements exceed the kids chart: an adult size may apply.',
   'enums.referralReason.AgeOutsideTable':
     'The age is outside the kids chart for this line.',
-  'enums.fitType.Training': 'Training',
-  'enums.fitType.Competition': 'Competition',
   'enums.source.Direct': 'Direct access',
   'enums.source.QR': 'QR',
   'enums.source.Landing': 'Landing',
@@ -701,8 +690,6 @@ export default {
   'enums.transactionReason.LossDefective': 'Loss / defective',
   'enums.transactionReason.ManualAdjustment': 'Manual adjustment',
   'enums.transactionReason.SaleConfirmed': 'Confirmed sale',
-  'enums.alertType.CriticalStock': 'Critical stock',
-  'enums.alertType.RestockNotice': 'Restock alert',
   'enums.alertStatus.Active': 'Active',
   'enums.alertStatus.Notified': 'Notified',
   'enums.alertStatus.Closed': 'Closed',
@@ -711,8 +698,4 @@ export default {
   'enums.pointsMovementType.Feedback': 'Feedback',
   'enums.pointsMovementType.Redemption': 'Redemption',
   'enums.pointsMovementType.Adjustment': 'Adjustment',
-
-  'stock.badge.in': 'In stock',
-  'stock.badge.low': 'Low stock',
-  'stock.badge.out': 'Out of stock',
 }

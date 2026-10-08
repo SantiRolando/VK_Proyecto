@@ -36,8 +36,6 @@ export default {
   'common.cancel': 'Cancelar',
   'common.save': 'Guardar',
   'common.close': 'Cerrar',
-  'common.empty': 'No hay nada por acá todavía.',
-  'common.comingSoon': 'Esta pantalla estará disponible pronto.',
   'common.error': 'Ocurrió un error.',
   'common.actions': 'Acciones',
   'address.street': 'Calle',
@@ -61,7 +59,7 @@ export default {
   'how.title': 'Cómo funciona',
   'how.subtitle': 'Tres pasos para encontrar tu talle.',
   'how.step1.title': 'Ingresá tus medidas',
-  'how.step1.body': 'Edad, sexo y nacionalidad para conocerte mejor.',
+  'how.step1.body': 'Altura, busto, cintura, cadera y torso, en centímetros.',
   'how.step2.title': 'Elegí el uso',
   'how.step2.body': 'Entrenamiento o competición, según tu objetivo.',
   'how.step3.title': 'Recibí tu talle',
@@ -242,10 +240,6 @@ export default {
     'Estás viendo todo el catálogo. Si medís tu talle, te mostramos solo lo que hay disponible en tu medida.',
   'catalog.noSize.cta': 'Medir mi talle',
   'catalog.pickSizeHint': 'Elegí un talle para ver disponibilidad',
-  'catalog.needSize.title': 'Primero necesitamos tu talle',
-  'catalog.needSize.body':
-    'Medí tus cinco medidas y te mostramos solo lo que hay disponible en tu talle.',
-  'catalog.needSize.cta': 'Medir mi talle',
   'catalog.noStock.title': 'Sin stock en tu talle',
   'catalog.noStock.body':
     'No hay unidades disponibles en ningún color de esta línea para el talle {{size}}. Podés pedirnos un aviso o mirar los talles cercanos.',
@@ -255,7 +249,6 @@ export default {
   'catalog.subscribe': 'Avisame cuando vuelva',
   'catalog.subscribeDone': 'Listo, te avisamos cuando haya stock.',
   'catalog.subscribeLogin': 'Para recibir el aviso necesitás una cuenta.',
-  'catalog.detail.title': 'Detalle del producto',
   'catalog.detail.back': 'Volver al catálogo',
   'catalog.detail.colors': 'Colores disponibles',
   'catalog.detail.sizes': 'Otros talles',
@@ -333,7 +326,6 @@ export default {
   'account.profiles.edit': 'Editar perfil',
   'account.profiles.default': 'Predeterminado',
   'account.profiles.setDefault': 'Usar por defecto',
-  'account.profiles.manage': 'Administrar perfiles',
   'account.profiles.removeTitle': 'Eliminar perfil',
   'account.profiles.removeBody':
     '¿Eliminar el perfil {{name}}? El historial de mediciones se conserva.',
@@ -536,7 +528,6 @@ export default {
   'admin.products.inactive': 'Dado de baja',
   'admin.products.empty': 'Todavía no hay productos.',
   'admin.products.variants': 'Variantes',
-  'admin.products.variantCount': '{{count}} variantes activas',
   'admin.products.reactivate': 'Reactivar',
   'admin.products.removeTitle': 'Dar de baja el producto',
   'admin.products.removeBody':
@@ -682,8 +673,6 @@ export default {
     'Las medidas superan la tabla infantil: puede corresponder un talle de adulto.',
   'enums.referralReason.AgeOutsideTable':
     'La edad está fuera de la tabla infantil de esta línea.',
-  'enums.fitType.Training': 'Entrenamiento',
-  'enums.fitType.Competition': 'Competición',
   'enums.source.Direct': 'Acceso directo',
   'enums.source.QR': 'QR',
   'enums.source.Landing': 'Landing',
@@ -705,8 +694,6 @@ export default {
   'enums.transactionReason.LossDefective': 'Pérdida / defectuoso',
   'enums.transactionReason.ManualAdjustment': 'Ajuste manual',
   'enums.transactionReason.SaleConfirmed': 'Venta confirmada',
-  'enums.alertType.CriticalStock': 'Stock crítico',
-  'enums.alertType.RestockNotice': 'Aviso de reposición',
   'enums.alertStatus.Active': 'Activa',
   'enums.alertStatus.Notified': 'Notificada',
   'enums.alertStatus.Closed': 'Cerrada',
@@ -715,8 +702,4 @@ export default {
   'enums.pointsMovementType.Feedback': 'Feedback',
   'enums.pointsMovementType.Redemption': 'Canje',
   'enums.pointsMovementType.Adjustment': 'Ajuste',
-
-  'stock.badge.in': 'Con stock',
-  'stock.badge.low': 'Stock bajo',
-  'stock.badge.out': 'Sin stock',
 }
