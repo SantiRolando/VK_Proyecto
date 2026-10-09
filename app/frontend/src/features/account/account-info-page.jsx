@@ -4,6 +4,7 @@ import { AlertsBody } from '@features/account/alerts-body.jsx'
 import { ProfilesBody } from '@features/account/profiles-page.jsx'
 import { useAuth } from '@features/auth/auth-context.js'
 import { isAdmin } from '@features/auth/permissions.js'
+import { useTabParam } from '@hooks/use-tab-param.js'
 import { useI18n } from '@i18n/context.js'
 import {
   Badge,
@@ -24,7 +25,6 @@ import {
   IconRuler,
   IconUser,
 } from '@tabler/icons-react'
-import { useSearchParams } from 'react-router'
 
 // Los valores de `?tab=` son el slug en inglés de la etiqueta de cada pestaña.
 const ACCOUNT_TAB = 'account'
@@ -63,23 +63,17 @@ function Field({ icon: Icon, label, value }) {
 export function AccountInfoPage() {
   const { t } = useI18n()
   const { user } = useAuth()
-  const [searchParams, setSearchParams] = useSearchParams()
 
   const withAlerts = !isAdmin(user)
   const tabs = withAlerts ? [...BASE_TABS, ALERTS_TAB] : BASE_TABS
 
-  const requested = searchParams.get('tab')
-  const tab = tabs.includes(requested) ? requested : ACCOUNT_TAB
+  const [tab, setTab] = useTabParam(tabs, ACCOUNT_TAB)
 
   return (
     <Container size="md" py="xl">
       <PageHeader title={t('account.info.title')} subtitle={t('account.info.subtitle')} />
 
-      <Tabs
-        value={tab}
-        onChange={(next) => setSearchParams(next === ACCOUNT_TAB ? {} : { tab: next })}
-        keepMounted={false}
-      >
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value={ACCOUNT_TAB} leftSection={<IconId size={16} />}>
             {t('account.info.tabAccount')}

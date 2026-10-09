@@ -5,15 +5,12 @@
 
 import { routes } from '@app/routes.js'
 import {
-  IconArrowsRightLeft,
   IconChartHistogram,
   IconClock,
-  IconMessageCircle,
   IconPackage,
   IconReceipt,
   IconRuler,
   IconSettings,
-  IconShirt,
   IconTicket,
   IconUsers,
 } from '@tabler/icons-react'
@@ -34,10 +31,6 @@ export const PANEL_NAV_ITEMS = [
   { to: routes.admin, labelKey: 'nav.analytics', icon: IconChartHistogram },
   { to: routes.adminSales, labelKey: 'nav.sales', icon: IconReceipt },
   { to: routes.adminInventory, labelKey: 'nav.inventory', icon: IconPackage },
-  { to: routes.adminMovements, labelKey: 'nav.movements', icon: IconArrowsRightLeft },
-  { to: routes.adminProducts, labelKey: 'nav.products', icon: IconShirt },
-  { to: routes.adminMissingSizes, labelKey: 'nav.missingSizes', icon: IconRuler },
-  { to: routes.adminComments, labelKey: 'nav.comments', icon: IconMessageCircle },
   { to: routes.adminUsers, labelKey: 'nav.users', icon: IconUsers },
   { to: routes.adminCoupons, labelKey: 'nav.coupons', icon: IconTicket },
   { to: routes.adminSettings, labelKey: 'nav.settings', icon: IconSettings },

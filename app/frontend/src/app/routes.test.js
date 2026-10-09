@@ -1,4 +1,4 @@
-import { routes } from '@app/routes.js'
+import { ADMIN_INVENTORY_TABS, routes } from '@app/routes.js'
 import { describe, expect, it } from 'vitest'
 
 const SAMPLE_ARGS = {
@@ -8,6 +8,7 @@ const SAMPLE_ARGS = {
   product: [5],
   checkoutConfirmation: [9],
   adminSale: [4],
+  adminInventoryTab: [ADMIN_INVENTORY_TABS.products],
 }
 
 function collectPaths() {
@@ -39,6 +40,9 @@ describe('routes', () => {
     expect(routes.fit({ line: 'endurance' })).toBe('/fit?line=endurance')
     expect(routes.fitResult(12)).toBe('/fit/result/12')
     expect(routes.adminSale(4)).toBe('/admin/sales/4')
+    expect(routes.adminInventoryTab(ADMIN_INVENTORY_TABS.products)).toBe(
+      '/admin/inventory?tab=products',
+    )
     expect(routes.catalog()).toBe('/catalog')
   })
 })

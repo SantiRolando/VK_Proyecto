@@ -3,6 +3,12 @@
   que renombrar una ruta es cambiar este archivo.
 */
 
+// Las pestañas del panel viven en la query: estos son los valores de `?tab=`.
+export const ADMIN_INVENTORY_TABS = { inventory: 'inventory', products: 'products' }
+
+const ADMIN_SALES_PATH = '/admin/sales'
+const ADMIN_INVENTORY_PATH = '/admin/inventory'
+
 function withQuery(path, query) {
   if (!query) return path
   const params = new URLSearchParams()
@@ -59,15 +65,22 @@ export const routes = {
   accountAlerts: '/account/alerts',
   accountRewards: '/account/rewards',
 
+  // Analíticas del panel: indicadores, demanda insatisfecha y comentarios en una pantalla.
   admin: '/admin',
-  adminSales: '/admin/sales',
-  adminSale: (saleId) => `/admin/sales/${saleId}`,
-  adminInventory: '/admin/inventory',
-  adminMovements: '/admin/inventory/movements',
-  adminProducts: '/admin/products',
-  adminMissingSizes: '/admin/analytics/missing-sizes',
-  adminComments: '/admin/analytics/comments',
+  adminSales: ADMIN_SALES_PATH,
+  adminSale: (saleId) => `${ADMIN_SALES_PATH}/${saleId}`,
+  adminInventory: ADMIN_INVENTORY_PATH,
+  adminInventoryTab: (tab) => withQuery(ADMIN_INVENTORY_PATH, { tab }),
   adminUsers: '/admin/users',
   adminCoupons: '/admin/coupons',
   adminSettings: '/admin/settings',
+
+  /*
+    Rutas anteriores a la unificación: se mantienen para no romper enlaces guardados y
+    redirigen a la pantalla que ahora las contiene.
+  */
+  adminProducts: '/admin/products',
+  adminMovements: '/admin/inventory/movements',
+  adminMissingSizes: '/admin/analytics/missing-sizes',
+  adminComments: '/admin/analytics/comments',
 }

@@ -13,10 +13,6 @@ export default {
   'nav.analytics': 'Analíticas',
   'nav.sales': 'Ventas',
   'nav.inventory': 'Inventario',
-  'nav.movements': 'Movimientos',
-  'nav.products': 'Productos',
-  'nav.missingSizes': 'Talles faltantes',
-  'nav.comments': 'Comentarios',
   'nav.users': 'Usuarios',
   'nav.coupons': 'Cupones',
   'nav.settings': 'Configuración',
@@ -47,6 +43,11 @@ export default {
   'common.delete': 'Eliminar',
   'common.cm': '{{value}} cm',
   'common.notSet': '—',
+  'common.edit': 'Editar',
+  'common.pagination.range': 'Mostrando {{from}}–{{to}} de {{total}}',
+  'common.pagination.pageSize': '{{count}} por página',
+  'common.pagination.pageSizeLabel': 'Filas por página',
+  'common.pagination.label': 'Paginación',
 
   'validation.required': 'Campo obligatorio',
   'validation.invalid': 'Valor inválido',
@@ -397,9 +398,6 @@ export default {
   'feedback.toast.title': '¡Ganaste puntos!',
   'feedback.toast.body': 'Sumaste {{points}} puntos por tu feedback.',
 
-  'admin.dashboard.title': 'Panel de administración',
-  'admin.dashboard.subtitle':
-    'Conversión, precisión del talle, stock crítico y ventas en vuelo.',
   'admin.dashboard.range': 'Rango de fechas',
   'admin.dashboard.conversion': 'Conversión',
   'admin.dashboard.generations': 'Mediciones',
@@ -453,7 +451,9 @@ export default {
   'admin.users.error.SERVER_ERROR': 'No se pudo cambiar el rol. Probá de nuevo.',
   'admin.sales.title': 'Ventas',
   'admin.sales.subtitle':
-    'Coordiná las ventas en curso: contactá al cliente, confirmá o cancelá.',
+    'Coordiná las ventas en curso y auditá los movimientos de stock que dejan.',
+  'admin.sales.sectionSales': 'Ventas en curso',
+  'admin.sales.sectionSalesHint': 'Contactá al cliente, confirmá o cancelá.',
   'admin.sales.filter.all': 'Todas',
   'admin.sales.results.one': '{{count}} venta',
   'admin.sales.results.other': '{{count}} ventas',
@@ -493,7 +493,9 @@ export default {
     'Cancelar la compra #{{id}} libera la reserva de inmediato y no toca el stock.',
   'admin.inventory.title': 'Inventario',
   'admin.inventory.subtitle':
-    'Disponible = físico − reservado. Todo ajuste pide motivo y queda auditado.',
+    'Lo que hay en depósito, lo reservado por ventas y lo disponible para vender. Cada ajuste pide un motivo y queda registrado.',
+  'admin.inventory.tabInventory': 'Inventario',
+  'admin.inventory.tabProducts': 'Productos',
   'admin.inventory.adjust': 'Ajustar stock',
   'admin.inventory.physical': 'Físico',
   'admin.inventory.reserved': 'Reservado',
@@ -515,6 +517,7 @@ export default {
   'admin.inventory.filter.allLines': 'Todas las líneas',
   'admin.inventory.filter.line': 'Filtrar por línea',
   'admin.inventory.filter.lowStock': 'Solo bajo mínimo',
+  'admin.inventory.filter.search': 'Buscar por SKU o modelo',
   'admin.movements.title': 'Movimientos de stock',
   'admin.movements.subtitle':
     'Auditoría de ajustes: quién, cuándo, por qué y sobre qué variante.',
@@ -528,6 +531,9 @@ export default {
   'admin.movements.empty': 'No hay movimientos para este filtro.',
   'admin.products.title': 'Productos',
   'admin.products.subtitle': 'Catálogo del panel: productos y sus variantes.',
+  'admin.products.column.product': 'Producto',
+  'admin.products.column.line': 'Línea',
+  'admin.products.column.price': 'Precio',
   'admin.products.new': 'Nuevo producto',
   'admin.products.edit': 'Editar producto',
   'admin.products.inactive': 'Dado de baja',
@@ -553,6 +559,10 @@ export default {
   'admin.products.variant.quantityHint':
     'El stock físico nace en 0 y se carga desde Inventario con un movimiento.',
   'admin.products.variant.empty': 'Este producto todavía no tiene variantes.',
+  'admin.analytics.title': 'Analíticas',
+  'admin.analytics.subtitle':
+    'Estado del negocio, demanda insatisfecha y comentarios de los clientes.',
+  'admin.analytics.indicators': 'Indicadores',
   'admin.analytics.export.csv': 'Exportar CSV',
   'admin.analytics.export.excel': 'Excel',
   'admin.missingSizes.title': 'Talles faltantes',

@@ -1,4 +1,4 @@
-import { createTheme } from '@mantine/core'
+import { Badge, createTheme } from '@mantine/core'
 
 export const theme = createTheme({
   primaryColor: 'blue',
@@ -8,6 +8,14 @@ export const theme = createTheme({
     fontFamily: 'Inter, sans-serif',
   },
   defaultRadius: 'md',
+  components: {
+    /*
+      La etiqueta de un badge nunca se recorta: su ancho mínimo es el del contenido. El `Badge`
+      de Mantine se capa con `max-width: 100%`, así que con poco espacio recorta el texto en vez
+      de estirar la columna que lo contiene.
+    */
+    Badge: Badge.extend({ styles: { root: { minWidth: 'max-content' } } }),
+  },
 })
 
 /*

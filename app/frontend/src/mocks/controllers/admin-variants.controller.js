@@ -41,6 +41,9 @@ function lineOf(db, variant) {
   return db.products.find((item) => item.id === variant.productId)?.line ?? null
 }
 
+// Por defecto 20 por página: el listado de inventario tiene más de cien variantes en la seed.
+const DEFAULT_PAGE_SIZE = 20
+
 register(
   'GET',
   '/admin/variants',
@@ -48,6 +51,11 @@ register(
     const db = getDb()
     const { productId, line, sizeId, color } = req.query
     const lowStock = req.query.lowStock === true || req.query.lowStock === 'true'
+    const search = String(req.query.q ?? '')
+      .trim()
+      .toLowerCase()
+    const page = Math.max(1, Number(req.query.page) || 1)
+    const pageSize = Math.max(1, Number(req.query.pageSize) || DEFAULT_PAGE_SIZE)
 
     const items = db.productVariants
       .filter((variant) => !productId || variant.productId === Number(productId))
@@ -56,9 +64,22 @@ register(
       .filter((variant) => !line || lineOf(db, variant) === line)
       .map((variant) => serializeInventoryVariant(db, variant))
       .filter((item) => !lowStock || item.isCritical)
+      // La búsqueda cruza el SKU y el modelo: es lo que el admin escribe para ubicar una variante.
+      .filter(
+        (item) =>
+          !search ||
+          item.sku.toLowerCase().includes(search) ||
+          (item.product?.model ?? '').toLowerCase().includes(search),
+      )
       .sort((a, b) => Number(b.isCritical) - Number(a.isCritical) || a.id - b.id)
 
-    return { status: 200, data: items, meta: { total: items.length } }
+    const start = (page - 1) * pageSize
+
+    return {
+      status: 200,
+      data: items.slice(start, start + pageSize),
+      meta: { page, pageSize, total: items.length },
+    }
   },
   { auth: 'admin' },
 )

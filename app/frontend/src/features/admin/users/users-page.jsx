@@ -1,5 +1,6 @@
 import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
+import { LazyBarChart } from '@components/lazy-bar-chart.jsx'
 import { PageHeader } from '@components/page-header.jsx'
 import { ResponsiveList } from '@components/responsive-list.jsx'
 import { SurfaceCard, SurfaceIcon } from '@components/surface-card.jsx'
@@ -35,13 +36,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { CHART_ACCENT } from '@theme/theme.js'
-import { lazy, Suspense, useState } from 'react'
-
-// `recharts` (~395 kB) queda en su propio chunk: se carga recién cuando esta
-// pantalla se abre, igual que en el dashboard.
-const BarChart = lazy(() =>
-  import('@mantine/charts').then((module) => ({ default: module.BarChart })),
-)
+import { useState } from 'react'
 
 // Tarjeta de indicador: valor grande + etiqueta + detalle opcional.
 function Stat({ icon: Icon, label, value, hint }) {
@@ -198,20 +193,18 @@ export function UsersPage() {
                 icon={IconChartHistogram}
                 title={t('admin.users.chart.title')}
               >
-                <Suspense fallback={<div style={{ height: 220 }} />}>
-                  <BarChart
-                    h={220}
-                    data={chartData}
-                    dataKey="label"
-                    series={[
-                      {
-                        name: 'signups',
-                        color: CHART_ACCENT,
-                        label: t('admin.users.chart.series'),
-                      },
-                    ]}
-                  />
-                </Suspense>
+                <LazyBarChart
+                  h={220}
+                  data={chartData}
+                  dataKey="label"
+                  series={[
+                    {
+                      name: 'signups',
+                      color: CHART_ACCENT,
+                      label: t('admin.users.chart.series'),
+                    },
+                  ]}
+                />
                 <Text size="xs" c="dimmed" mt="xs">
                   {t('admin.users.chart.hint')}
                 </Text>

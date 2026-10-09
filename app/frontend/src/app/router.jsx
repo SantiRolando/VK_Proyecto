@@ -6,7 +6,7 @@
 import { GuestOnly } from '@app/guards/guest-only.jsx'
 import { RequireAdmin } from '@app/guards/require-admin.jsx'
 import { RequireAuth } from '@app/guards/require-auth.jsx'
-import { routes } from '@app/routes.js'
+import { ADMIN_INVENTORY_TABS, routes } from '@app/routes.js'
 import { AppShellLayout } from '@components/layout/app-shell-layout.jsx'
 import { PublicLayout } from '@components/layout/public-layout.jsx'
 import { NotFoundPage } from '@components/not-found-page.jsx'
@@ -83,29 +83,13 @@ const AdminSaleDetailPage = lazyPage(
   () => import('@features/admin/sales/sale-detail-page.jsx'),
   'AdminSaleDetailPage',
 )
-const DashboardPage = lazyPage(
-  () => import('@features/admin/dashboard/dashboard-page.jsx'),
-  'DashboardPage',
+const AnalyticsPage = lazyPage(
+  () => import('@features/admin/analytics/analytics-page.jsx'),
+  'AnalyticsPage',
 )
 const InventoryPage = lazyPage(
   () => import('@features/admin/inventory/inventory-page.jsx'),
   'InventoryPage',
-)
-const MovementsPage = lazyPage(
-  () => import('@features/admin/inventory/movements-page.jsx'),
-  'MovementsPage',
-)
-const ProductsPage = lazyPage(
-  () => import('@features/admin/catalog-admin/products-page.jsx'),
-  'ProductsPage',
-)
-const MissingSizesPage = lazyPage(
-  () => import('@features/admin/analytics/missing-sizes-page.jsx'),
-  'MissingSizesPage',
-)
-const CommentsPage = lazyPage(
-  () => import('@features/admin/analytics/comments-page.jsx'),
-  'CommentsPage',
 )
 const CouponsPage = lazyPage(
   () => import('@features/admin/coupons/coupons-page.jsx'),
@@ -197,14 +181,34 @@ export function AppRouter() {
             </RequireAuth>
           }
         >
-          <Route path={routes.admin} element={<DashboardPage />} />
+          <Route path={routes.admin} element={<AnalyticsPage />} />
           <Route path={routes.adminSales} element={<AdminSalesPage />} />
           <Route path={routes.adminSale(':saleId')} element={<AdminSaleDetailPage />} />
           <Route path={routes.adminInventory} element={<InventoryPage />} />
-          <Route path={routes.adminMovements} element={<MovementsPage />} />
-          <Route path={routes.adminProducts} element={<ProductsPage />} />
-          <Route path={routes.adminMissingSizes} element={<MissingSizesPage />} />
-          <Route path={routes.adminComments} element={<CommentsPage />} />
+
+          {/* Pantallas unificadas: las rutas viejas llevan a la sección que las contiene. */}
+          <Route
+            path={routes.adminMovements}
+            element={<Navigate to={routes.adminSales} replace />}
+          />
+          <Route
+            path={routes.adminProducts}
+            element={
+              <Navigate
+                to={routes.adminInventoryTab(ADMIN_INVENTORY_TABS.products)}
+                replace
+              />
+            }
+          />
+          <Route
+            path={routes.adminMissingSizes}
+            element={<Navigate to={routes.admin} replace />}
+          />
+          <Route
+            path={routes.adminComments}
+            element={<Navigate to={routes.admin} replace />}
+          />
+
           <Route path={routes.adminUsers} element={<UsersPage />} />
           <Route path={routes.adminCoupons} element={<CouponsPage />} />
           <Route path={routes.adminSettings} element={<SettingsPage />} />

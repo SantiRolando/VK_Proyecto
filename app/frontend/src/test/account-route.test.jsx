@@ -62,9 +62,7 @@ describe('destinos post-login', () => {
     await signInAs(SeedUser.Admin)
     renderAt(routes.login)
 
-    expect(
-      await screen.findByRole('heading', { name: 'Panel de administración' }),
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Analíticas' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Historial' })).not.toBeInTheDocument()
   })
 })

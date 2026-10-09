@@ -5,7 +5,7 @@ import { testTools } from '@api/services/test-tools.js'
 import { Providers } from '@app/providers.jsx'
 import { queryClient } from '@app/query-client.js'
 import { AppRouter } from '@app/router.jsx'
-import { routes } from '@app/routes.js'
+import { ADMIN_INVENTORY_TABS, routes } from '@app/routes.js'
 import { SeedUser } from '@constants/enums.js'
 import { signInAs } from '@test/session.js'
 import { render, screen, waitFor, within } from '@testing-library/react'
@@ -67,7 +67,7 @@ describe('inventario', () => {
 
     // El inventario refleja el físico nuevo y sale del estado crítico.
     await waitFor(async () => {
-      const { items } = await adminInventoryService.listVariants({ line: 'Endurance' })
+      const { items } = await adminInventoryService.listVariants({ q: EMPTY_SKU })
       expect(items.find((item) => item.sku === EMPTY_SKU)).toMatchObject({
         quantity: 4,
         available: 4,
@@ -81,9 +81,9 @@ describe('inventario', () => {
 
     // Quedó el movimiento auditable con su motivo y autor.
     const movements = await adminInventoryService.listTransactions({
-      variantId: (
-        await adminInventoryService.listVariants({ line: 'Endurance' })
-      ).items.find((item) => item.sku === EMPTY_SKU).id,
+      variantId: (await adminInventoryService.listVariants({ q: EMPTY_SKU })).items.find(
+        (item) => item.sku === EMPTY_SKU,
+      ).id,
     })
     expect(movements.items).toHaveLength(1)
     expect(movements.items[0]).toMatchObject({
@@ -100,9 +100,30 @@ describe('inventario', () => {
     expect(catalog.meta.hasStock).toBe(true)
   })
 
+  it('pagina el inventario y busca por modelo', async () => {
+    const user = userEvent.setup()
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminInventory)
+
+    // La seed tiene más de cien variantes: la primera página trae veinte.
+    expect(await screen.findByText(/Mostrando 1–20 de \d+/)).toBeInTheDocument()
+    // El crítico de Endurance entra en esa página.
+    expect(await screen.findByText(EMPTY_SKU)).toBeInTheDocument()
+
+    // La segunda página corre el rango y ya no lo repite.
+    await user.click(screen.getByRole('button', { name: '2' }))
+    expect(await screen.findByText(/Mostrando 21–40 de \d+/)).toBeInTheDocument()
+    expect(screen.queryByText(EMPTY_SKU)).not.toBeInTheDocument()
+
+    // La búsqueda cruza el modelo y vuelve a la primera página.
+    await user.type(screen.getByLabelText('Buscar por SKU o modelo'), 'jammer')
+    expect((await screen.findAllByText(/^JAMMER-/)).length).toBeGreaterThan(0)
+    await waitFor(() => expect(screen.queryByText(EMPTY_SKU)).not.toBeInTheDocument())
+  })
+
   it('lista la auditoría de movimientos con motivo, dirección y autor', async () => {
     await signInAs(SeedUser.Admin)
-    renderAt(routes.adminMovements)
+    renderAt(routes.adminSales)
 
     expect(await screen.findByText('Movimientos de stock')).toBeInTheDocument()
     // Los 4 movimientos sembrados.
@@ -110,13 +131,21 @@ describe('inventario', () => {
     expect(screen.getAllByText('Vikinga Admin').length).toBeGreaterThan(0)
     expect(screen.getByText('4 movimientos')).toBeInTheDocument()
   })
+
+  it('la ruta vieja de movimientos cae en la pantalla de ventas', async () => {
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminMovements)
+
+    expect(await screen.findByText('Movimientos de stock')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Ventas' })).toBeInTheDocument()
+  })
 })
 
 describe('catálogo del panel', () => {
   it('crea un producto y lo da de baja sin borrarlo', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
-    renderAt(routes.adminProducts)
+    renderAt(routes.adminInventoryTab(ADMIN_INVENTORY_TABS.products))
 
     expect(await screen.findByText('endurance-classic')).toBeInTheDocument()
 
@@ -141,5 +170,13 @@ describe('catálogo del panel', () => {
     expect(await screen.findByText('Dado de baja')).toBeInTheDocument()
     // Sigue en el panel (no se borró).
     expect(screen.getByText('sunga-pro')).toBeInTheDocument()
+  })
+
+  it('la ruta vieja del catálogo abre su pestaña', async () => {
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminProducts)
+
+    expect(await screen.findByRole('heading', { name: 'Productos' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Nuevo producto' })).toBeInTheDocument()
   })
 })

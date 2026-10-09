@@ -10,8 +10,8 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 /*
-  Reportes del panel sobre el router y los providers reales: demanda no
-  satisfecha y comentarios del feedback.
+  Analíticas del panel sobre el router y los providers reales: los indicadores, la demanda
+  insatisfecha y los comentarios del feedback conviven en la misma pantalla.
 */
 
 function renderAt(path) {
@@ -24,8 +24,8 @@ function renderAt(path) {
   )
 }
 
-async function mainView() {
-  return within(await screen.findByRole('main'))
+async function section(name) {
+  return within(await screen.findByRole('region', { name }))
 }
 
 beforeEach(async () => {
@@ -34,29 +34,42 @@ beforeEach(async () => {
   await testTools.resetDatabase()
 })
 
-describe('demanda no satisfecha', () => {
-  it('dibuja el mapa por línea × talle y ofrece exportar', async () => {
+describe('analíticas', () => {
+  it('reúne los indicadores, la demanda insatisfecha y los comentarios', async () => {
     await signInAs(SeedUser.Admin)
-    renderAt(routes.adminMissingSizes)
-    const view = await mainView()
+    renderAt(routes.admin)
 
-    expect(await view.findByText(/\d+ consultas sin stock/)).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Analíticas' })).toBeInTheDocument()
+
+    const indicators = await section('Indicadores')
+    for (const title of [
+      'Conversión',
+      'Precisión del talle',
+      'Stock crítico',
+      'Ventas en vuelo',
+    ]) {
+      expect(indicators.getByText(title)).toBeInTheDocument()
+    }
+    expect(indicators.getByLabelText('Rango de fechas')).toBeInTheDocument()
+
+    const missing = await section('Talles faltantes')
+    expect(await missing.findByText(/\d+ consultas sin stock/)).toBeInTheDocument()
     // Endurance talle M no tiene stock en la seed: su línea aparece en el mapa.
-    expect(view.getByText('Endurance')).toBeInTheDocument()
+    expect(missing.getByText('Endurance')).toBeInTheDocument()
+    expect(missing.getByRole('button', { name: 'Exportar CSV' })).toBeEnabled()
+    expect(missing.getByRole('button', { name: 'Excel' })).toBeEnabled()
 
-    expect(view.getByRole('button', { name: 'Exportar CSV' })).toBeEnabled()
-    expect(view.getByRole('button', { name: 'Excel' })).toBeEnabled()
+    const comments = await section('Comentarios')
+    expect(await comments.findByText(/Perfecto en la cadera/)).toBeInTheDocument()
+    expect(comments.getByText(/\d+ comentarios/)).toBeInTheDocument()
+    expect(comments.getByRole('button', { name: 'Excel' })).toBeEnabled()
   })
-})
 
-describe('comentarios', () => {
-  it('lista los comentarios del feedback con su calificación', async () => {
+  it('las rutas viejas de los reportes caen en la pantalla unificada', async () => {
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminComments)
-    const view = await mainView()
 
-    expect(await view.findByText(/Perfecto en la cadera/)).toBeInTheDocument()
-    expect(view.getByText(/\d+ comentarios/)).toBeInTheDocument()
-    expect(view.getByRole('button', { name: 'Excel' })).toBeEnabled()
+    expect(await screen.findByRole('heading', { name: 'Analíticas' })).toBeInTheDocument()
+    expect(await screen.findByRole('region', { name: 'Comentarios' })).toBeInTheDocument()
   })
 })

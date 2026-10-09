@@ -13,6 +13,15 @@ const SURFACE_STYLE = {
 }
 
 /*
+  Tarjeta hundida dentro de una superficie: invierte el fondo para no apilar sombra sobre
+  sombra. Acepta el mismo encabezado que la superficie, sin franja.
+*/
+const INSET_STYLE = {
+  background: 'var(--vk-surface-inset-background)',
+  borderColor: 'var(--vk-surface-border)',
+}
+
+/*
   La franja va en un `Box`: `Card.Section` se sale de la card y el recorte le come el
   encabezado al radio de la esquina.
 */
@@ -37,32 +46,29 @@ export function SurfaceIcon({ icon: Icon, size = 22 }) {
   )
 }
 
-export function SurfaceCard({
+function hasHeader({ title, description, icon, rightSection, placeholderIcon }) {
+  return Boolean(title || description || icon || rightSection || placeholderIcon)
+}
+
+/*
+  Encabezado de una tarjeta: icono, título, descripción y un slot a la derecha. La fila wrapea y
+  el slot no se encoge: sin eso la badge se recorta a "E." en un teléfono.
+*/
+function CardHeader({
   title,
   description,
   icon: Icon,
-  titleSectionVariant = 'default',
   rightSection,
   placeholderIcon: PlaceholderIcon,
-  children,
-  ...cardProps
+  size,
 }) {
-  const isTop = titleSectionVariant === 'top'
-  const hasHeader = Boolean(
-    title || description || Icon || rightSection || PlaceholderIcon,
-  )
-
-  /*
-    La fila del encabezado wrapea y el slot de la derecha no se encoge: sin eso la badge se
-    recorta a "E." en un teléfono.
-  */
-  const header = (
+  return (
     <Group justify="space-between" align="flex-start" gap="md" wrap="wrap">
       <Group gap="sm" align="flex-start" wrap="nowrap">
         {Icon && <SurfaceIcon icon={Icon} />}
         <div>
           {title && (
-            <Text fw={600} size={isTop ? 'lg' : 'md'}>
+            <Text fw={600} size={size}>
               {title}
             </Text>
           )}
@@ -92,39 +98,59 @@ export function SurfaceCard({
       )}
     </Group>
   )
+}
+
+export function SurfaceCard({
+  title,
+  description,
+  icon,
+  titleSectionVariant = 'default',
+  rightSection,
+  placeholderIcon,
+  children,
+  ...cardProps
+}) {
+  const isTop = titleSectionVariant === 'top'
+  const header = { title, description, icon, rightSection, placeholderIcon }
+  const withHeader = hasHeader(header)
 
   return (
     <Card withBorder radius="lg" p={0} style={SURFACE_STYLE} {...cardProps}>
-      {isTop && hasHeader && (
+      {isTop && withHeader && (
         <Box p="lg" style={HEADER_STYLE}>
-          {header}
+          <CardHeader {...header} size="lg" />
         </Box>
       )}
 
       <Box p="lg">
-        {!isTop && hasHeader && <Box mb="md">{header}</Box>}
+        {!isTop && withHeader && (
+          <Box mb="md">
+            <CardHeader {...header} size="md" />
+          </Box>
+        )}
         {children}
       </Box>
     </Card>
   )
 }
 
-/*
-  Tarjeta hundida dentro de una superficie: invierte el fondo para no apilar sombra sobre
-  sombra.
-*/
-export function InsetCard({ children, ...cardProps }) {
+export function InsetCard({
+  title,
+  description,
+  icon,
+  rightSection,
+  children,
+  ...cardProps
+}) {
+  const header = { title, description, icon, rightSection }
+
   return (
-    <Card
-      withBorder
-      radius="md"
-      p="md"
-      style={{
-        background: 'var(--vk-surface-inset-background)',
-        borderColor: 'var(--vk-surface-border)',
-      }}
-      {...cardProps}
-    >
+    <Card withBorder radius="md" p="md" style={INSET_STYLE} {...cardProps}>
+      {hasHeader(header) && (
+        <Box mb="md">
+          <CardHeader {...header} size="md" />
+        </Box>
+      )}
       {children}
     </Card>
   )

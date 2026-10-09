@@ -1,12 +1,14 @@
 import { DateTime } from '@components/date-time.jsx'
 import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
-import { PageHeader } from '@components/page-header.jsx'
+import { Pagination } from '@components/pagination.jsx'
 import { ResponsiveList } from '@components/responsive-list.jsx'
+import { SurfaceCard } from '@components/surface-card.jsx'
 import { colorLabel } from '@constants/colors.js'
 import { useMovements } from '@features/admin/inventory/hooks/use-inventory.js'
+import { usePagination } from '@hooks/use-pagination.js'
 import { useI18n } from '@i18n/context.js'
-import { Badge, Container, Group, Select, Stack, Text } from '@mantine/core'
+import { Badge, Group, Select, Stack, Text } from '@mantine/core'
 import { IconHistory } from '@tabler/icons-react'
 import { useState } from 'react'
 
@@ -30,19 +32,22 @@ function linesLabel(lines) {
 }
 
 /*
-  Auditoría de movimientos de stock: quién, cuándo, por qué y sobre
-  qué variante. `SaleConfirmed` se registra solo al confirmar una venta.
+  Auditoría de movimientos de stock: quién, cuándo, por qué y sobre qué variante. `SaleConfirmed`
+  se registra solo al confirmar una venta.
 */
-export function MovementsPage() {
+export function MovementsBody() {
   const { t } = useI18n()
   const [reason, setReason] = useState(ALL)
+  const { page, pageSize, setPage, setPageSize, resetPage } = usePagination()
 
   const query = useMovements({
     reason: reason === ALL ? null : reason,
-    pageSize: 100,
+    page,
+    pageSize,
   })
 
   const items = query.data?.items ?? []
+  const total = query.data?.meta?.total ?? 0
 
   const columns = [
     {
@@ -95,12 +100,12 @@ export function MovementsPage() {
   ]
 
   return (
-    <Container size="xl" py="xl">
-      <PageHeader
-        title={t('admin.movements.title')}
-        subtitle={t('admin.movements.subtitle')}
-      />
-
+    <SurfaceCard
+      titleSectionVariant="top"
+      icon={IconHistory}
+      title={t('admin.movements.title')}
+      description={t('admin.movements.subtitle')}
+    >
       <Stack gap="md">
         <Group justify="space-between" gap="sm" wrap="wrap">
           <Select
@@ -112,14 +117,17 @@ export function MovementsPage() {
               })),
             ]}
             value={reason}
-            onChange={(value) => setReason(value ?? ALL)}
+            onChange={(value) => {
+              setReason(value ?? ALL)
+              resetPage()
+            }}
             allowDeselect={false}
             w={220}
             aria-label={t('admin.movements.filter.reason')}
           />
           {query.data && (
             <Text size="sm" c="dimmed">
-              {t('admin.movements.results', { count: query.data.meta.total })}
+              {t('admin.movements.results', { count: total })}
             </Text>
           )}
         </Group>
@@ -152,7 +160,15 @@ export function MovementsPage() {
               />
             ))}
         </QueryBoundary>
+
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
       </Stack>
-    </Container>
+    </SurfaceCard>
   )
 }
