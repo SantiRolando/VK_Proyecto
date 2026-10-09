@@ -9,8 +9,8 @@ const apiMode = import.meta.env.VITE_API_MODE ?? 'mock'
 export const env = {
   isMock: apiMode === 'mock',
   isHybrid: apiMode === 'hybrid',
-  // Ayudas de desarrollo (cuentas demo, pista del código OTP): nunca en un build.
-  showDevHints: Boolean(import.meta.env.DEV) && apiMode !== 'http',
+  // Ayudas de desarrollo (cuentas demo, pista del código OTP): visibles en cualquier build.
+  showDevHints: true,
   // Prefijo que el dev server reenvía al backend (ver `vite.config.js`).
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '/api',
   // Latencia simulada (`min-max`, en ms) y probabilidad de fallo de cada respuesta.
