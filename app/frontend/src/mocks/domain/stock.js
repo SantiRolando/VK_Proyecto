@@ -47,3 +47,35 @@ export function isCriticalStock(db, variant) {
 export function listCriticalVariants(db) {
   return db.productVariants.filter((variant) => isCriticalStock(db, variant))
 }
+
+/*
+  Fila de inventario de una variante: el físico, lo reservado, el disponible y el mínimo, con el
+  producto y el talle. Es la forma que devuelve `/admin/stock/inventory`.
+*/
+export function inventoryRow(db, variant) {
+  const product = db.products.find((item) => item.id === variant.productId) ?? null
+  const size = db.sizes.find((item) => item.id === variant.sizeId) ?? null
+  const available = availableQuantity(db, variant.id)
+
+  return {
+    id: variant.id,
+    sku: variant.sku,
+    color: variant.color,
+    active: variant.active !== false,
+    quantity: variant.quantity,
+    reserved: reservedQuantity(db, variant.id),
+    available,
+    minStock: variant.minStock,
+    deficit: Math.max(0, variant.minStock - available),
+    isCritical: available < variant.minStock,
+    product: product
+      ? {
+          id: product.id,
+          line: product.line,
+          audience: product.audience,
+          model: product.model,
+        }
+      : null,
+    size: size ? { id: size.id, code: size.code, sortOrder: size.sortOrder } : null,
+  }
+}

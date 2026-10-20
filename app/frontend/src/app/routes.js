@@ -4,7 +4,11 @@
 */
 
 // Las pestañas del panel viven en la query: estos son los valores de `?tab=`.
-export const ADMIN_INVENTORY_TABS = { inventory: 'inventory', products: 'products' }
+export const ADMIN_INVENTORY_TABS = {
+  inventory: 'inventory',
+  alerts: 'alerts',
+  products: 'products',
+}
 
 const ADMIN_SALES_PATH = '/admin/sales'
 const ADMIN_INVENTORY_PATH = '/admin/inventory'

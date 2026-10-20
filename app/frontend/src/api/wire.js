@@ -5,6 +5,8 @@
 */
 
 import {
+  AlertStatus,
+  AlertType,
   Audience,
   FitType,
   FitWarning,
@@ -13,6 +15,8 @@ import {
   Line,
   Rating,
   ReferralReason,
+  StockDirection,
+  StockReason,
   UserType,
 } from '@constants/enums.js'
 
@@ -41,6 +45,10 @@ export const ratingCodec = codec(Rating)
 export const outcomeCodec = codec(GenerationOutcome)
 export const warningCodec = codec(FitWarning)
 export const referralCodec = codec(ReferralReason)
+export const reasonCodec = codec(StockReason)
+export const directionCodec = codec(StockDirection)
+export const alertStatusCodec = codec(AlertStatus)
+export const alertTypeCodec = codec(AlertType)
 
 /*
   Paginación del backend: el envelope `{ items, page, size, totalElements, totalPages }` se

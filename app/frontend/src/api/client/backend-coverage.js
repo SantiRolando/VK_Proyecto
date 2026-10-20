@@ -1,7 +1,7 @@
 /*
   Rutas que ya implementa la API real: en modo `hybrid` estas van al backend y el resto al
-  mock. A medida que el backend suma módulos (stock, ventas, cupones, puntos, analítica) se
-  agregan acá y se borran del mock.
+  mock. A medida que el backend suma módulos (ventas, cupones, puntos, analítica) se agregan
+  acá y se borran del mock.
 */
 
 const COVERED = [
@@ -15,6 +15,10 @@ const COVERED = [
   ['*', /^\/profiles(\/\d+(\/default)?)?$/],
   ['*', /^\/addresses(\/\d+(\/default)?)?$/],
   ['*', /^\/admin\/catalog\/products(\/.*)?$/],
+  ['GET', /^\/admin\/stock\/(inventory|transactions(\/\d+)?)$/],
+  ['POST', /^\/admin\/stock\/transactions$/],
+  ['GET', /^\/admin\/stock\/alerts$/],
+  ['PATCH', /^\/admin\/stock\/alerts\/\d+\/notify$/],
 ]
 
 export function isBackendRoute(method, url) {

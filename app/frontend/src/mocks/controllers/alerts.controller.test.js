@@ -52,10 +52,11 @@ describe('avisos de reposición', () => {
   })
 
   it('el grupo pasa a notificado cuando se repone la variante', async () => {
-    await call('POST', '/admin/stock-transactions', {
+    await call('POST', '/admin/stock/transactions', {
       auth: ADMIN,
       body: {
-        reason: 'GoodsReceipt',
+        reason: 'GOODS_RECEIPT',
+        direction: 'INBOUND',
         lines: [{ variantId: navyVariant().id, quantity: 2 }],
       },
     })

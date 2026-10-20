@@ -1,4 +1,5 @@
 import { adminInventoryService } from '@api/services/admin-inventory-service.js'
+import { adminStockAlertsService } from '@api/services/admin-stock-alerts-service.js'
 import { catalogService } from '@api/services/catalog-service.js'
 import { sizeService } from '@api/services/size-service.js'
 import { testTools } from '@api/services/test-tools.js'
@@ -14,8 +15,8 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 /*
-  Inventario y catálogo sobre el router y los providers reales: ajuste de stock con motivo
-  (auditado) y CRUD del catálogo del panel.
+  Inventario, alertas y catálogo sobre el router y los providers reales: ajuste de stock con
+  motivo (auditado), alertas de crítico, movimientos y CRUD del catálogo del panel.
 */
 
 // Endurance talle M no tiene stock en ningún color en la seed.
@@ -31,8 +32,14 @@ function renderAt(path) {
   )
 }
 
+// La fila del SKU: en inventario la celda arranca con él; en alertas va con modelo y talle.
 async function rowOf(sku) {
-  return (await screen.findByText(sku)).closest('tr')
+  return (await screen.findByText(sku, { exact: false })).closest('tr')
+}
+
+async function inventoryRow(sku) {
+  const { items } = await adminInventoryService.listInventory({ pageSize: 100 })
+  return items.find((item) => item.sku === sku)
 }
 
 beforeEach(async () => {
@@ -42,7 +49,7 @@ beforeEach(async () => {
 })
 
 describe('inventario', () => {
-  it('ajusta el stock con motivo, deja el movimiento auditado y el catálogo lo refleja', async () => {
+  it('ajusta el stock con motivo y nota, deja el movimiento auditado y el catálogo lo refleja', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminInventory)
@@ -63,34 +70,29 @@ describe('inventario', () => {
     const quantity = within(modal).getByLabelText(/Cantidad/)
     await user.clear(quantity)
     await user.type(quantity, '4')
+    await user.type(within(modal).getByLabelText(/Nota/), 'Recepción de mercadería')
     await user.click(within(modal).getByRole('button', { name: 'Registrar movimiento' }))
 
     // El inventario refleja el físico nuevo y sale del estado crítico.
     await waitFor(async () => {
-      const { items } = await adminInventoryService.listVariants({ q: EMPTY_SKU })
-      expect(items.find((item) => item.sku === EMPTY_SKU)).toMatchObject({
-        quantity: 4,
-        available: 4,
-        isCritical: false,
-      })
+      const variant = await inventoryRow(EMPTY_SKU)
+      expect(variant).toMatchObject({ quantity: 4, available: 4, isCritical: false })
     })
     await waitFor(async () => {
       const updated = await rowOf(EMPTY_SKU)
       expect(within(updated).queryByText('Crítico')).not.toBeInTheDocument()
     })
 
-    // Quedó el movimiento auditable con su motivo y autor.
-    const movements = await adminInventoryService.listTransactions({
-      variantId: (await adminInventoryService.listVariants({ q: EMPTY_SKU })).items.find(
-        (item) => item.sku === EMPTY_SKU,
-      ).id,
-    })
-    expect(movements.items).toHaveLength(1)
+    // Quedó el movimiento auditable con su motivo, su nota y sus líneas.
+    const movements = await adminInventoryService.listTransactions({})
+    expect(movements.items).toHaveLength(5)
     expect(movements.items[0]).toMatchObject({
       reason: 'GoodsReceipt',
       direction: 'Inbound',
-      user: { name: 'Vikinga Admin' },
+      note: 'Recepción de mercadería',
     })
+    const detail = await adminInventoryService.getTransaction(movements.items[0].id)
+    expect(detail.lines).toHaveLength(1)
 
     // El catálogo del cliente ya ofrece el talle M de Endurance.
     const size = (await sizeService.getSizes({ line: 'Endurance' })).find(
@@ -100,36 +102,122 @@ describe('inventario', () => {
     expect(catalog.meta.hasStock).toBe(true)
   })
 
-  it('pagina el inventario y busca por modelo', async () => {
+  it('no deja sacar más de lo disponible', async () => {
     const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminInventory)
 
-    // La seed tiene más de cien variantes: la primera página trae veinte.
-    expect(await screen.findByText(/Mostrando 1–20 de \d+/)).toBeInTheDocument()
-    // El crítico de Endurance entra en esa página.
-    expect(await screen.findByText(EMPTY_SKU)).toBeInTheDocument()
+    const row = await rowOf(EMPTY_SKU)
+    await user.click(within(row).getByRole('button', { name: 'Ajustar stock' }))
+    const modal = await screen.findByRole('dialog', { name: 'Ajustar stock' })
 
-    // La segunda página corre el rango y ya no lo repite.
-    await user.click(screen.getByRole('button', { name: '2' }))
-    expect(await screen.findByText(/Mostrando 21–40 de \d+/)).toBeInTheDocument()
-    expect(screen.queryByText(EMPTY_SKU)).not.toBeInTheDocument()
+    await user.click(
+      await within(modal).findByRole('radio', { name: 'Pérdida / defectuoso' }),
+    )
+    const quantity = within(modal).getByLabelText(/Cantidad/)
+    await user.clear(quantity)
+    await user.type(quantity, '1')
+    await user.click(within(modal).getByRole('button', { name: 'Registrar movimiento' }))
 
-    // La búsqueda cruza el modelo y vuelve a la primera página.
-    await user.type(screen.getByLabelText('Buscar por SKU o modelo'), 'jammer')
-    expect((await screen.findAllByText(/^JAMMER-/)).length).toBeGreaterThan(0)
-    await waitFor(() => expect(screen.queryByText(EMPTY_SKU)).not.toBeInTheDocument())
+    // El disponible es 0: la salida se rechaza con el número a la vista.
+    expect(
+      await within(modal).findByText('No hay disponible suficiente: el disponible es 0.'),
+    ).toBeInTheDocument()
+    expect(await inventoryRow(EMPTY_SKU)).toMatchObject({ quantity: 0 })
   })
 
-  it('lista la auditoría de movimientos con motivo, dirección y autor', async () => {
+  it('pagina el inventario', async () => {
+    const user = userEvent.setup()
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminInventory)
+
+    expect(await screen.findByText(/Mostrando 1–20 de \d+/)).toBeInTheDocument()
+    expect(await screen.findByText(EMPTY_SKU)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '2' }))
+    expect(await screen.findByText(/Mostrando 21–40 de \d+/)).toBeInTheDocument()
+  })
+
+  it('filtra por las variantes bajo el mínimo', async () => {
+    const user = userEvent.setup()
+    await signInAs(SeedUser.Admin)
+    renderAt(routes.adminInventory)
+
+    const before = await screen.findByText(/Mostrando 1–20 de \d+/)
+    expect(before).toBeInTheDocument()
+
+    await user.click(screen.getByLabelText('Solo bajo mínimo'))
+    expect(await screen.findByText(EMPTY_SKU)).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByText(/Mostrando 1–20 de \d+/)).not.toBeInTheDocument(),
+    )
+  })
+})
+
+describe('alertas de stock crítico', () => {
+  it('marca una alerta como notificada y la saca de las pendientes', async () => {
+    const user = userEvent.setup()
+    await signInAs(SeedUser.Admin)
+
+    // La primera alerta de crítico de la seed, con su SKU resuelto contra el inventario.
+    const alerts = await adminStockAlertsService.list({ status: 'Active' })
+    const target = alerts.items.find((alert) => alert.alertType === 'CriticalStock')
+    const { items } = await adminInventoryService.listInventory({
+      onlyBelowMin: true,
+      pageSize: 100,
+    })
+    const sku = items.find((item) => item.id === target.variantId).sku
+
+    renderAt(routes.adminInventoryTab(ADMIN_INVENTORY_TABS.alerts))
+
+    const row = await rowOf(sku)
+    expect(within(row).getByText('Activa')).toBeInTheDocument()
+
+    await user.click(within(row).getByRole('button', { name: 'Marcar notificada' }))
+
+    await waitFor(() =>
+      expect(screen.queryByText(sku, { exact: false })).not.toBeInTheDocument(),
+    )
+
+    // La alerta quedó notificada del lado del endpoint.
+    const notified = await adminStockAlertsService.list({ status: 'Notified' })
+    expect(notified.items).toContainEqual(
+      expect.objectContaining({
+        id: target.id,
+        status: 'Notified',
+        notifiedAt: expect.any(String),
+      }),
+    )
+  })
+
+  it('no cuenta los avisos de reposición del cliente', async () => {
+    await signInAs(SeedUser.Admin)
+
+    const alerts = await adminStockAlertsService.list({ status: 'Active' })
+    const critical = alerts.items.filter((alert) => alert.alertType === 'CriticalStock')
+    expect(critical.length).toBeLessThan(alerts.items.length)
+
+    renderAt(routes.adminInventoryTab(ADMIN_INVENTORY_TABS.alerts))
+
+    expect(await screen.findByText(`${critical.length} alertas`)).toBeInTheDocument()
+  })
+})
+
+describe('movimientos', () => {
+  it('lista la auditoría y abre el detalle con sus líneas', async () => {
+    const user = userEvent.setup()
     await signInAs(SeedUser.Admin)
     renderAt(routes.adminSales)
 
     expect(await screen.findByText('Movimientos de stock')).toBeInTheDocument()
-    // Los 4 movimientos sembrados.
     expect((await screen.findAllByText('Entrada')).length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Vikinga Admin').length).toBeGreaterThan(0)
     expect(screen.getByText('4 movimientos')).toBeInTheDocument()
+
+    await user.click(screen.getAllByRole('button', { name: 'Ver detalle' })[0])
+
+    const detail = await screen.findByRole('dialog', { name: 'Detalle del movimiento' })
+    expect(within(detail).getByText('Usuario #1')).toBeInTheDocument()
+    expect(within(detail).getByText('Cantidad')).toBeInTheDocument()
   })
 
   it('la ruta vieja de movimientos cae en la pantalla de ventas', async () => {

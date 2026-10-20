@@ -17,6 +17,8 @@ export function useUpdateSaleStatus() {
       queryClient.invalidateQueries({ queryKey: ['catalog'] })
       queryClient.invalidateQueries({ queryKey: ['catalog-product'] })
       queryClient.invalidateQueries({ queryKey: ['admin', 'inventory'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'variant-index'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] })
     },
   })
 }

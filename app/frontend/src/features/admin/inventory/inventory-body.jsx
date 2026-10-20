@@ -3,27 +3,13 @@ import { EmptyState } from '@components/feedback/empty-state.jsx'
 import { QueryBoundary } from '@components/feedback/query-boundary.jsx'
 import { Pagination } from '@components/pagination.jsx'
 import { ResponsiveList } from '@components/responsive-list.jsx'
-import { Line } from '@constants/enums.js'
 import { AdjustModal } from '@features/admin/inventory/adjust-modal.jsx'
 import { useInventory } from '@features/admin/inventory/hooks/use-inventory.js'
 import { usePagination } from '@hooks/use-pagination.js'
 import { useI18n } from '@i18n/context.js'
-import {
-  Badge,
-  Button,
-  Group,
-  Select,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-} from '@mantine/core'
-import { useDebouncedValue } from '@mantine/hooks'
-import { IconAlertTriangle, IconBox, IconPlus, IconSearch } from '@tabler/icons-react'
+import { Badge, Button, Group, Stack, Switch, Text } from '@mantine/core'
+import { IconAlertTriangle, IconBox, IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
-
-const ALL = 'all'
-const LINES = Object.values(Line)
 
 /*
   Inventario por variante: físico / reservado / disponible, alerta de stock crítico y ajuste
@@ -31,17 +17,12 @@ const LINES = Object.values(Line)
 */
 export function InventoryBody() {
   const { t } = useI18n()
-  const [search, setSearch] = useState('')
-  const [line, setLine] = useState(ALL)
   const [lowStock, setLowStock] = useState(false)
   const [adjusting, setAdjusting] = useState(null)
   const { page, pageSize, setPage, setPageSize, resetPage } = usePagination()
-  const [debouncedSearch] = useDebouncedValue(search, 300)
 
   const query = useInventory({
-    q: debouncedSearch.trim() || null,
-    line: line === ALL ? null : line,
-    lowStock: lowStock ? 'true' : null,
+    onlyBelowMin: lowStock ? true : null,
     page,
     pageSize,
   })
@@ -138,44 +119,14 @@ export function InventoryBody() {
   return (
     <Stack gap="md">
       <Group justify="space-between" gap="sm" wrap="wrap">
-        <Group gap="sm" wrap="wrap">
-          <TextInput
-            value={search}
-            onChange={(event) => {
-              setSearch(event.currentTarget.value)
-              resetPage()
-            }}
-            placeholder={t('admin.inventory.filter.search')}
-            leftSection={<IconSearch size={16} />}
-            w={240}
-            aria-label={t('admin.inventory.filter.search')}
-          />
-          <Select
-            data={[
-              { value: ALL, label: t('admin.inventory.filter.allLines') },
-              ...LINES.map((value) => ({
-                value,
-                label: t(`enums.line.${value}`),
-              })),
-            ]}
-            value={line}
-            onChange={(value) => {
-              setLine(value ?? ALL)
-              resetPage()
-            }}
-            allowDeselect={false}
-            w={200}
-            aria-label={t('admin.inventory.filter.line')}
-          />
-          <Switch
-            label={t('admin.inventory.filter.lowStock')}
-            checked={lowStock}
-            onChange={(event) => {
-              setLowStock(event.currentTarget.checked)
-              resetPage()
-            }}
-          />
-        </Group>
+        <Switch
+          label={t('admin.inventory.filter.lowStock')}
+          checked={lowStock}
+          onChange={(event) => {
+            setLowStock(event.currentTarget.checked)
+            resetPage()
+          }}
+        />
 
         {query.data && (
           <Text size="sm" c="dimmed">

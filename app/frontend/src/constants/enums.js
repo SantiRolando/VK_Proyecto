@@ -57,6 +57,34 @@ export const ReferralReason = {
   AgeOutsideTable: 'AgeOutsideTable',
 }
 
+/*
+  Movimiento de stock: `SaleConfirmed` lo escribe la confirmación de venta, no el ajuste manual
+  del panel.
+*/
+export const StockReason = {
+  GoodsReceipt: 'GoodsReceipt',
+  SizeExchange: 'SizeExchange',
+  LossDefective: 'LossDefective',
+  ManualAdjustment: 'ManualAdjustment',
+  SaleConfirmed: 'SaleConfirmed',
+}
+
+export const StockDirection = {
+  Inbound: 'Inbound',
+  Outbound: 'Outbound',
+}
+
+export const AlertStatus = {
+  Active: 'Active',
+  Notified: 'Notified',
+  Closed: 'Closed',
+}
+
+export const AlertType = {
+  CriticalStock: 'CriticalStock',
+  RestockNotice: 'RestockNotice',
+}
+
 export const Rating = {
   Small: 'Small',
   Correct: 'Correct',

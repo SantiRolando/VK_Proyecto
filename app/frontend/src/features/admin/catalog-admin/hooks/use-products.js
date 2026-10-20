@@ -14,6 +14,8 @@ function useCatalogMutation(mutationFn) {
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
       queryClient.invalidateQueries({ queryKey: ['admin', 'product'] })
       queryClient.invalidateQueries({ queryKey: ['admin', 'variants'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'inventory'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'variant-index'] })
       queryClient.invalidateQueries({ queryKey: ['catalog'] })
       queryClient.invalidateQueries({ queryKey: ['catalog-product'] })
     },

@@ -3,10 +3,9 @@
   precisión del talle (compró vs. solo consultó) y stock crítico.
 */
 
-import { serializeInventoryVariant } from '@mocks/controllers/admin-variants.controller.js'
 import { getDb } from '@mocks/db/database.js'
 import { inRange, rangeFromQuery } from '@mocks/domain/date-range.js'
-import { listCriticalVariants } from '@mocks/domain/stock.js'
+import { inventoryRow, listCriticalVariants } from '@mocks/domain/stock.js'
 import { register } from '@mocks/router/mock-router.js'
 
 /*
@@ -22,11 +21,10 @@ function purchasedGenerationIds(db) {
 }
 
 /*
-  El serializador de inventario vive en `admin-variants`: el bloque de stock crítico del
-  dashboard reusa el mismo DTO.
+  El bloque de stock crítico del dashboard reusa la fila de inventario.
 */
 function serializeCriticalVariant(db, variant) {
-  return serializeInventoryVariant(db, variant)
+  return inventoryRow(db, variant)
 }
 
 register(

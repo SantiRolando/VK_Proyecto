@@ -1,49 +1,80 @@
 import { ErrorState } from '@components/feedback/error-state.jsx'
+import { StockDirection } from '@constants/enums.js'
+import { useAdjustStock } from '@features/admin/inventory/hooks/use-inventory.js'
 import {
-  useAdjustStock,
-  useStockReasons,
-} from '@features/admin/inventory/hooks/use-inventory.js'
+  fixedDirection,
+  MANUAL_REASONS,
+} from '@features/admin/inventory/stock-reasons.js'
 import { useI18n } from '@i18n/context.js'
-import { Button, Group, Modal, NumberInput, Radio, Stack, Text } from '@mantine/core'
+import {
+  Alert,
+  Button,
+  Group,
+  Modal,
+  NumberInput,
+  Radio,
+  Stack,
+  Text,
+  Textarea,
+} from '@mantine/core'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useState } from 'react'
 
+const NOTE_MAX_LENGTH = 300
+
 /*
-  Ajuste de una variante: el motivo es obligatorio; la dirección la impone el motivo para los
-  motivos que la fijan (el mock lo informa) y el resto la elige el admin. El físico cambia solo
-  por acá, así todo ajuste queda auditado.
+  Ajuste de una variante: el motivo es obligatorio y algunos motivos fijan la dirección. El
+  físico cambia solo por acá, así todo ajuste queda auditado.
 */
 export function AdjustModal({ variant, opened, onClose }) {
   const { t } = useI18n()
-  const reasons = useStockReasons()
   const adjust = useAdjustStock()
 
   const [reason, setReason] = useState(null)
-  const [direction, setDirection] = useState('Inbound')
+  const [direction, setDirection] = useState(StockDirection.Inbound)
   const [quantity, setQuantity] = useState(1)
+  const [note, setNote] = useState('')
   const [error, setError] = useState(null)
+  const [insufficient, setInsufficient] = useState(false)
 
-  const selected = reasons.data?.find((item) => item.value === reason)
-  const fixedDirection = selected?.direction ?? null
   const open = opened && variant !== null
+  const selectedDirection = fixedDirection(reason) ?? direction
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (!reason) return
 
+    /*
+      La salida descuenta del disponible, que es el físico menos lo reservado por ventas
+      abiertas: se comprueba acá para decirlo con el número que el admin está mirando.
+    */
+    if (
+      selectedDirection === StockDirection.Outbound &&
+      Number(quantity) > variant.available
+    ) {
+      setInsufficient(true)
+      return
+    }
+
+    setInsufficient(false)
     setError(null)
     try {
       await adjust.mutateAsync({
         reason,
-        direction: fixedDirection ?? direction,
+        direction: selectedDirection,
+        note,
         lines: [{ variantId: variant.id, quantity: Number(quantity) }],
       })
       setReason(null)
       setQuantity(1)
+      setNote('')
       onClose()
     } catch (adjustError) {
       setError(adjustError)
     }
   }
+
+  const conflict = insufficient || error?.status === 409
 
   return (
     <Modal
@@ -72,20 +103,20 @@ export function AdjustModal({ variant, opened, onClose }) {
               withAsterisk
             >
               <Stack gap={6} mt="xs">
-                {(reasons.data ?? []).map((item) => (
+                {MANUAL_REASONS.map((value) => (
                   <Radio
-                    key={item.value}
-                    value={item.value}
-                    label={t(`enums.transactionReason.${item.value}`)}
+                    key={value}
+                    value={value}
+                    label={t(`enums.transactionReason.${value}`)}
                   />
                 ))}
               </Stack>
             </Radio.Group>
 
-            {fixedDirection ? (
+            {fixedDirection(reason) ? (
               <Text size="sm" c="dimmed">
                 {t('admin.inventory.directionFixed', {
-                  direction: t(`enums.transactionDirection.${fixedDirection}`),
+                  direction: t(`enums.transactionDirection.${selectedDirection}`),
                 })}
               </Text>
             ) : (
@@ -95,7 +126,7 @@ export function AdjustModal({ variant, opened, onClose }) {
                 onChange={setDirection}
               >
                 <Group gap="lg" mt="xs">
-                  {['Inbound', 'Outbound'].map((value) => (
+                  {Object.values(StockDirection).map((value) => (
                     <Radio
                       key={value}
                       value={value}
@@ -115,7 +146,31 @@ export function AdjustModal({ variant, opened, onClose }) {
               required
             />
 
-            {error && <ErrorState error={error} onRetry={() => setError(null)} />}
+            <Textarea
+              label={t('admin.inventory.note')}
+              value={note}
+              onChange={(event) => setNote(event.currentTarget.value)}
+              placeholder={t('admin.inventory.notePlaceholder')}
+              maxLength={NOTE_MAX_LENGTH}
+              rows={2}
+            />
+
+            {conflict && (
+              <Alert
+                variant="light"
+                color="red"
+                title={t('common.error')}
+                icon={<IconAlertCircle size={18} />}
+              >
+                <Text size="sm">
+                  {t('admin.inventory.insufficient', { count: variant.available })}
+                </Text>
+              </Alert>
+            )}
+
+            {!conflict && error && (
+              <ErrorState error={error} onRetry={() => setError(null)} />
+            )}
 
             <Group justify="flex-end">
               <Button variant="default" type="button" onClick={onClose}>
